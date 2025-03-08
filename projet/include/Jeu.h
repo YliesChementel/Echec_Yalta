@@ -8,10 +8,14 @@ public:
     Jeu();
     void ChangerTourJoueur();
     void VerifStatutJoueur();
+    void InitListePiece(Joueur& joueur, int camp);
+    ~Jeu();
 
 private:
     Joueur* ListeJoueur;
     bool etatDeParti;
+    int tourJoueur;
+    Plateau plateau;
 };
 
 

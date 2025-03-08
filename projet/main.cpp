@@ -1,8 +1,6 @@
-#include "Plateau.h"
+#include "Jeu.h"
 
 int main() {
-    Plateau plateau;
-    plateau.InitMatrice();
-    plateau.AffichageMatrice();
+    Jeu jeu;
     return 0;
 }

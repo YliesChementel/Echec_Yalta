@@ -6,10 +6,13 @@ class Joueur {
 public:
     Joueur();
     void JouerUnCoup(Piece piece, int coup);
+    Piece* getListePiece();
+    void setListePiece(Piece* listePiece);
+    ~Joueur();
 
 private:
     bool statut;
-    Piece listePiece[];
+    Piece* listePiece;
 };
 
 

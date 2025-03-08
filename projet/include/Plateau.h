@@ -6,11 +6,12 @@ class Plateau {
 public:
     Plateau();
     void InitMatrice();
-    void UpdateMatrice(Piece piece, int coup);
+    void PlacerPiece(Piece* ListePiece1, Piece* ListePiece2, Piece* ListePiece3);
+    void UpdateMatrice(Piece* piece, int coupX, int coupY);
     void AffichageMatrice();
 
 private:
-    Piece matrice[12][12];
+    Piece* matrice[12][12];
 };
 
 
