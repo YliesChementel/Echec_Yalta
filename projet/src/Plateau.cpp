@@ -20,7 +20,7 @@ void Plateau::PlacerPiece(Piece* ListePiece1, Piece* ListePiece2, Piece* ListePi
         for (int j = 0; j < 12; ++j) {
             if (i < 2 && j < 8 && index1 < 16) {
                 matrice[i][j] = &ListePiece1[index1++];
-            } else if (((i < 8 && i > 5 && j < 4) || (i > 3 && i < 6 && j > 7)) && index2 < 16) {
+            } else if (((i < 8 && i > 5 && j < 4) || (i < 8 && i > 5 && j > 7)) && index2 < 16) {
                 matrice[i][j] = &ListePiece2[index2++];
             } else if (i > 9 && j > 3 && index3 < 16) {
                 matrice[i][j] = &ListePiece3[index3++];
@@ -47,6 +47,37 @@ void Plateau::AffichageMatrice() {
 
 
 
-void Plateau::UpdateMatrice(Piece* piece, int coupX, int coupY){
-    matrice[coupX][coupY]=piece;
+bool Plateau::DeplacerPiece(int xOrigine, int yOrigine, int xCoup, int yCoup) {
+    if (matrice[xOrigine][yOrigine] == nullptr) { //verif si la pièce est présente
+        std::cout << "Aucune pièce à cette position" << std::endl;
+        return false;
+    }
+
+    if (xCoup < 0 || xCoup >= 12 || yCoup < 0 || yCoup >= 12) {//Bord du plateau
+        std::cout << "Déplacement hors limites" << std::endl;
+        return false;
+    }
+
+    if ((xCoup < 4 && yCoup > 7) || (xCoup >7 && yCoup < 4)) {// Case non existante du plateau yalta
+        std::cout << "Déplacement hors limites" << std::endl;
+        return false;
+    }
+
+    if((xCoup >3 && xCoup < 8) || (yCoup > 3 && yCoup < 8)){// Case non existante du plateau yalta (milieu)
+        std::cout << "Déplacement hors limites" << std::endl;
+        return false;
+    }
+
+    if (matrice[xCoup][yCoup] != nullptr) {
+        std::cout << "Capture" << std::endl;
+        // gérer la capture ici
+    }
+
+    matrice[xCoup][yCoup] = matrice[xOrigine][yOrigine];
+    matrice[xOrigine][yOrigine] = nullptr;
+
+    std::cout << "Pièce déplacée de (" << xOrigine << "," << yOrigine 
+              << ") vers (" << xCoup << "," << yCoup << ")" << std::endl;
+    
+    return true;
 }

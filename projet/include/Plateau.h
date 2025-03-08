@@ -7,7 +7,7 @@ public:
     Plateau();
     void InitMatrice();
     void PlacerPiece(Piece* ListePiece1, Piece* ListePiece2, Piece* ListePiece3);
-    void UpdateMatrice(Piece* piece, int coupX, int coupY);
+    bool DeplacerPiece(int xOrigine, int yOrigine, int xCoup, int yCoup);
     void AffichageMatrice();
 
 private:

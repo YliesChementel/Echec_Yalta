@@ -9,7 +9,6 @@ public:
     void ChangerTourJoueur();
     void VerifStatutJoueur();
     void InitListePiece(Joueur& joueur, int camp);
-    ~Jeu();
 
 private:
     Joueur* ListeJoueur;

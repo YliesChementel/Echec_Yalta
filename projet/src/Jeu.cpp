@@ -12,8 +12,18 @@ Jeu::Jeu(){
     }
     plateau.PlacerPiece(ListeJoueur[0].getListePiece(), ListeJoueur[1].getListePiece(), ListeJoueur[2].getListePiece());
     plateau.AffichageMatrice();
+    std::cout << std::endl;
+    plateau.DeplacerPiece(1,0,3,0);
+    plateau.AffichageMatrice();
 }
 
+void Jeu::InitListePiece(Joueur& joueur, int camp) {
+    Piece* liste = new Piece[16];
+    for (int i = 0; i < 16; i++) {
+        liste[i] = Piece(camp);
+    }
+    joueur.setListePiece(liste);
+}
 
 void Jeu::ChangerTourJoueur() {
    if(tourJoueur==1){
@@ -29,16 +39,4 @@ void Jeu::ChangerTourJoueur() {
 
 void Jeu::VerifStatutJoueur() {
     
-}
-
-void Jeu::InitListePiece(Joueur& joueur, int camp) {
-    Piece* liste = new Piece[16];
-    for (int i = 0; i < 16; i++) {
-        liste[i] = Piece(camp);
-    }
-    joueur.setListePiece(liste);
-}
-
-Jeu::~Jeu() {
-    delete[] ListeJoueur;
 }
