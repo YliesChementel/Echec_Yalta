@@ -3,11 +3,13 @@
 
 class Piece {
 public:
-    Piece();
+    Piece(int camp = 0);
     void Deplacement();
+    int GetCamp();
+    void SetCamp(int camp);
 
 private:
-    bool camp;
+    int camp;
 };
 
 

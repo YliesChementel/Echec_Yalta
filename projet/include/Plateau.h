@@ -7,9 +7,10 @@ public:
     Plateau();
     void InitMatrice();
     void UpdateMatrice(Piece piece, int coup);
+    void AffichageMatrice();
 
 private:
-    Piece **Matrice;
+    Piece matrice[12][12];
 };
 
 
