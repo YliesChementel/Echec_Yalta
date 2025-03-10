@@ -5,8 +5,8 @@ Piece::Piece(int camp) : camp(camp){
     camp;
 }
 
-void Piece::Deplacement() {
-
+bool Piece::Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) {
+    return true;
 }
 
 int Piece::GetCamp() {
