@@ -13,15 +13,23 @@ Jeu::Jeu(){
     plateau.PlacerPiece(ListeJoueur[0].getListePiece(), ListeJoueur[1].getListePiece(), ListeJoueur[2].getListePiece());
     plateau.AffichageMatrice();
     std::cout << std::endl;
-    plateau.DeplacerPiece(1,0,3,0);
+    plateau.DeplacerPiece(1,1,4,0);
     plateau.AffichageMatrice();
 }
 
 void Jeu::InitListePiece(Joueur& joueur, int camp) {
-    Piece* liste = new Piece[16];
-    for (int i = 0; i < 16; i++) {
-        liste[i] = Piece(camp);
+    Piece** liste = new Piece*[16];
+    for (int i = 0; i < 8; i++) {
+        liste[i] = new Pion(camp);
     }
+    liste[8] = new Tour(camp);
+    liste[9] = new Cavalier(camp);
+    liste[10] = new Fou(camp);
+    liste[11] = new Reine(camp);
+    liste[12] = new Roi(camp);
+    liste[13] = new Fou(camp);
+    liste[14] = new Cavalier(camp);
+    liste[15] = new Tour(camp);
     joueur.setListePiece(liste);
 }
 

@@ -14,16 +14,16 @@ void Plateau::InitMatrice(){
     }
 }
 
-void Plateau::PlacerPiece(Piece* ListePiece1, Piece* ListePiece2, Piece* ListePiece3) {
+void Plateau::PlacerPiece(Piece** ListePiece1, Piece** ListePiece2, Piece** ListePiece3) {
     int index1 = 0, index2 = 0, index3 = 0;
     for (int i = 0; i < 12; ++i) {
         for (int j = 0; j < 12; ++j) {
             if (i < 2 && j < 8 && index1 < 16) {
-                matrice[i][j] = &ListePiece1[index1++];
+                matrice[i][j] = ListePiece1[index1++];
             } else if (((i < 8 && i > 5 && j < 4) || (i < 8 && i > 5 && j > 7)) && index2 < 16) {
-                matrice[i][j] = &ListePiece2[index2++];
+                matrice[i][j] = ListePiece2[index2++];
             } else if (i > 9 && j > 3 && index3 < 16) {
-                matrice[i][j] = &ListePiece3[index3++];
+                matrice[i][j] = ListePiece3[index3++];
             } else {
                 matrice[i][j] = nullptr;
             }
@@ -48,6 +48,14 @@ void Plateau::AffichageMatrice() {
 
 
 bool Plateau::DeplacerPiece(int xOrigine, int yOrigine, int xCoup, int yCoup) {
+    Piece* piece = matrice[xOrigine][yOrigine];
+    std::cout << "Type de pièce déplacée : " << piece->GetType() << std::endl;
+    if (piece == nullptr || !piece->Deplacement(xOrigine, yOrigine, xCoup, yCoup)) {
+        std::cout << "Déplacement invalide" << std::endl;
+        return false;
+    }
+    
+
     if (matrice[xOrigine][yOrigine] == nullptr) { //verif si la pièce est présente
         std::cout << "Aucune pièce à cette position" << std::endl;
         return false;
