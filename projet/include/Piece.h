@@ -32,7 +32,7 @@ public:
         }
         return false;
     };
-    std::string GetType() const override { return "Roi"; }
+    std::string GetType() const override { return "r"; }
 };
 
 class Fou : public Piece {
@@ -49,7 +49,7 @@ public:
         }
         return false;
     };
-    std::string GetType() const override { return "Fou"; }
+    std::string GetType() const override { return "F"; }
 };
 
 
@@ -64,7 +64,7 @@ public:
         }
         return false;
     };
-    std::string GetType() const override  { return "Tour"; }
+    std::string GetType() const override  { return "T"; }
 };
 
 
@@ -85,7 +85,7 @@ public:
         }
         return false;
     };
-    std::string GetType() const override  { return "Reine"; }
+    std::string GetType() const override  { return "R"; }
 };
 
 class Cavalier : public Piece {
@@ -102,7 +102,7 @@ public:
         }
         return false;
     };
-    std::string GetType() const override  { return "Cavalier"; }
+    std::string GetType() const override  { return "C"; }
 };
 
 class Pion : public Piece {
@@ -113,7 +113,7 @@ public:
     bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override{
         return false;
     };
-    std::string GetType() const override  { return "Pion"; }
+    std::string GetType() const override  { return "P"; }
 };
 
 #endif

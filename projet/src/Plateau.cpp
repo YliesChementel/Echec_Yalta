@@ -13,18 +13,43 @@ void Plateau::InitMatrice(){
         }
     }
 }
-
 void Plateau::PlacerPiece(Piece** ListePiece1, Piece** ListePiece2, Piece** ListePiece3) {
     int index1 = 0, index2 = 0, index3 = 0;
+
+    // Placer les pièces du joueur 1
+    for (int j = 0; j < 8; ++j) {
+        matrice[1][j] = ListePiece1[index1++];
+    }
+    for (int j = 0; j < 8; ++j) {
+        matrice[0][j] = ListePiece1[index1++];
+    }
+
+    // Placer les pièces du joueur 2
+    for (int j = 0; j < 4; ++j) {
+        matrice[7][j] = ListePiece2[index2++];
+    }
+    for (int j = 8; j < 12; ++j) {
+        matrice[7][j] = ListePiece2[index2++];
+    }
+    for (int j = 0; j < 4; ++j) {
+        matrice[6][j] = ListePiece2[index2++];
+    }
+    for (int j = 8; j < 12; ++j) {
+        matrice[6][j] = ListePiece2[index2++];
+    }
+
+    // Placer les pièces du joueur 3
+    for (int j = 4; j < 12; ++j) {
+        matrice[10][j] = ListePiece3[index3++];
+    }
+    for (int j = 4; j < 12; ++j) {
+        matrice[11][j] = ListePiece3[index3++];
+    }
+
+    // Mettre les cases restantes vides 
     for (int i = 0; i < 12; ++i) {
         for (int j = 0; j < 12; ++j) {
-            if (i < 2 && j < 8 && index1 < 16) {
-                matrice[i][j] = ListePiece1[index1++];
-            } else if (((i < 8 && i > 5 && j < 4) || (i < 8 && i > 5 && j > 7)) && index2 < 16) {
-                matrice[i][j] = ListePiece2[index2++];
-            } else if (i > 9 && j > 3 && index3 < 16) {
-                matrice[i][j] = ListePiece3[index3++];
-            } else {
+            if (matrice[i][j] == nullptr) {
                 matrice[i][j] = nullptr;
             }
         }
@@ -32,11 +57,26 @@ void Plateau::PlacerPiece(Piece** ListePiece1, Piece** ListePiece2, Piece** List
 }
 
 
+
+
+
 void Plateau::AffichageMatrice() {
+    std::cout << "   ";
+    for (int j = 0; j < 12; ++j) {
+        std::cout << j << " ";
+    }
+    std::cout << std::endl;
+
     for (int i = 0; i < 12; ++i) {
+        if(i<10){
+            std::cout << i << "  ";
+        }else{
+            std::cout << i << " ";
+        }
+        
         for (int j = 0; j < 12; ++j) {
             if (matrice[i][j] != nullptr) {
-                std::cout << matrice[i][j]->GetCamp() << " ";
+                std::cout << matrice[i][j]->GetType() << " ";
             } else {
                 std::cout << "X ";
             }
@@ -47,8 +87,12 @@ void Plateau::AffichageMatrice() {
 
 
 
-bool Plateau::DeplacerPiece(int xOrigine, int yOrigine, int xCoup, int yCoup) {
+bool Plateau::DeplacerPiece(int tourJoueur,int xOrigine, int yOrigine, int xCoup, int yCoup) {
     Piece* piece = matrice[xOrigine][yOrigine];
+    if(piece->GetCamp() != tourJoueur){
+        std::cout << "Ce n'est pas votre pièce" << std::endl;
+        return false;
+    };
     std::cout << "Type de pièce déplacée : " << piece->GetType() << std::endl;
     if (piece == nullptr || !piece->Deplacement(xOrigine, yOrigine, xCoup, yCoup)) {
         std::cout << "Déplacement invalide" << std::endl;
@@ -77,8 +121,13 @@ bool Plateau::DeplacerPiece(int xOrigine, int yOrigine, int xCoup, int yCoup) {
     }
 
     if (matrice[xCoup][yCoup] != nullptr) {
-        std::cout << "Capture" << std::endl;
-        // gérer la capture ici
+        if(matrice[xCoup][yCoup]->GetCamp() == tourJoueur){
+            std::cout << "Vous essayez de capturer votre propre pièce" << std::endl;
+            return false;
+        }
+        else{
+            std::cout << "Capture" << std::endl;
+        }
     }
 
     matrice[xCoup][yCoup] = matrice[xOrigine][yOrigine];

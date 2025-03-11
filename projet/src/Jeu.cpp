@@ -12,9 +12,21 @@ Jeu::Jeu(){
     }
     plateau.PlacerPiece(ListeJoueur[0].getListePiece(), ListeJoueur[1].getListePiece(), ListeJoueur[2].getListePiece());
     plateau.AffichageMatrice();
-    std::cout << std::endl;
-    plateau.DeplacerPiece(1,1,4,0);
-    plateau.AffichageMatrice();
+
+    int xOrigine, yOrigine, xCoup, yCoup;
+    bool tour;
+    while(etatDeParti==false){
+        tour=false;
+        ChangerTourJoueur();
+        std::cout << "Tour du joueur " << tourJoueur << std::endl;
+        while(tour==false){
+            std::cout << "Entrer les coordonnées de la pièce et de son coup" << std::endl;
+            std::cin >> xOrigine >> yOrigine >> xCoup >> yCoup;
+            tour=plateau.DeplacerPiece(tourJoueur,xOrigine, yOrigine, xCoup, yCoup);
+        }
+        plateau.AffichageMatrice();
+        std::cout << std::endl;
+    }
 }
 
 void Jeu::InitListePiece(Joueur& joueur, int camp) {
