@@ -1,6 +1,7 @@
 #ifndef PIECE_H
 #define PIECE_H
 #include <string>
+#include <iostream>
 
 class Piece {
 public:
@@ -77,24 +78,47 @@ public:
     int GetCamp() { return Piece::GetCamp(); }
     void SetCamp(int camp) { Piece::SetCamp(camp); }
     bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override{
-
-        if((this->determineSousMatrice(xOrigine,yOrigine)==1 || this->determineSousMatrice(xOrigine,yOrigine)==2 || this->determineSousMatrice(xOrigine,yOrigine)==3)
-            && (this->determineSousMatrice(xCoup,yCoup)==1 || this->determineSousMatrice(xCoup,yCoup)==2 || this->determineSousMatrice(xCoup,yCoup)==3)){// matrice non "changeante"
-
+        if(this->determineSousMatrice(xOrigine,yOrigine)==4 && this->determineSousMatrice(xCoup,yCoup)==6){// matrice milieu-droite inversé verticalement
+            xOrigine = 11 - xOrigine;
+            std::cout << "test1" << std::endl;
         }
-        if(this->determineSousMatrice(xOrigine,yOrigine)==1 && this->determineSousMatrice(xCoup,yCoup)==2){// matrice 1 et 1
-
+        else if(this->determineSousMatrice(xOrigine,yOrigine)==6 && this->determineSousMatrice(xCoup,yCoup)==4){// matrice milieu-droite inversé verticalement
+            xCoup = 11 - xCoup;
+            std::cout << "test2" << std::endl;
         }
-        if(this->determineSousMatrice(xOrigine,yOrigine)==this->determineSousMatrice(xCoup,yCoup)){// matrice 1 et 1
-
+        else if(this->determineSousMatrice(xOrigine,yOrigine)==5 && this->determineSousMatrice(xCoup,yCoup)==6){// matrice bas-milieu inversé horizontalement
+            yOrigine = 11 - yOrigine;
+            std::cout << "test3" << std::endl;
         }
-
+        else if(this->determineSousMatrice(xOrigine,yOrigine)==6 && this->determineSousMatrice(xCoup,yCoup)==5){// matrice bas-milieu inversé horizontalement
+            yCoup = 11 - yCoup;
+            std::cout << "test4" << std::endl;
+        }
+        
         if((xCoup<xOrigine+8 && xCoup>xOrigine-8 && yCoup == yOrigine) || (yCoup<yOrigine+8 && yCoup>yOrigine-8 && xCoup == xOrigine)){
             return true;
         }
         return false;
     };
     std::string GetType() const override  { return "T"; }
+    /*void ajusteCoordonnees(int& x, int& y) {
+        int sousMatrice = determineSousMatrice(x, y);
+
+        // Appliquez l'inversion en fonction de la sous-matrice
+        switch (sousMatrice) {
+            case 4:
+                if (x >= 4 && x < 8) {// Inverser verticalement pour la sous-matrice 4
+                    x = 11 - x; 
+                }
+                break;
+            case 5:
+                // Inverser horizontalement pour la sous-matrice 5
+                if (y >= 4 && y < 8) {
+                    y = 7 - y; // Inversion horizontale
+                }
+                break;
+        }
+    }*/
 
 };
 
@@ -125,6 +149,38 @@ public:
     int GetCamp() { return Piece::GetCamp(); }
     void SetCamp(int camp) { Piece::SetCamp(camp); }
     bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override{
+        if(this->determineSousMatrice(xOrigine,yOrigine)==4 && this->determineSousMatrice(xCoup,yCoup)==6){// matrice milieu-droite inversé verticalement
+            xOrigine = 11 - xOrigine;
+            std::cout << "test1" << std::endl;
+        }
+        else if(this->determineSousMatrice(xOrigine,yOrigine)==6 && this->determineSousMatrice(xCoup,yCoup)==4){// matrice milieu-droite inversé verticalement
+            xCoup = 11 - xCoup;
+            std::cout << "test2" << std::endl;
+        }
+        else if(this->determineSousMatrice(xOrigine,yOrigine)==5 && this->determineSousMatrice(xCoup,yCoup)==6){// matrice bas-milieu inversé horizontalement
+            yOrigine = 11 - yOrigine;
+            std::cout << "test3" << std::endl;
+        }
+        else if(this->determineSousMatrice(xOrigine,yOrigine)==6 && this->determineSousMatrice(xCoup,yCoup)==5){// matrice bas-milieu inversé horizontalement
+            yCoup = 11 - yCoup;
+            std::cout << "test4" << std::endl;
+        }
+        else if(this->determineSousMatrice(xOrigine,yOrigine)==2 && this->determineSousMatrice(xCoup,yCoup)==5){// chemin plus court entre haut-milieu et bas-milieu 
+            xCoup = xCoup - 4;
+            std::cout << "test5" << std::endl;
+        }
+        else if(this->determineSousMatrice(xOrigine,yOrigine)==5 && this->determineSousMatrice(xCoup,yCoup)==2){// chemin plus court entre haut-milieu et bas-milieu 
+            xOrigine = xOrigine - 4;
+            std::cout << "test6" << std::endl;
+        }
+        else if(this->determineSousMatrice(xOrigine,yOrigine)==3 && this->determineSousMatrice(xCoup,yCoup)==4){// chemin plus court entre milieu-gauche et milieu-droite
+            yCoup = yCoup - 4;
+            std::cout << "test7" << std::endl;
+        }
+        else if(this->determineSousMatrice(xOrigine,yOrigine)==4 && this->determineSousMatrice(xCoup,yCoup)==3){// chemin plus court entre haut-milieu et bas-milieu 
+            yOrigine = yOrigine - 4;
+            std::cout << "test8" << std::endl;
+        }
         if( (xCoup==xOrigine+2 && (yCoup==yOrigine+1 || yCoup==yOrigine-1))  ||
         (xCoup==xOrigine-2 && (yCoup==yOrigine+1 || yCoup==yOrigine-1))  ||
         (yCoup==yOrigine+2 && (xCoup==xOrigine+1 || xCoup==xOrigine-1))  ||

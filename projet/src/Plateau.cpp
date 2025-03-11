@@ -26,16 +26,16 @@ void Plateau::PlacerPiece(Piece** ListePiece1, Piece** ListePiece2, Piece** List
 
     // Placer les pièces du joueur 2
     for (int j = 0; j < 4; ++j) {
-        matrice[7][j] = ListePiece2[index2++];
+        matrice[6][j] = ListePiece2[index2++];
     }
     for (int j = 8; j < 12; ++j) {
-        matrice[7][j] = ListePiece2[index2++];
+        matrice[6][j] = ListePiece2[index2++];
     }
     for (int j = 0; j < 4; ++j) {
-        matrice[6][j] = ListePiece2[index2++];
+        matrice[7][j] = ListePiece2[index2++];
     }
     for (int j = 8; j < 12; ++j) {
-        matrice[6][j] = ListePiece2[index2++];
+        matrice[7][j] = ListePiece2[index2++];
     }
 
     // Placer les pièces du joueur 3
