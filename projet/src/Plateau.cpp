@@ -78,7 +78,16 @@ void Plateau::AffichageMatrice() {
             if (matrice[i][j] != nullptr) {
                 std::cout << matrice[i][j]->GetType() << " ";
             } else {
-                std::cout << "X ";
+                if ((i < 4 && j > 7) || (i >7 && j < 4)) {// Case non existante du plateau yalta
+                    std::cout << "  ";
+                }
+                else if((i >3 && i < 8) && (j > 3 && j < 8)){// Case non existante du plateau yalta (milieu)
+                    std::cout << "  ";
+                }
+                else{
+                    std::cout << "X ";
+                }
+                
             }
         }
         std::cout << std::endl;
@@ -106,17 +115,17 @@ bool Plateau::DeplacerPiece(int tourJoueur,int xOrigine, int yOrigine, int xCoup
     }
 
     if (xCoup < 0 || xCoup >= 12 || yCoup < 0 || yCoup >= 12) {//Bord du plateau
-        std::cout << "Déplacement hors limites" << std::endl;
+        std::cout << "Déplacement hors du plateau" << std::endl;
         return false;
     }
 
     if ((xCoup < 4 && yCoup > 7) || (xCoup >7 && yCoup < 4)) {// Case non existante du plateau yalta
-        std::cout << "Déplacement hors limites" << std::endl;
+        std::cout << "Case non existante" << std::endl;
         return false;
     }
 
-    if((xCoup >3 && xCoup < 8) || (yCoup > 3 && yCoup < 8)){// Case non existante du plateau yalta (milieu)
-        std::cout << "Déplacement hors limites" << std::endl;
+    if((xCoup >3 && xCoup < 8) && (yCoup > 3 && yCoup < 8)){// Case non existante du plateau yalta (milieu)
+        std::cout << "Case non existante du plateau yalta (milieu)" << std::endl;
         return false;
     }
 
