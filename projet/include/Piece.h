@@ -15,21 +15,37 @@ private:
     int camp;
 
 protected:
-    int determineSousMatrice(int x, int y) {// Déterminez la sous-matrice en fonction des coordonnées
-        if (x < 4 && y < 4) {// haut gauche
-            return 1;
-        } else if (x < 4 && y < 8 && y > 3) {// haut milieu
-            return 2;
-        } else if (y < 4 && x < 8 && x > 3) {// milieu gauche
-            return 3;
-        } else if ( y > 7 && x < 8 && x > 3) {// milieu droite
-            return 4;
-        } else if (x > 7 && y < 8 && y > 3) {// bas milieu
-            return 5;
-        } else if(x > 7 && y > 7){// bas droite
-            return 6;
-        }
+    int determineSousMatrice(int x, int y) const {// Déterminez la sous-matrice en fonction des coordonnées
+        if (x < 4 && y < 4) return 1; // haut gauche
+        if (x < 4 && y >= 4 && y < 8) return 2; // haut milieu
+        if (y < 4 && x >= 4 && x < 8) return 3; // milieu gauche
+        if (y >= 7 && x >= 4 && x < 8) return 4; // milieu droite
+        if (x >= 7 && y >= 4 && y < 8) return 5; // bas milieu
+        if (x >= 7 && y >= 7) return 6; // bas droite
         return 0;
+    }
+
+    void ajustementCoordonnees(int& xOrigine, int& yOrigine, int& xCoup, int& yCoup) const {
+        int matriceOrigine = determineSousMatrice(xOrigine, yOrigine);
+        int matriceDestination = determineSousMatrice(xCoup, yCoup);
+
+        if (matriceOrigine == 4 && matriceDestination == 6) { // matrice milieu-droite inversé verticalement
+            xOrigine = 11 - xOrigine;
+        } else if (matriceOrigine == 6 && matriceDestination == 4) { // matrice milieu-droite inversé verticalement
+            xCoup = 11 - xCoup;
+        } else if (matriceOrigine == 5 && matriceDestination == 6) { // matrice bas-milieu inversé horizontalement
+            yOrigine = 11 - yOrigine;
+        } else if (matriceOrigine == 6 && matriceDestination == 5) { // matrice bas-milieu inversé horizontalement
+            yCoup = 11 - yCoup;
+        } else if (matriceOrigine == 2 && matriceDestination == 5) { // chemin plus court entre haut-milieu et bas-milieu 
+            xCoup -= 4;
+        } else if (matriceOrigine == 5 && matriceDestination == 2) { // chemin plus court entre haut-milieu et bas-milieu 
+            xOrigine -= 4;
+        } else if (matriceOrigine == 3 && matriceDestination == 4) { // chemin plus court entre milieu-gauche et milieu-droite
+            yCoup -= 4;
+        } else if (matriceOrigine == 4 && matriceDestination == 3) { // chemin plus court entre haut-milieu et bas-milieu 
+            yOrigine -= 4;
+        }
     }
 };
 
@@ -40,6 +56,7 @@ public:
     int GetCamp() { return Piece::GetCamp(); }
     void SetCamp(int camp) { Piece::SetCamp(camp); }
     bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override {
+        ajustementCoordonnees(xOrigine, yOrigine, xCoup, yCoup);
         if(xCoup == xOrigine+1 || xCoup == xOrigine-1 || yCoup == yOrigine+1 || yCoup == yOrigine-1){
             return true;
         }
@@ -60,6 +77,7 @@ public:
     int GetCamp() { return Piece::GetCamp(); }
     void SetCamp(int camp) { Piece::SetCamp(camp); }
     bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override{
+        ajustementCoordonnees(xOrigine, yOrigine, xCoup, yCoup);
         if((xCoup==xOrigine+1 && yCoup==yOrigine+1) ||
         (xCoup==xOrigine-1 && yCoup==yOrigine-1) ||
         (xCoup==xOrigine-1 && yCoup==yOrigine+1) ||
@@ -78,47 +96,13 @@ public:
     int GetCamp() { return Piece::GetCamp(); }
     void SetCamp(int camp) { Piece::SetCamp(camp); }
     bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override{
-        if(this->determineSousMatrice(xOrigine,yOrigine)==4 && this->determineSousMatrice(xCoup,yCoup)==6){// matrice milieu-droite inversé verticalement
-            xOrigine = 11 - xOrigine;
-            std::cout << "test1" << std::endl;
-        }
-        else if(this->determineSousMatrice(xOrigine,yOrigine)==6 && this->determineSousMatrice(xCoup,yCoup)==4){// matrice milieu-droite inversé verticalement
-            xCoup = 11 - xCoup;
-            std::cout << "test2" << std::endl;
-        }
-        else if(this->determineSousMatrice(xOrigine,yOrigine)==5 && this->determineSousMatrice(xCoup,yCoup)==6){// matrice bas-milieu inversé horizontalement
-            yOrigine = 11 - yOrigine;
-            std::cout << "test3" << std::endl;
-        }
-        else if(this->determineSousMatrice(xOrigine,yOrigine)==6 && this->determineSousMatrice(xCoup,yCoup)==5){// matrice bas-milieu inversé horizontalement
-            yCoup = 11 - yCoup;
-            std::cout << "test4" << std::endl;
-        }
-        
+        ajustementCoordonnees(xOrigine, yOrigine, xCoup, yCoup);
         if((xCoup<xOrigine+8 && xCoup>xOrigine-8 && yCoup == yOrigine) || (yCoup<yOrigine+8 && yCoup>yOrigine-8 && xCoup == xOrigine)){
             return true;
         }
         return false;
     };
     std::string GetType() const override  { return "T"; }
-    /*void ajusteCoordonnees(int& x, int& y) {
-        int sousMatrice = determineSousMatrice(x, y);
-
-        // Appliquez l'inversion en fonction de la sous-matrice
-        switch (sousMatrice) {
-            case 4:
-                if (x >= 4 && x < 8) {// Inverser verticalement pour la sous-matrice 4
-                    x = 11 - x; 
-                }
-                break;
-            case 5:
-                // Inverser horizontalement pour la sous-matrice 5
-                if (y >= 4 && y < 8) {
-                    y = 7 - y; // Inversion horizontale
-                }
-                break;
-        }
-    }*/
 
 };
 
@@ -129,6 +113,7 @@ public:
     int GetCamp() { return Piece::GetCamp(); }
     void SetCamp(int camp) { Piece::SetCamp(camp); }
     bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override{
+        ajustementCoordonnees(xOrigine, yOrigine, xCoup, yCoup);
         if((xCoup<xOrigine+8 && xCoup>xOrigine-8 && yCoup == yOrigine) || (yCoup<yOrigine+8 && yCoup>yOrigine-8 && yCoup == yOrigine)){
             return true;
         }
@@ -149,38 +134,7 @@ public:
     int GetCamp() { return Piece::GetCamp(); }
     void SetCamp(int camp) { Piece::SetCamp(camp); }
     bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override{
-        if(this->determineSousMatrice(xOrigine,yOrigine)==4 && this->determineSousMatrice(xCoup,yCoup)==6){// matrice milieu-droite inversé verticalement
-            xOrigine = 11 - xOrigine;
-            std::cout << "test1" << std::endl;
-        }
-        else if(this->determineSousMatrice(xOrigine,yOrigine)==6 && this->determineSousMatrice(xCoup,yCoup)==4){// matrice milieu-droite inversé verticalement
-            xCoup = 11 - xCoup;
-            std::cout << "test2" << std::endl;
-        }
-        else if(this->determineSousMatrice(xOrigine,yOrigine)==5 && this->determineSousMatrice(xCoup,yCoup)==6){// matrice bas-milieu inversé horizontalement
-            yOrigine = 11 - yOrigine;
-            std::cout << "test3" << std::endl;
-        }
-        else if(this->determineSousMatrice(xOrigine,yOrigine)==6 && this->determineSousMatrice(xCoup,yCoup)==5){// matrice bas-milieu inversé horizontalement
-            yCoup = 11 - yCoup;
-            std::cout << "test4" << std::endl;
-        }
-        else if(this->determineSousMatrice(xOrigine,yOrigine)==2 && this->determineSousMatrice(xCoup,yCoup)==5){// chemin plus court entre haut-milieu et bas-milieu 
-            xCoup = xCoup - 4;
-            std::cout << "test5" << std::endl;
-        }
-        else if(this->determineSousMatrice(xOrigine,yOrigine)==5 && this->determineSousMatrice(xCoup,yCoup)==2){// chemin plus court entre haut-milieu et bas-milieu 
-            xOrigine = xOrigine - 4;
-            std::cout << "test6" << std::endl;
-        }
-        else if(this->determineSousMatrice(xOrigine,yOrigine)==3 && this->determineSousMatrice(xCoup,yCoup)==4){// chemin plus court entre milieu-gauche et milieu-droite
-            yCoup = yCoup - 4;
-            std::cout << "test7" << std::endl;
-        }
-        else if(this->determineSousMatrice(xOrigine,yOrigine)==4 && this->determineSousMatrice(xCoup,yCoup)==3){// chemin plus court entre haut-milieu et bas-milieu 
-            yOrigine = yOrigine - 4;
-            std::cout << "test8" << std::endl;
-        }
+        ajustementCoordonnees(xOrigine, yOrigine, xCoup, yCoup);
         if( (xCoup==xOrigine+2 && (yCoup==yOrigine+1 || yCoup==yOrigine-1))  ||
         (xCoup==xOrigine-2 && (yCoup==yOrigine+1 || yCoup==yOrigine-1))  ||
         (yCoup==yOrigine+2 && (xCoup==xOrigine+1 || xCoup==xOrigine-1))  ||
@@ -198,6 +152,7 @@ public:
     int GetCamp() { return Piece::GetCamp(); }
     void SetCamp(int camp) { Piece::SetCamp(camp); }
     bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override{
+        ajustementCoordonnees(xOrigine, yOrigine, xCoup, yCoup);
         return false;
     };
     std::string GetType() const override  { return "P"; }
