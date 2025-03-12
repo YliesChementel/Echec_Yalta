@@ -1,6 +1,7 @@
 #include "Plateau.h"
 #include <iostream>
 #include "Piece.h"
+#include <vector>
 
 Plateau::Plateau(){
     InitMatrice();
@@ -102,6 +103,7 @@ bool Plateau::DeplacerPiece(int tourJoueur,int xOrigine, int yOrigine, int xCoup
         std::cout << "Ce n'est pas votre pièce" << std::endl;
         return false;
     };
+    
     std::cout << "Type de pièce déplacée : " << piece->GetType() << std::endl;
     if (piece == nullptr || !piece->Deplacement(xOrigine, yOrigine, xCoup, yCoup)) {
         std::cout << "Déplacement invalide" << std::endl;
@@ -146,4 +148,70 @@ bool Plateau::DeplacerPiece(int tourJoueur,int xOrigine, int yOrigine, int xCoup
               << ") vers (" << xCoup << "," << yCoup << ")" << std::endl;
     
     return true;
+}
+
+std::vector<std::pair<int, int>> Plateau::ObtenirCoupsPossibles(Piece* piece, int xOrigine, int yOrigine) {
+    std::vector<std::pair<int, int>> coupsPossibles;
+
+    for (int i = 0; i < 12; ++i) {
+        for (int j = 0; j < 12; ++j) {
+            if ((i < 4 && j > 7) || (i > 7 && j < 4) || (i > 3 && i < 8 && j > 3 && j < 8)) {// Vérification des cases non existantes
+                continue;
+            }
+            if (piece->Deplacement(xOrigine, yOrigine, i, j)) {
+                coupsPossibles.emplace_back(i, j);
+            }
+        }
+    }
+
+    return coupsPossibles;
+}
+
+void Plateau::AfficherCoupsPossibles(int xOrigine, int yOrigine) {
+    Piece* piece = matrice[xOrigine][yOrigine];
+    if (!piece) {
+        std::cout << "Aucune pièce à cette position.\n";
+        return;
+    }
+
+    std::vector<std::pair<int, int>> coupsPossibles = ObtenirCoupsPossibles(piece, xOrigine, yOrigine);
+
+    std::cout << "   ";
+    for (int j = 0; j < 12; ++j) {
+        std::cout << j << " ";
+    }
+    std::cout << std::endl;
+
+    for (int i = 0; i < 12; ++i) {
+        if (i < 10) {
+            std::cout << i << "  ";
+        } else {
+            std::cout << i << " ";
+        }
+
+        for (int j = 0; j < 12; ++j) {
+            bool estCoupPossible = false;
+            for (const auto& coup : coupsPossibles) {
+                if (coup.first == i && coup.second == j) {
+                    estCoupPossible = true;
+                    break;
+                }
+            }
+
+            if (matrice[i][j] != nullptr) {
+                std::cout << matrice[i][j]->GetType() << " ";
+            } else if (estCoupPossible) {
+                std::cout << "O ";
+            } else {
+                if ((i < 4 && j > 7) || (i > 7 && j < 4)) { // Case non existante du plateau yalta
+                    std::cout << "  ";
+                } else if ((i > 3 && i < 8) && (j > 3 && j < 8)) { // Case non existante du plateau yalta (milieu)
+                    std::cout << "  ";
+                } else {
+                    std::cout << "X ";
+                }
+            }
+        }
+        std::cout << std::endl;
+    }
 }

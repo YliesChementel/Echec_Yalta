@@ -29,6 +29,28 @@ protected:
         int matriceOrigine = determineSousMatrice(xOrigine, yOrigine);
         int matriceDestination = determineSousMatrice(xCoup, yCoup);
 
+        if (this->GetType() == "F" && xOrigine == yOrigine){
+            if  ((xOrigine == 0 || xOrigine == 1 || xOrigine == 2 || xOrigine == 3) && (matriceDestination == 4 || matriceDestination == 5)) {
+                if(matriceDestination == 4){
+                    yCoup -= 4;
+                }
+                else{
+                    xCoup -= 4;
+                }
+            }
+            /*else if((xOrigine == 11 || xOrigine == 10 || xOrigine == 9 || xOrigine == 8) && (matriceDestination == 2 || matriceDestination == 3)){
+                if(matriceDestination == 4){
+                    yCoup -= 4;
+                    xCoup = 11 - xCoup;
+                }
+                else{
+                    yCoup = 11 - yCoup;
+                    xCoup -= 4;
+                }
+            }*/
+        }
+        
+
         if (matriceOrigine == 4 && matriceDestination == 6) { // matrice milieu-droite inversé verticalement
             xOrigine = 11 - xOrigine;
         } else if (matriceOrigine == 6 && matriceDestination == 4) { // matrice milieu-droite inversé verticalement
@@ -45,6 +67,36 @@ protected:
             yCoup -= 4;
         } else if (matriceOrigine == 4 && matriceDestination == 3) { // chemin plus court entre haut-milieu et bas-milieu 
             yOrigine -= 4;
+        }
+        else if (matriceOrigine == 4 && matriceDestination == 5) {
+            xOrigine = 11 - xOrigine;
+            yCoup = 11 - yCoup;
+        }
+        else if (matriceOrigine == 5 && matriceDestination == 4) {
+            yOrigine = 11 - yOrigine;
+            xCoup = 11 - xCoup;
+        }
+
+
+        else if (matriceOrigine == 6 && matriceDestination == 2) {
+            xOrigine -= 4;
+            yOrigine -= 4;
+            yCoup = 7 - yCoup;
+        }
+        else if (matriceOrigine == 2 && matriceDestination == 6) {
+            xCoup -= 4;
+            yCoup -= 4;
+            yOrigine = 7 - yOrigine;
+        }
+        else if (matriceOrigine == 6 && matriceDestination == 3) {
+            xOrigine -= 4;
+            yOrigine -= 4;
+            xCoup = 7 - xCoup;
+        }
+        else if (matriceOrigine == 3 && matriceDestination == 6) {
+            xCoup -= 4;
+            yCoup -= 4;
+            xOrigine = 7 - xOrigine;
         }
     }
 };
@@ -78,10 +130,19 @@ public:
     void SetCamp(int camp) { Piece::SetCamp(camp); }
     bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override{
         ajustementCoordonnees(xOrigine, yOrigine, xCoup, yCoup);
-        if((xCoup==xOrigine+1 && yCoup==yOrigine+1) ||
-        (xCoup==xOrigine-1 && yCoup==yOrigine-1) ||
-        (xCoup==xOrigine-1 && yCoup==yOrigine+1) ||
-        (xCoup==xOrigine+1 && yCoup==yOrigine-1)){
+        if (std::abs(xCoup - xOrigine) == std::abs(yCoup - yOrigine)) {
+            
+            int matriceOrigine = determineSousMatrice(xOrigine, yOrigine);//le fou ne peut pas aller à la matrice opposé
+            int matriceDestination = determineSousMatrice(xCoup, yCoup);
+            if ((matriceOrigine == 1 && matriceDestination == 6) ||
+                (matriceOrigine == 6 && matriceDestination == 1) ||
+                (matriceOrigine == 5 && matriceDestination == 3) ||
+                (matriceOrigine == 3 && matriceDestination == 5) ||
+                (matriceOrigine == 4 && matriceDestination == 2) ||
+                (matriceOrigine == 2 && matriceDestination == 4)) {
+                return false;
+            }
+
             return true;
         }
         return false;
@@ -117,10 +178,19 @@ public:
         if((xCoup<xOrigine+8 && xCoup>xOrigine-8 && yCoup == yOrigine) || (yCoup<yOrigine+8 && yCoup>yOrigine-8 && yCoup == yOrigine)){
             return true;
         }
-        else if((xCoup==xOrigine+1 && yCoup==yOrigine+1)||
-        (xCoup==xOrigine-1 && yCoup==yOrigine-1)||
-        (xCoup==xOrigine-1 && yCoup==yOrigine+1)||
-        (xCoup==xOrigine+1 && yCoup==yOrigine-1)){
+        if (std::abs(xCoup - xOrigine) == std::abs(yCoup - yOrigine)) {
+            
+            int matriceOrigine = determineSousMatrice(xOrigine, yOrigine);//la reine ne peut pas aller à la matrice opposé
+            int matriceDestination = determineSousMatrice(xCoup, yCoup);
+            if ((matriceOrigine == 1 && matriceDestination == 6) ||
+                (matriceOrigine == 6 && matriceDestination == 1) ||
+                (matriceOrigine == 5 && matriceDestination == 3) ||
+                (matriceOrigine == 3 && matriceDestination == 5) ||
+                (matriceOrigine == 4 && matriceDestination == 2) ||
+                (matriceOrigine == 2 && matriceDestination == 4)) {
+                return false;
+            }
+
             return true;
         }
         return false;
