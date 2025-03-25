@@ -52,21 +52,21 @@ void Jeu::InitListePiece(Joueur& joueur, int camp) {
 void Jeu::InitListePiece(Joueur& joueur, int camp) {
     Piece** liste = new Piece*[16];
     for (int i = 0; i < 8; i++) {
-        liste[i] = new Reine(camp);
+        liste[i] = new Fou(camp);
     }
-    liste[8] = new Reine(camp);
-    liste[9] = new Reine(camp);
-    liste[10] = new Reine(camp);
-    liste[11] = new Reine(camp);
+    liste[8] = new Fou(camp);
+    liste[9] = new Fou(camp);
+    liste[10] = new Fou(camp);
+    liste[11] = new Fou(camp);
     liste[12] = new Roi(camp);
-    liste[13] = new Reine(camp);
-    liste[14] = new Reine(camp);
-    liste[15] = new Reine(camp);
+    liste[13] = new Fou(camp);
+    liste[14] = new Fou(camp);
+    liste[15] = new Fou(camp);
     joueur.setListePiece(liste);
 }
 
 void Jeu::ChangerTourJoueur() {
-   if(tourJoueur==1){
+   /*if(tourJoueur==1){
     tourJoueur=2;
    }
    else if(tourJoueur==2){
@@ -74,7 +74,8 @@ void Jeu::ChangerTourJoueur() {
    }
    else{
     tourJoueur=1;
-   }
+   }*/
+   tourJoueur=1;
 }
 
 void Jeu::VerifStatutJoueur() {

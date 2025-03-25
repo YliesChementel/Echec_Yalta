@@ -15,7 +15,8 @@ private:
     int camp;
 
 protected:
-    int determineSousMatrice(int x, int y) const {// Déterminez la sous-matrice en fonction des coordonnées
+    // Détermine la sous-matrice en fonction des coordonnées
+    int determineSousMatrice(int x, int y) const {
         if (x < 4 && y < 4) return 1; // haut gauche
         if (x < 4 && y >= 4 && y < 8) return 2; // haut milieu
         if (y < 4 && x >= 4 && x < 8) return 3; // milieu gauche
@@ -25,6 +26,33 @@ protected:
         return 0;
     }
 
+    //Ajustement obligatoirement pour toutes les pièces pour que le plateau fonctionne comme un plateau normal
+    void ajustementCoordonnees(int& xOrigine, int& yOrigine, int& xCoup, int& yCoup) const {
+        int matriceOrigine = determineSousMatrice(xOrigine, yOrigine);
+        int matriceDestination = determineSousMatrice(xCoup, yCoup);
+        
+        if (matriceOrigine == 4 && matriceDestination == 6) { xOrigine = 11 - xOrigine;} // matrice milieu-droite inversé verticalement
+        else if (matriceOrigine == 6 && matriceDestination == 4) { xCoup = 11 - xCoup;} // matrice milieu-droite inversé verticalement
+
+        else if (matriceOrigine == 5 && matriceDestination == 6) { yOrigine = 11 - yOrigine;}// matrice bas-milieu inversé horizontalement
+        else if (matriceOrigine == 6 && matriceDestination == 5) { yCoup = 11 - yCoup; } // matrice bas-milieu inversé horizontalement
+
+        else if (matriceOrigine == 2 && matriceDestination == 5) {  xCoup -= 4;} // chemin plus court entre haut-milieu et bas-milieu
+        else if (matriceOrigine == 5 && matriceDestination == 2) { xOrigine -= 4;} // chemin plus court entre haut-milieu et bas-milieu 
+        
+        else if (matriceOrigine == 3 && matriceDestination == 4) { yCoup -= 4;} // chemin plus court entre milieu-gauche et milieu-droite
+        else if (matriceOrigine == 4 && matriceDestination == 3) { yOrigine -= 4;}// chemin plus court entre milieu-gauche et milieu-droite
+        
+        else if (matriceOrigine == 4 && matriceDestination == 5) { //Transitions entre les matrices milieu-droite et bas-milieu
+            xOrigine = 11 - xOrigine;
+            yCoup = 11 - yCoup;
+        }
+        else if (matriceOrigine == 5 && matriceDestination == 4) { //Transitions entre les matrices milieu-droite et bas-milieu
+            yOrigine = 11 - yOrigine;
+            xCoup = 11 - xCoup;
+        }
+    }
+
     bool estAuDessusDiagonal(int x, int y)const {
         return y > x;
     }
@@ -32,11 +60,6 @@ protected:
     bool estEnDessousDiagonal(int x, int y)const {
         return y < x;
     }
-    
-    bool EstSurDiagonal(int x, int y) const{
-        return y == x;
-    }
-
     
     bool estAuDessusDiagonaleMontante(int x, int y) {
         return y > x - 4;
@@ -61,17 +84,14 @@ protected:
     bool estAuDessusDiagonaleDescendante(int x, int y) const{
         return y < 7 - x;
     }
-    bool estSurDiagonaleDescendante(int x, int y) const{
-        return y == 7 - x;
-    }
-    
-    
 
-    void ajustementCoordonnees(int& xOrigine, int& yOrigine, int& xCoup, int& yCoup) const {
+    
+    void ajustementDiagonale(int& xOrigine, int& yOrigine, int& xCoup, int& yCoup) const {
         int matriceOrigine = determineSousMatrice(xOrigine, yOrigine);
         int matriceDestination = determineSousMatrice(xCoup, yCoup);
 
         if (this->GetType() == "F" || this->GetType()=="R"){
+            //Ajustement pour les diagonales entre les sous-matrices 1 et 6
             if(xOrigine == yOrigine){
                 if  ((xOrigine == 0 || xOrigine == 1 || xOrigine == 2 || xOrigine == 3) && (matriceDestination == 4 || matriceDestination == 5)) {
                     if(matriceDestination == 4){
@@ -94,7 +114,6 @@ protected:
                     }
                 }
             }
-
             else if (matriceOrigine == 6 && matriceDestination == 2 && estEnDessousDiagonal(xOrigine, yOrigine)) {//pour diagonales entre les sous-matrices 6, 2 et 3
                 xOrigine -= 4;
                 yOrigine -= 4;
@@ -129,39 +148,48 @@ protected:
             }
             
         }
-
-
-        
-
-        if (matriceOrigine == 4 && matriceDestination == 6) { // matrice milieu-droite inversé verticalement
-            xOrigine = 11 - xOrigine;
-        } else if (matriceOrigine == 6 && matriceDestination == 4) { // matrice milieu-droite inversé verticalement
-            xCoup = 11 - xCoup;
-        } else if (matriceOrigine == 5 && matriceDestination == 6) { // matrice bas-milieu inversé horizontalement
-            yOrigine = 11 - yOrigine;
-        } else if (matriceOrigine == 6 && matriceDestination == 5) { // matrice bas-milieu inversé horizontalement
-            yCoup = 11 - yCoup;
-        } else if (matriceOrigine == 2 && matriceDestination == 5) { // chemin plus court entre haut-milieu et bas-milieu 
-            xCoup -= 4;
-        } else if (matriceOrigine == 5 && matriceDestination == 2) { // chemin plus court entre haut-milieu et bas-milieu 
-            xOrigine -= 4;
-        } else if (matriceOrigine == 3 && matriceDestination == 4) { // chemin plus court entre milieu-gauche et milieu-droite
-            yCoup -= 4;
-        } else if (matriceOrigine == 4 && matriceDestination == 3) { // chemin plus court entre haut-milieu et bas-milieu 
-            yOrigine -= 4;
-        }
-        else if (matriceOrigine == 4 && matriceDestination == 5) {
-            xOrigine = 11 - xOrigine;
-            yCoup = 11 - yCoup;
-        }
-        else if (matriceOrigine == 5 && matriceDestination == 4) {
-            yOrigine = 11 - yOrigine;
-            xCoup = 11 - xCoup;
-        }
-
-
-        
     }
+
+    void ajustementCavalier(int& xOrigine, int& yOrigine, int& xCoup, int& yCoup) const {
+        int matriceOrigine = determineSousMatrice(xOrigine, yOrigine);
+        int matriceDestination = determineSousMatrice(xCoup, yCoup);
+
+        if(this->GetType() == "C"){//Pour les cavaliers (temporaire)
+            if (matriceOrigine == 6 && matriceDestination == 2) {//pour diagonales entre les sous-matrices 6, 2 et 3
+                xOrigine -= 4;
+                yOrigine -= 4;
+                yCoup = 7 - yCoup;
+            }
+            else if (matriceOrigine == 2 && matriceDestination == 6) {
+                xCoup -= 4;
+                yCoup -= 4;
+                yOrigine = 7 - yOrigine;
+            }
+            else if (matriceOrigine == 6 && matriceDestination == 3) {
+                xOrigine -= 4;
+                yOrigine -= 4; 
+                xCoup = 7 - xCoup;
+            }
+            else if (matriceOrigine == 3 && matriceDestination == 6) {
+                xCoup -= 4;
+                yCoup -= 4;
+                xOrigine = 7 - xOrigine;
+            }
+            else if (matriceOrigine == 1 && matriceDestination == 4) {//pour diagonales entre les sous-matrices 1, 4 et 5
+                yCoup -= 4;
+            }
+            else if (matriceOrigine == 4 && matriceDestination == 1) {
+                yOrigine -= 4;
+            }
+            else if (matriceOrigine == 1 && matriceDestination == 5) {
+                xCoup -= 4;
+            }
+            else if (matriceOrigine == 5 && matriceDestination == 1) {
+                xOrigine -= 4;
+            }
+        }
+    }
+
 };
 
 
@@ -202,6 +230,7 @@ public:
         (estEnDessousDiagonaleMontante2(xOrigine, yOrigine) && matriceOrigine==4 && matriceDestination==5)){//vérif avant car il ne faut que les ajustement soit fait
             return false;
         }
+        ajustementDiagonale(xOrigine, yOrigine, xCoup, yCoup);
         ajustementCoordonnees(xOrigine, yOrigine, xCoup, yCoup);
         if (std::abs(xCoup - xOrigine) == std::abs(yCoup - yOrigine)) {
             if ((matriceOrigine == 1 && matriceDestination == 6) ||//le fou ne peut pas aller à la matrice opposé
@@ -263,6 +292,7 @@ public:
         (estEnDessousDiagonaleMontante2(xOrigine, yOrigine) && matriceOrigine==4 && matriceDestination==5)){//vérif avant car il ne faut que les ajustement soit fait
             return false;
         }
+        ajustementDiagonale(xOrigine, yOrigine, xCoup, yCoup);
         ajustementCoordonnees(xOrigine, yOrigine, xCoup, yCoup);
 
         if((xCoup<xOrigine+8 && xCoup>xOrigine-8 && yCoup == yOrigine) || (yCoup<yOrigine+8 && yCoup>yOrigine-8 && yCoup == yOrigine)){
@@ -301,6 +331,7 @@ public:
     int GetCamp() { return Piece::GetCamp(); }
     void SetCamp(int camp) { Piece::SetCamp(camp); }
     bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override{
+        ajustementCavalier(xOrigine, yOrigine, xCoup, yCoup);
         ajustementCoordonnees(xOrigine, yOrigine, xCoup, yCoup);
         if( (xCoup==xOrigine+2 && (yCoup==yOrigine+1 || yCoup==yOrigine-1))  ||
         (xCoup==xOrigine-2 && (yCoup==yOrigine+1 || yCoup==yOrigine-1))  ||

@@ -95,7 +95,24 @@ void Plateau::AffichageMatrice() {
     }
 }
 
+/*
+bool Plateau::CheminLibre(int xOrigine, int yOrigine, int xCoup, int yCoup) {
+    int dx = (xCoup - xOrigine > 0) - (xCoup - xOrigine < 0);
+    int dy = (yCoup - yOrigine > 0) - (yCoup - yOrigine < 0);
 
+    int x = xOrigine + dx;
+    int y = yOrigine + dy;
+
+    while (x != xCoup || y != yCoup) {
+        if (matrice[x][y] != nullptr) {
+            return false;
+        }
+        x += dx;
+        y += dy;
+    }
+    return true;
+}
+*/
 
 bool Plateau::DeplacerPiece(int tourJoueur,int xOrigine, int yOrigine, int xCoup, int yCoup) {
     Piece* piece = matrice[xOrigine][yOrigine];

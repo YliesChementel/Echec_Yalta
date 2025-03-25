@@ -12,7 +12,8 @@ public:
     void AffichageMatrice();
     std::vector<std::pair<int, int>> ObtenirCoupsPossibles(Piece* piece, int xOrigine, int yOrigine);
     void AfficherCoupsPossibles(int xOrigine, int yOrigine);
-    
+    bool CheminLibre(int xOrigine, int yOrigine, int xCoup, int yCoup);
+
 
 private:
     Piece* matrice[12][12];
