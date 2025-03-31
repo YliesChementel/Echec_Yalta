@@ -78,9 +78,49 @@ int main() {
         lines.push_back(createLine(center, m, sf::Color::Red));
     }
 
-    sf::ConvexShape losange = createLosange(center, center + 0.25f * (milieux[2] - center), center + 0.25f * (matrice2_5 - center) + 0.25f * (mat5_4_end - mat5_4_start), milieux[5], sf::Color::Blue, sf::Color::Green);
-    //sf::ConvexShape losange2 = createLosange(milieux[1], milieux[1] + 0.25f * (points[2] - milieux[1]), milieux[5] + 0.5f * (points[1] - milieux[5]), milieux[5] + 0.25f * (points[1] - milieux[5]), sf::Color::Black, sf::Color::Green);
-    //sf::ConvexShape losange3 = createLosange(milieux[1] + 0.25f * (points[2] - milieux[1]), milieux[1] + 0.5f * (points[2] - milieux[1]), milieux[5] + 0.75f * (points[1] - milieux[5]), milieux[5] + 0.5f * (points[1] - milieux[5]), sf::Color::Black, sf::Color::Green);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Création des lignes de la matrice 5
+    sf::Vector2f mat5_1_start = center + 0.25f * (milieux[2] - center);// 25% de la distance
+    sf::Vector2f mat5_1_end = (1 - 0.375f) * points[1] + 0.375f * points[2];
+
+    sf::Vector2f mat5_2_start = center + 0.50f * (milieux[2] - center);// 50% de la distance
+    sf::Vector2f mat5_2_end = (1 - 0.25f) * points[1] + 0.25f * points[2];
+
+    sf::Vector2f mat5_3_start = center + 0.75f * (milieux[2] - center);// 75% de la distance
+    sf::Vector2f mat5_3_end = (1 - 0.125f) * points[1] + 0.125f * points[2];
+
+    sf::Vector2f mat5_4_start = center + 0.25f * (milieux[5] - center);// 25% de la distance
+    sf::Vector2f mat5_4_end = (1 - 0.625f) * points[0] + 0.625f * points[1];
+
+    sf::Vector2f mat5_5_start = center + 0.50f * (milieux[5] - center);// 50% de la distance
+    sf::Vector2f mat5_5_end = (1 - 0.750f) * points[0] + 0.750f * points[1];
+
+    sf::Vector2f mat5_6_start = center + 0.75f * (milieux[5] - center);// 75% de la distance
+    sf::Vector2f mat5_6_end = (1 - 0.875f) * points[0] + 0.875f * points[1];
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    sf::ConvexShape losange = createLosange(center, mat5_1_start, mat5_4_start + 0.25f * (mat5_4_end - mat5_4_start), mat5_4_start, sf::Color::Black, sf::Color::Green);
+    sf::ConvexShape losange2 = createLosange(mat5_1_start, mat5_2_start, mat5_4_start + 0.5f * (mat5_4_end - mat5_4_start), mat5_4_start + 0.25f * (mat5_4_end - mat5_4_start), sf::Color::Black, sf::Color::Green);
+    sf::ConvexShape losange3 = createLosange(mat5_2_start, mat5_3_start, mat5_4_start + 0.75f * (mat5_4_end - mat5_4_start), mat5_4_start + 0.5f * (mat5_4_end - mat5_4_start), sf::Color::Black, sf::Color::Green);
+    sf::ConvexShape losange4 = createLosange(mat5_3_start, milieux[2], mat5_4_end, mat5_4_start + 0.75f * (mat5_4_end - mat5_4_start), sf::Color::Black, sf::Color::Green);
+
+    sf::ConvexShape losange5 = createLosange(mat5_4_start, mat5_4_start + 0.25f * (mat5_4_end - mat5_4_start), mat5_5_start + 0.25f * (mat5_5_end - mat5_5_start),mat5_5_start , sf::Color::Black, sf::Color::Green);
+    sf::ConvexShape losange6 = createLosange(mat5_4_start + 0.25f * (mat5_4_end - mat5_4_start),mat5_4_start + 0.5f * (mat5_4_end - mat5_4_start), mat5_5_start + 0.5f * (mat5_5_end - mat5_5_start), mat5_5_start + 0.25f * (mat5_5_end - mat5_5_start) , sf::Color::Black, sf::Color::Green);
+    sf::ConvexShape losange7 = createLosange(mat5_4_start + 0.5f * (mat5_4_end - mat5_4_start),mat5_4_start + 0.75f * (mat5_4_end - mat5_4_start),mat5_5_start + 0.75f * (mat5_5_end - mat5_5_start), mat5_5_start + 0.5f * (mat5_5_end - mat5_5_start), sf::Color::Black, sf::Color::Green);
+    sf::ConvexShape losange8 = createLosange(mat5_4_start + 0.75f * (mat5_4_end - mat5_4_start), mat5_4_end, mat5_5_end, mat5_5_start + 0.75f * (mat5_5_end - mat5_5_start), sf::Color::Black, sf::Color::Green);
+    
+    sf::ConvexShape losange9 = createLosange(mat5_5_start, mat5_5_start + 0.25f * (mat5_5_end - mat5_5_start), mat5_6_start + 0.25f * (mat5_6_end - mat5_6_start), mat5_6_start, sf::Color::Black, sf::Color::Green);
+    sf::ConvexShape losange10 = createLosange( mat5_5_start + 0.25f * (mat5_5_end - mat5_5_start), mat5_5_start + 0.5f * (mat5_5_end - mat5_5_start),mat5_6_start + 0.5f * (mat5_6_end - mat5_6_start) , mat5_6_start + 0.25f * (mat5_6_end - mat5_6_start), sf::Color::Black, sf::Color::Green);
+    sf::ConvexShape losange11 = createLosange( mat5_5_start + 0.5f * (mat5_5_end - mat5_5_start), mat5_5_start + 0.75f * (mat5_5_end - mat5_5_start), mat5_6_start + 0.75f * (mat5_6_end - mat5_6_start), mat5_6_start + 0.5f * (mat5_6_end - mat5_6_start), sf::Color::Black, sf::Color::Green);
+    sf::ConvexShape losange12 = createLosange( mat5_5_start + 0.75f * (mat5_5_end - mat5_5_start), mat5_5_end, mat5_6_end , mat5_6_start + 0.75f * (mat5_6_end - mat5_6_start), sf::Color::Black, sf::Color::Green);
+
+    sf::ConvexShape losange13 = createLosange(mat5_6_start, mat5_6_start + 0.25f * (mat5_6_end - mat5_6_start), mat5_1_end,milieux[5] , sf::Color::Black, sf::Color::Green);
+    sf::ConvexShape losange14 = createLosange(mat5_6_start + 0.25f * (mat5_6_end - mat5_6_start), mat5_6_start + 0.5f * (mat5_6_end - mat5_6_start),mat5_2_end ,mat5_1_end , sf::Color::Black, sf::Color::Green);
+    sf::ConvexShape losange15 = createLosange(mat5_6_start + 0.5f * (mat5_6_end - mat5_6_start) ,mat5_6_start + 0.75f * (mat5_6_end - mat5_6_start) ,mat5_3_end ,mat5_2_end , sf::Color::Black, sf::Color::Green);
+    sf::ConvexShape losange16 = createLosange(mat5_6_start + 0.75f * (mat5_6_end - mat5_6_start), mat5_3_end, points[1], mat5_6_end, sf::Color::Black, sf::Color::Green);
+
+    
     
     bool losangeFilled = false;
     
@@ -92,7 +132,7 @@ int main() {
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
                 sf::Vector2i mousePos = sf::Mouse::getPosition(window);
                 if (isPointInConvexShape(losange, mousePos)) {
-                    losange.setFillColor(losangeFilled ? sf::Color::Blue : sf::Color::Red);
+                    losange.setFillColor(losangeFilled ? sf::Color::Blue : sf::Color::Black);
                     losangeFilled = !losangeFilled;
                }
             }
@@ -106,6 +146,19 @@ int main() {
         window.draw(losange);
         window.draw(losange2);
         window.draw(losange3);
+        window.draw(losange4);
+        window.draw(losange5);
+        window.draw(losange6);
+        window.draw(losange7);
+        window.draw(losange8);
+        window.draw(losange9);
+        window.draw(losange10);
+        window.draw(losange11);
+        window.draw(losange12);
+        window.draw(losange13);
+        window.draw(losange14);
+        window.draw(losange15);
+        window.draw(losange16);
         window.display();
     }
     return 0;
