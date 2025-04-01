@@ -68,9 +68,12 @@ int main() {
     center /= static_cast<float>(points.size());
 
     std::vector<sf::Vector2f> milieux = {
-        milieu(points[4], points[3]), milieu(points[3], points[2]),
-        milieu(points[0], points[1]), milieu(points[0], points[5]),
-        milieu(points[5], points[4]), milieu(points[1], points[2])
+        milieu(points[4], points[3]), // bas gauche
+        milieu(points[3], points[2]), // bas
+        milieu(points[0], points[1]), // haut droite
+        milieu(points[0], points[5]), // haut
+        milieu(points[5], points[4]), // haut gauche
+        milieu(points[1], points[2])  // bas droite
     };
 
     std::vector<std::array<sf::Vertex, 2>> lines;
@@ -98,6 +101,101 @@ int main() {
     sf::Vector2f mat5_6_start = center + 0.75f * (milieux[5] - center);// 75% de la distance
     sf::Vector2f mat5_6_end = (1 - 0.875f) * points[0] + 0.875f * points[1];
 
+    // Création des lignes de la matrice 6
+    sf::Vector2f mat6_1_start = center + 0.25f * (milieux[3] - center);// 25% de la distance
+    sf::Vector2f mat6_1_end = (1 - 0.375f) * points[0] + 0.375f * points[1];
+
+    sf::Vector2f mat6_2_start = center + 0.50f * (milieux[3] - center);// 50% de la distance
+    sf::Vector2f mat6_2_end = (1 - 0.25f) * points[0] + 0.25f * points[1];
+
+    sf::Vector2f mat6_3_start = center + 0.75f * (milieux[3] - center);// 75% de la distance
+    sf::Vector2f mat6_3_end = (1 - 0.125f) * points[0] + 0.125f * points[1];
+
+    sf::Vector2f mat6_4_start = center + 0.25f * (milieux[2] - center);// 25% de la distance
+    sf::Vector2f mat6_4_end = (1 - 0.625f) * points[5] + 0.625f * points[0];
+
+    sf::Vector2f mat6_5_start = center + 0.50f * (milieux[2] - center);// 50% de la distance
+    sf::Vector2f mat6_5_end = (1 - 0.750f) * points[5] + 0.750f * points[0];
+
+    sf::Vector2f mat6_6_start = center + 0.75f * (milieux[2] - center);// 75% de la distance
+    sf::Vector2f mat6_6_end = (1 - 0.875f) * points[5] + 0.875f * points[0];
+
+    // Création des lignes de la matrice 4
+    sf::Vector2f mat4_1_start = center + 0.25f * (milieux[4] - center);// 25% de la distance
+    sf::Vector2f mat4_1_end = (1 - 0.375f) * points[5] + 0.375f * points[0];
+
+    sf::Vector2f mat4_2_start = center + 0.50f * (milieux[4] - center);// 50% de la distance
+    sf::Vector2f mat4_2_end = (1 - 0.25f) * points[5] + 0.25f * points[0];
+
+    sf::Vector2f mat4_3_start = center + 0.75f * (milieux[4] - center);// 75% de la distance
+    sf::Vector2f mat4_3_end = (1 - 0.125f) * points[5] + 0.125f * points[0];
+
+    sf::Vector2f mat4_4_start = center + 0.25f * (milieux[3] - center);// 25% de la distance
+    sf::Vector2f mat4_4_end = (1 - 0.625f) * points[4] + 0.625f * points[5];
+
+    sf::Vector2f mat4_5_start = center + 0.50f * (milieux[3] - center);// 50% de la distance
+    sf::Vector2f mat4_5_end = (1 - 0.750f) * points[4] + 0.750f * points[5];
+
+    sf::Vector2f mat4_6_start = center + 0.75f * (milieux[3] - center);// 75% de la distance
+    sf::Vector2f mat4_6_end = (1 - 0.875f) * points[4] + 0.875f * points[5];
+
+    // Création des lignes de la matrice 3
+    sf::Vector2f mat3_1_start = center + 0.25f * (milieux[0] - center);// 25% de la distance
+    sf::Vector2f mat3_1_end = (1 - 0.375f) * points[4] + 0.375f * points[5];
+
+    sf::Vector2f mat3_2_start = center + 0.50f * (milieux[0] - center);// 50% de la distance
+    sf::Vector2f mat3_2_end = (1 - 0.25f) * points[4] + 0.25f * points[5];
+
+    sf::Vector2f mat3_3_start = center + 0.75f * (milieux[0] - center);// 75% de la distance
+    sf::Vector2f mat3_3_end = (1 - 0.125f) * points[4] + 0.125f * points[5];
+
+    sf::Vector2f mat3_4_start = center + 0.25f * (milieux[4] - center);// 25% de la distance
+    sf::Vector2f mat3_4_end = (1 - 0.625f) * points[3] + 0.625f * points[4];
+
+    sf::Vector2f mat3_5_start = center + 0.50f * (milieux[4] - center);// 50% de la distance
+    sf::Vector2f mat3_5_end = (1 - 0.750f) * points[3] + 0.750f * points[4];
+
+    sf::Vector2f mat3_6_start = center + 0.75f * (milieux[4] - center);// 75% de la distance
+    sf::Vector2f mat3_6_end = (1 - 0.875f) * points[3] + 0.875f * points[4];
+
+    // Création des lignes de la matrice 2
+    sf::Vector2f mat2_1_start = center + 0.25f * (milieux[1] - center);// 25% de la distance
+    sf::Vector2f mat2_1_end = (1 - 0.375f) * points[3] + 0.375f * points[4];
+
+    sf::Vector2f mat2_2_start = center + 0.50f * (milieux[1] - center);// 50% de la distance
+    sf::Vector2f mat2_2_end = (1 - 0.25f) * points[3] + 0.25f * points[4];
+
+    sf::Vector2f mat2_3_start = center + 0.75f * (milieux[1] - center);// 75% de la distance
+    sf::Vector2f mat2_3_end = (1 - 0.125f) * points[3] + 0.125f * points[4];
+
+    sf::Vector2f mat2_4_start = center + 0.25f * (milieux[0] - center);// 25% de la distance
+    sf::Vector2f mat2_4_end = (1 - 0.625f) * points[2] + 0.625f * points[3];
+
+    sf::Vector2f mat2_5_start = center + 0.50f * (milieux[0] - center);// 50% de la distance
+    sf::Vector2f mat2_5_end = (1 - 0.750f) * points[2] + 0.750f * points[3];
+
+    sf::Vector2f mat2_6_start = center + 0.75f * (milieux[0] - center);// 75% de la distance
+    sf::Vector2f mat2_6_end = (1 - 0.875f) * points[2] + 0.875f * points[3];
+
+    // Création des lignes de la matrice 1
+    sf::Vector2f mat1_1_start = center + 0.25f * (milieux[5] - center);// 25% de la distance
+    sf::Vector2f mat1_1_end = (1 - 0.375f) * points[2] + 0.375f * points[3];
+
+    sf::Vector2f mat1_2_start = center + 0.50f * (milieux[5] - center);// 50% de la distance
+    sf::Vector2f mat1_2_end = (1 - 0.25f) * points[2] + 0.25f * points[3];
+
+    sf::Vector2f mat1_3_start = center + 0.75f * (milieux[5] - center);// 75% de la distance
+    sf::Vector2f mat1_3_end = (1 - 0.125f) * points[2] + 0.125f * points[3];
+
+    sf::Vector2f mat1_4_start = center + 0.25f * (milieux[1] - center);// 25% de la distance
+    sf::Vector2f mat1_4_end = (1 - 0.625f) * points[1] + 0.625f * points[2];
+
+    sf::Vector2f mat1_5_start = center + 0.50f * (milieux[1] - center);// 50% de la distance
+    sf::Vector2f mat1_5_end = (1 - 0.750f) * points[1] + 0.750f * points[2];
+
+    sf::Vector2f mat1_6_start = center + 0.75f * (milieux[1] - center);// 75% de la distance
+    sf::Vector2f mat1_6_end = (1 - 0.875f) * points[1] + 0.875f * points[2];
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     sf::ConvexShape losange = createLosange(center, mat5_1_start, mat5_4_start + 0.25f * (mat5_4_end - mat5_4_start), mat5_4_start, sf::Color::Black, sf::Color::Green);
@@ -120,8 +218,15 @@ int main() {
     sf::ConvexShape losange15 = createLosange(mat5_6_start + 0.5f * (mat5_6_end - mat5_6_start) ,mat5_6_start + 0.75f * (mat5_6_end - mat5_6_start) ,mat5_3_end ,mat5_2_end , sf::Color::Black, sf::Color::Green);
     sf::ConvexShape losange16 = createLosange(mat5_6_start + 0.75f * (mat5_6_end - mat5_6_start), mat5_3_end, points[1], mat5_6_end, sf::Color::Black, sf::Color::Green);
 
-    
-    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    sf::ConvexShape losange17 = createLosange(center, mat6_1_start, mat6_4_start + 0.25f * (mat6_4_end - mat6_4_start), mat6_4_start, sf::Color::Black, sf::Color::Green);
+    sf::ConvexShape losange18 = createLosange(center, mat4_1_start, mat4_4_start + 0.25f * (mat4_4_end - mat4_4_start), mat4_4_start, sf::Color::Black, sf::Color::Green);
+    sf::ConvexShape losange19 = createLosange(center, mat3_1_start, mat3_4_start + 0.25f * (mat3_4_end - mat3_4_start), mat3_4_start, sf::Color::Black, sf::Color::Green);
+    sf::ConvexShape losange20 = createLosange(center, mat2_1_start, mat2_4_start + 0.25f * (mat2_4_end - mat2_4_start), mat2_4_start, sf::Color::Black, sf::Color::Green);
+    sf::ConvexShape losange21 = createLosange(center, mat1_1_start, mat1_4_start + 0.25f * (mat1_4_end - mat1_4_start), mat1_4_start, sf::Color::Black, sf::Color::Green);
+
+
     bool losangeFilled = false;
     
     while (window.isOpen()) {
@@ -159,6 +264,13 @@ int main() {
         window.draw(losange14);
         window.draw(losange15);
         window.draw(losange16);
+
+
+        window.draw(losange17);
+        window.draw(losange18);
+        window.draw(losange19);
+        window.draw(losange20);
+        window.draw(losange21);
         window.display();
     }
     return 0;
