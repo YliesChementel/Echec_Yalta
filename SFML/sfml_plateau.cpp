@@ -199,6 +199,20 @@ int main() {
             }
         }
 
+
+        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+        sf::Vector2f mouseWorldPos = window.mapPixelToCoords(mousePos);
+        for (auto& losange : matrice1) {
+            if (losange.getGlobalBounds().contains(mouseWorldPos)) {
+                if (losange.getFillColor() == beige) {
+                    losange.setFillColor(blanc);
+                } else {
+                    losange.setFillColor(beige);
+                }
+
+            }
+        }
+
         window.clear(sf::Color::White);
         window.draw(hexagon);
         window.draw(hexagon2);
