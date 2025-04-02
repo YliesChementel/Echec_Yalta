@@ -2,24 +2,9 @@
 #include <cmath>
 #include <vector>
 #include <array>
+#include <iostream>
 
 const float PI = 3.14159265359f;
-
-bool isPointInConvexShape(const sf::ConvexShape& shape, const sf::Vector2i& point) {
-    int count = shape.getPointCount();
-    bool inside = false;
-
-    for (int i = 0, j = count - 1; i < count; j = i++) {
-        sf::Vector2f vi = shape.getPoint(i);
-        sf::Vector2f vj = shape.getPoint(j);
-        
-        if ((vi.y > point.y) != (vj.y > point.y) &&
-            (point.x < (vj.x - vi.x) * (point.y - vi.y) / (vj.y - vi.y) + vi.x)) {
-            inside = !inside;
-        }
-    }
-    return inside;
-}
 
 sf::Vector2f milieu(const sf::Vector2f& p1, const sf::Vector2f& p2) {
     return (p1 + p2) / 2.0f;
@@ -79,13 +64,26 @@ std::vector<sf::ConvexShape> createMatrixLosange( const sf::Vector2f& center,con
     return shapes;
 }
 
+
+sf::Text createText(const std::string& textStr, const sf::Vector2f& position, unsigned int characterSize, sf::Color color, sf::Font& font) {
+    sf::Text text;
+    text.setString(textStr);
+    text.setFont(font);  // Utilisation de la police passée en argument
+    text.setPosition(position);
+    text.setFillColor(color);
+    return text;
+}
+
+
 int main() {
-    sf::RenderWindow window(sf::VideoMode(1000, 1000), "Echec Yalta");
+    sf::RenderWindow window(sf::VideoMode(1200, 1000), "Echec Yalta");
     std::vector<float> side_lengths = {450, 460, 460, 450, 460, 460};
     std::vector<sf::Vector2f> points;
     
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Création de l'héxagon du plateau
     float angle = 0;
-    sf::Vector2f origin(250, 100);
+    sf::Vector2f origin(350, 100);
     points.push_back(origin + sf::Vector2f(side_lengths[0], 0));
     
     for (int i = 1; i < 6; i++) {
@@ -103,6 +101,35 @@ int main() {
     sf::Vector2f center(0, 0);
     for (const auto& p : points) center += p;
     center /= static_cast<float>(points.size());
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Création de l'héxagon 2
+    std::vector<sf::Vector2f> points2;
+    std::vector<float> side_lengths2 = {500, 510, 510, 500, 510, 510};
+    points2.push_back(origin + sf::Vector2f(side_lengths2[0], 0));
+    
+    for (int i = 1; i < 6; i++) {
+        angle += PI / 3;
+        points2.push_back(points2.back() + sf::Vector2f(std::cos(angle), std::sin(angle)) * side_lengths2[i]);
+    }
+
+    sf::Vector2f center2(0, 0);
+    for (const auto& p : points2) center2 += p;
+    center2 /= static_cast<float>(points2.size());
+
+    // Déplacer tous les points de l'héxagone 2 pour qu'il soit centré sur le même point que l'héxagone 1
+    sf::Vector2f offset = center - center2; 
+    for (auto& p : points2) {
+        p += offset;  // Appliquer l'offset à chaque point
+    }
+
+    sf::ConvexShape hexagon2;
+    hexagon2.setPointCount(6);
+    for (size_t i = 0; i < 6; i++) hexagon2.setPoint(i, points2[i]);
+    hexagon2.setFillColor(sf::Color::Transparent);
+    hexagon2.setOutlineColor(sf::Color::Black);
+    hexagon2.setOutlineThickness(10);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Création des milieux des arêtes
@@ -143,9 +170,25 @@ int main() {
     std::vector<sf::ConvexShape> matrice5 = createMatrixLosange(center,mat5_lines, points[1], milieux[2], milieux[5], beige, blanc);
     std::vector<sf::ConvexShape> matrice6 = createMatrixLosange(center,mat6_lines, points[0], milieux[3], milieux[2], blanc, beige);
     
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Création du texte pour les cases
+    sf::Font font;
+    if (!font.loadFromFile("arial.ttf")) {
+        std::cerr << "Error loading font!" << std::endl;
+        return -1;
+    }
 
-    bool losangeFilled = false;
-    
+    sf::Text aBas = createText("a", milieu(points[3], points2[4]) - sf::Vector2f(-30, 18), 30, sf::Color::Black, font);
+    sf::Text bBas = createText("b", milieu(points[3], points2[4]) - sf::Vector2f(-87, 18), 30, sf::Color::Black, font);
+    sf::Text cBas = createText("c", milieu(points[3], points2[4]) - sf::Vector2f(-144, 18), 30, sf::Color::Black, font);
+    sf::Text dBas = createText("d", milieu(points[3], points2[4]) - sf::Vector2f(-201, 18), 30, sf::Color::Black, font);
+    sf::Text eBas = createText("e", milieu(points[3], points2[4]) - sf::Vector2f(-258, 18), 30, sf::Color::Black, font);
+    sf::Text fBas = createText("f", milieu(points[3], points2[4]) - sf::Vector2f(-315, 18), 30, sf::Color::Black, font);
+    sf::Text gBas = createText("g", milieu(points[3], points2[4]) - sf::Vector2f(-372, 18), 30, sf::Color::Black, font);
+    sf::Text hBas = createText("h", milieu(points[3], points2[4]) - sf::Vector2f(-429, 18), 30, sf::Color::Black, font);
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Dessin de l'interface
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -158,6 +201,15 @@ int main() {
 
         window.clear(sf::Color::White);
         window.draw(hexagon);
+        window.draw(hexagon2);
+        window.draw(aBas);
+        window.draw(bBas);
+        window.draw(cBas);
+        window.draw(dBas);
+        window.draw(eBas);
+        window.draw(fBas);
+        window.draw(gBas);
+        window.draw(hBas);
         for (const auto& line : lines) {
             window.draw(line.data(), 2, sf::Lines);
         }
