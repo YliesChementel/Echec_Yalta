@@ -65,18 +65,22 @@ std::vector<sf::ConvexShape> createMatrixLosange( const sf::Vector2f& center,con
 }
 
 
-sf::Text createText(const std::string& textStr, const sf::Vector2f& position, unsigned int characterSize, sf::Color color, sf::Font& font) {
+sf::Text createText(const std::string& textStr, const sf::Vector2f& startPosition, unsigned int characterSize, sf::Color color, sf::Font& font) {
     sf::Text text;
     text.setString(textStr);
     text.setFont(font);  // Utilisation de la police passée en argument
-    text.setPosition(position);
     text.setFillColor(color);
+    text.setCharacterSize(characterSize);
+    text.setPosition(startPosition);
     return text;
 }
 
 
+
 int main() {
-    sf::RenderWindow window(sf::VideoMode(1200, 1000), "Echec Yalta");
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 8;
+    sf::RenderWindow window(sf::VideoMode(1200, 1000), "Echec Yalta",sf::Style::Default,settings);
     std::vector<float> side_lengths = {450, 460, 460, 450, 460, 460};
     std::vector<sf::Vector2f> points;
     
@@ -129,7 +133,7 @@ int main() {
     for (size_t i = 0; i < 6; i++) hexagon2.setPoint(i, points2[i]);
     hexagon2.setFillColor(sf::Color::Transparent);
     hexagon2.setOutlineColor(sf::Color::Black);
-    hexagon2.setOutlineThickness(10);
+    hexagon2.setOutlineThickness(7);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Création des milieux des arêtes
@@ -178,14 +182,41 @@ int main() {
         return -1;
     }
 
-    sf::Text aBas = createText("a", milieu(points[3], points2[4]) - sf::Vector2f(-30, 18), 30, sf::Color::Black, font);
-    sf::Text bBas = createText("b", milieu(points[3], points2[4]) - sf::Vector2f(-87, 18), 30, sf::Color::Black, font);
-    sf::Text cBas = createText("c", milieu(points[3], points2[4]) - sf::Vector2f(-144, 18), 30, sf::Color::Black, font);
-    sf::Text dBas = createText("d", milieu(points[3], points2[4]) - sf::Vector2f(-201, 18), 30, sf::Color::Black, font);
-    sf::Text eBas = createText("e", milieu(points[3], points2[4]) - sf::Vector2f(-258, 18), 30, sf::Color::Black, font);
-    sf::Text fBas = createText("f", milieu(points[3], points2[4]) - sf::Vector2f(-315, 18), 30, sf::Color::Black, font);
-    sf::Text gBas = createText("g", milieu(points[3], points2[4]) - sf::Vector2f(-372, 18), 30, sf::Color::Black, font);
-    sf::Text hBas = createText("h", milieu(points[3], points2[4]) - sf::Vector2f(-429, 18), 30, sf::Color::Black, font);
+    std::vector<std::string> lettresBas = {"a", "b", "c", "d", "e", "f", "g", "h"};
+    std::vector<std::string> lettresHaut = {"8", "7", "6", "5", "9", "10", "11", "12"};
+    std::vector<std::string> chiffresBasGauche = {"1", "2", "3", "4", "5", "6", "7", "8"};
+    std::vector<std::string> lettresHautDroite = {"h", "g", "f", "e", "i", "j", "k", "l"};
+    std::vector<std::string> lettresHautGauche = {"l", "k", "j", "i", "d", "c", "b", "a"};
+    std::vector<std::string> lettresBasDroite = {"1", "2", "3", "4", "9", "10", "11", "12"};
+
+    sf::Vector2f startBas = milieu(points[3], points2[4]) - sf::Vector2f(-30, 18);
+    sf::Vector2f startHaut = milieu(points[5], points2[0]) - sf::Vector2f(-30, 18);
+    sf::Vector2f startBasGauche = milieu(points[4], points2[5]) + sf::Vector2f(213, 370);
+    sf::Vector2f startHautDroite = milieu(points[0], points2[1]) + sf::Vector2f(213, 360);
+    sf::Vector2f startHautGauche = milieu(points[5], points2[0]) - sf::Vector2f(35, -15);
+    sf::Vector2f startBasDroite = milieu(points[2], points2[3]) + sf::Vector2f(7, -55);
+
+    std::vector<sf::Text> coordText;
+    for (size_t i = 0; i < 8; ++i) {
+        coordText.push_back(createText(lettresBas[i], startBas + sf::Vector2f(i * 57.0f, 0.0f), 28, sf::Color::Black, font));
+        if(i > 4) {
+            coordText.push_back(createText(lettresHaut[i], startHaut + sf::Vector2f(i * 56.0f, 0.0f), 28, sf::Color::Black, font));
+        }
+        else {
+            coordText.push_back(createText(lettresHaut[i], startHaut + sf::Vector2f(i * 57.0f, 0.0f), 28, sf::Color::Black, font));
+        }
+        coordText.push_back(createText(chiffresBasGauche[i], startBasGauche - sf::Vector2f(i * 29.0f, i * 50.0f), 28, sf::Color::Black, font));
+        coordText.push_back(createText(lettresHautDroite[i], startHautDroite - sf::Vector2f(i * 29.0f, i * 50.0f), 28, sf::Color::Black, font));
+        coordText.push_back(createText(lettresHautGauche[i], startHautGauche + sf::Vector2f(7 - i * 29.0f, i * 50.0f), 28, sf::Color::Black, font));
+        if(i > 4) {
+            coordText.push_back(createText(lettresBasDroite[i], startBasDroite + sf::Vector2f(i * 28.0f, 7 - i * 50.0f), 28, sf::Color::Black, font));
+
+        }
+        else {
+            coordText.push_back(createText(lettresBasDroite[i], startBasDroite + sf::Vector2f(i * 29.0f, 7 - i * 50.0f), 28, sf::Color::Black, font));
+        }
+    }
+
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Dessin de l'interface
@@ -216,14 +247,11 @@ int main() {
         window.clear(sf::Color::White);
         window.draw(hexagon);
         window.draw(hexagon2);
-        window.draw(aBas);
-        window.draw(bBas);
-        window.draw(cBas);
-        window.draw(dBas);
-        window.draw(eBas);
-        window.draw(fBas);
-        window.draw(gBas);
-        window.draw(hBas);
+        
+        for (const auto& text : coordText) {
+            window.draw(text);
+        }
+
         for (const auto& line : lines) {
             window.draw(line.data(), 2, sf::Lines);
         }
