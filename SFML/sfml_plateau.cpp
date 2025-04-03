@@ -68,11 +68,48 @@ std::vector<sf::ConvexShape> createMatrixLosange( const sf::Vector2f& center,con
 sf::Text createText(const std::string& textStr, const sf::Vector2f& startPosition, unsigned int characterSize, sf::Color color, sf::Font& font) {
     sf::Text text;
     text.setString(textStr);
-    text.setFont(font);  // Utilisation de la police passée en argument
+    text.setFont(font);
     text.setFillColor(color);
     text.setCharacterSize(characterSize);
     text.setPosition(startPosition);
     return text;
+}
+
+sf::Sprite chargerImage(const std::string& cheminFichier, float posX, float posY, float scaleX, float scaleY, sf::Texture& texture) {
+    if (!texture.loadFromFile(cheminFichier)) {
+        std::cerr << "Erreur : Impossible de charger l'image " << cheminFichier << std::endl;
+    }
+
+    sf::Sprite sprite;
+    sprite.setTexture(texture);
+    sprite.setPosition(posX, posY);
+    sprite.setScale(scaleX, scaleY);
+    
+    return sprite;
+}
+
+sf::Vector2f calculerCentreLosange(const sf::ConvexShape& shape) {
+    sf::Vector2f centre;
+    const sf::Vector2f& A = shape.getPoint(0);
+    const sf::Vector2f& C = shape.getPoint(2);
+    centre.x = (A.x + C.x) / 2.0f;
+    centre.y = (A.y + C.y) / 2.0f;
+    return centre;
+}
+
+// Fonction pour charger une image et la centrer dans un losange (sf::ConvexShape)
+sf::Sprite chargerImageDansLosange(const std::string& cheminFichier, const sf::ConvexShape& shape, float scaleX, float scaleY, sf::Texture& texture) {
+    if (!texture.loadFromFile(cheminFichier)) {
+        std::cerr << "Erreur : Impossible de charger l'image " << cheminFichier << std::endl;
+    }
+    sf::Sprite sprite;
+    sprite.setTexture(texture);
+    sprite.setScale(scaleX, scaleY);
+    sf::Vector2f centre = calculerCentreLosange(shape);
+    sf::FloatRect bounds = sprite.getGlobalBounds();
+    sprite.setPosition(centre.x - bounds.width / 2.0f, centre.y - bounds.height / 2.0f);
+
+    return sprite;
 }
 
 
@@ -217,7 +254,32 @@ int main() {
         }
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Création des pièces du jeu
+    sf::Texture texture1, texture2, texture3, texture4, texture5, texture6, texture7, texture8;
 
+    sf::Sprite monImage = chargerImageDansLosange("./images/WhiteRook.png",matrice1[15], 0.2f, 0.2f, texture1);
+    sf::Sprite monImage2 = chargerImageDansLosange("./images/WhiteKnight.png",matrice1[11], 0.2f, 0.2f, texture2);
+    sf::Sprite monImage3 = chargerImageDansLosange("./images/WhiteBishop.png",matrice1[7], 0.2f, 0.2f, texture3);
+    sf::Sprite monImage4 = chargerImageDansLosange("./images/WhiteKing.png",matrice1[3], 0.2f, 0.2f, texture4);
+    sf::Sprite monImage5 = chargerImageDansLosange("./images/WhiteQueen.png",matrice2[12], 0.2f, 0.2f, texture5);
+    sf::Sprite monImage6 = chargerImageDansLosange("./images/WhiteBishop.png",matrice2[13], 0.2f, 0.2f, texture6);
+    sf::Sprite monImage7 = chargerImageDansLosange("./images/WhiteKnight.png",matrice2[14], 0.2f, 0.2f, texture7);
+    sf::Sprite monImage8 = chargerImageDansLosange("./images/WhiteRook.png",matrice2[15], 0.2f, 0.2f, texture8);
+    sf::Texture texture9, texture10, texture11, texture12, texture13, texture14, texture15, texture16;
+    sf::Sprite monImage9 = chargerImageDansLosange("./images/WhitePawn.png",matrice1[14], 0.2f, 0.2f, texture9);
+    sf::Sprite monImage10 = chargerImageDansLosange("./images/WhitePawn.png",matrice1[10], 0.2f, 0.2f, texture10);
+    sf::Sprite monImage11 = chargerImageDansLosange("./images/WhitePawn.png",matrice1[6], 0.2f, 0.2f, texture11);
+    sf::Sprite monImage12 = chargerImageDansLosange("./images/WhitePawn.png",matrice1[2], 0.2f, 0.2f, texture12);
+    sf::Sprite monImage13 = chargerImageDansLosange("./images/WhitePawn.png",matrice2[8], 0.2f, 0.2f, texture13);
+    sf::Sprite monImage14 = chargerImageDansLosange("./images/WhitePawn.png",matrice2[9], 0.2f, 0.2f, texture14);
+    sf::Sprite monImage15 = chargerImageDansLosange("./images/WhitePawn.png",matrice2[10], 0.2f, 0.2f, texture15);
+    sf::Sprite monImage16 = chargerImageDansLosange("./images/WhitePawn.png",matrice2[11], 0.2f, 0.2f, texture16);
+
+
+    bool isDragging = false;
+    sf::Vector2f offsetImage;
+    
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Dessin de l'interface
     while (window.isOpen()) {
@@ -228,19 +290,24 @@ int main() {
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
                 sf::Vector2i mousePos = sf::Mouse::getPosition(window);
             }
-        }
 
-
-        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-        sf::Vector2f mouseWorldPos = window.mapPixelToCoords(mousePos);
-        for (auto& losange : matrice1) {
-            if (losange.getGlobalBounds().contains(mouseWorldPos)) {
-                if (losange.getFillColor() == beige) {
-                    losange.setFillColor(blanc);
-                } else {
-                    losange.setFillColor(beige);
+            // Vérifier si on clique sur l'image
+            if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+                sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                
+                if (monImage.getGlobalBounds().contains(mousePos)) {
+                    isDragging = true;
+                    offsetImage = monImage.getPosition() - mousePos;
                 }
-
+            }
+            // Déplacer l'image avec la souris
+            if (event.type == sf::Event::MouseMoved && isDragging) {
+                sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                monImage.setPosition(mousePos + offsetImage);
+            }
+            // Relâcher l'image
+            if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
+                isDragging = false;
             }
         }
 
@@ -273,6 +340,23 @@ int main() {
         for (const auto& losange : matrice6) {
             window.draw(losange);
         }
+
+        window.draw(monImage);
+        window.draw(monImage2);
+        window.draw(monImage3);
+        window.draw(monImage4);
+        window.draw(monImage5);
+        window.draw(monImage6);
+        window.draw(monImage7);
+        window.draw(monImage8);
+        window.draw(monImage9);
+        window.draw(monImage10);
+        window.draw(monImage11);
+        window.draw(monImage12);
+        window.draw(monImage13);
+        window.draw(monImage14);
+        window.draw(monImage15);
+        window.draw(monImage16);
     window.display();
     }
     return 0;
