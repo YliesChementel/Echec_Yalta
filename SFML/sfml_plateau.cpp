@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <cmath>
 #include <vector>
 #include <array>
@@ -127,7 +128,7 @@ std::vector<sf::Texture> loadTextures(const std::vector<std::string>& filePaths)
 std::vector<sf::Sprite> CreerPiece(const std::vector<std::string>& cheminFichiers, const std::vector<sf::ConvexShape> matriceA, const std::vector<sf::ConvexShape> matriceB,  std::vector<sf::Texture>& textures) {
     std::vector<sf::Sprite> Pieces;
     sf:: Texture texture;
-    Pieces.push_back(chargerImageDansLosange("images/"+ cheminFichiers[0], matriceA[15], 0.2f, 0.2f,texture));
+    Pieces.push_back(chargerImageDansLosange("images/"+ cheminFichiers[0], matriceA[15], 0.2f, 0.2f,textures[0]));
     Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[1], matriceA[11], 0.2f, 0.2f, textures[1]));
     Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[2], matriceA[7], 0.2f, 0.2f, textures[2]));
     Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[3], matriceA[3], 0.2f, 0.2f, textures[3]));
@@ -364,6 +365,15 @@ int main() {
     std::vector<sf::Sprite> BlackPieces = CreerPiece(texturePathBlack, matrice5, matrice6, texturesBlack);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Chargement du fichier audio
+    sf::SoundBuffer buffer;
+    if (!buffer.loadFromFile("sound/coup.ogg")) {
+        return -1;  // Si le fichier n'a pas pu être chargé
+    }
+    sf::Sound sound;
+    sound.setBuffer(buffer);
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Variables pour le drag and drop
     bool isDragging = false;
     sf::Vector2f offsetImage;
@@ -423,6 +433,7 @@ int main() {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Relâchement de l'image
             if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
+                sound.play();
                 isDragging = false;
                 sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                 bool placed = false;
