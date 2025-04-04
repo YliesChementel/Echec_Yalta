@@ -126,22 +126,23 @@ std::vector<sf::Texture> loadTextures(const std::vector<std::string>& filePaths)
 
 std::vector<sf::Sprite> CreerPiece(const std::vector<std::string>& cheminFichiers, const std::vector<sf::ConvexShape> matriceA, const std::vector<sf::ConvexShape> matriceB,  std::vector<sf::Texture>& textures) {
     std::vector<sf::Sprite> Pieces;
-    Pieces.push_back(chargerImageDansLosange("./images/"+ cheminFichiers[0], matriceA[15], 0.2f, 0.2f, textures[0]));
-    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[1], matriceA[11], 0.2f, 0.2f, textures[1]));
-    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[2], matriceA[7], 0.2f, 0.2f, textures[2]));
-    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[3], matriceA[3], 0.2f, 0.2f, textures[3]));
-    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[4], matriceB[12], 0.2f, 0.2f, textures[4]));
-    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[5], matriceB[13], 0.2f, 0.2f, textures[5]));
-    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[6], matriceB[14], 0.2f, 0.2f, textures[6]));
-    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[7], matriceB[15], 0.2f, 0.2f, textures[7]));
-    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[8], matriceA[14], 0.2f, 0.2f, textures[8]));
-    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[9], matriceA[10], 0.2f, 0.2f, textures[9]));
-    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[10], matriceA[6], 0.2f, 0.2f, textures[10]));
-    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[11], matriceA[2], 0.2f, 0.2f, textures[11]));
-    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[12], matriceB[8], 0.2f, 0.2f, textures[12]));
-    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[13], matriceB[9], 0.2f, 0.2f, textures[13]));
-    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[14], matriceB[10], 0.2f, 0.2f, textures[14]));
-    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[15], matriceB[11], 0.2f, 0.2f, textures[15]));
+    sf:: Texture texture;
+    Pieces.push_back(chargerImageDansLosange("images/"+ cheminFichiers[0], matriceA[15], 0.2f, 0.2f,texture));
+    Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[1], matriceA[11], 0.2f, 0.2f, textures[1]));
+    Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[2], matriceA[7], 0.2f, 0.2f, textures[2]));
+    Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[3], matriceA[3], 0.2f, 0.2f, textures[3]));
+    Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[4], matriceB[12], 0.2f, 0.2f, textures[4]));
+    Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[5], matriceB[13], 0.2f, 0.2f, textures[5]));
+    Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[6], matriceB[14], 0.2f, 0.2f, textures[6]));
+    Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[7], matriceB[15], 0.2f, 0.2f, textures[7]));
+    Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[8], matriceA[14], 0.2f, 0.2f, textures[8]));
+    Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[9], matriceA[10], 0.2f, 0.2f, textures[9]));
+    Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[10], matriceA[6], 0.2f, 0.2f, textures[10]));
+    Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[11], matriceA[2], 0.2f, 0.2f, textures[11]));
+    Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[12], matriceB[8], 0.2f, 0.2f, textures[12]));
+    Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[13], matriceB[9], 0.2f, 0.2f, textures[13]));
+    Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[14], matriceB[10], 0.2f, 0.2f, textures[14]));
+    Pieces.push_back(chargerImageDansLosange("images/"+cheminFichiers[15], matriceB[11], 0.2f, 0.2f, textures[15]));
     return Pieces;
 }
 
@@ -162,6 +163,25 @@ bool PieceDansMatrice(const sf::Vector2f& point, const std::vector<sf::ConvexSha
 
     return inside;
 }
+
+bool PieceDansLosange(const sf::ConvexShape& shape, const sf::Vector2f& point){
+    int n = shape.getPointCount();
+    bool inside = false;
+    // On parcourt les bords du polygone (les segments entre les points successifs)
+    for (int i = 0, j = n - 1; i < n; j = i++) {
+        sf::Vector2f p1 = shape.getPoint(i);
+        sf::Vector2f p2 = shape.getPoint(j);
+
+        // Vérification si le point est à l'intérieur du polygone en utilisant l'algorithme du ray-casting
+        if (((p1.y > point.y) != (p2.y > point.y)) &&
+            (point.x < (p2.x - p1.x) * (point.y - p1.y) / (p2.y - p1.y) + p1.x)) {
+            inside = !inside;
+        }
+    }
+
+    return inside;
+}
+
 
 void PlacementPiece(int& selectedPieceIndex,const sf::ConvexShape losange,std::vector<sf::Sprite>& WhitePieces,std::vector<sf::Sprite>& BlackPieces,std::vector<sf::Sprite>& RedPieces){
     sf::Vector2f centre = calculerCentreLosange(losange);
@@ -274,7 +294,7 @@ int main() {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Création du texte pour les cases
     sf::Font font;
-    if (!font.loadFromFile("arial.ttf")) {
+    if (!font.loadFromFile("./font/arial.ttf")) {
         std::cerr << "Error loading font!" << std::endl;
         return -1;
     }
@@ -343,13 +363,12 @@ int main() {
     std::vector<sf::Texture> texturesBlack = loadTextures(texturePathBlack);
     std::vector<sf::Sprite> BlackPieces = CreerPiece(texturePathBlack, matrice5, matrice6, texturesBlack);
 
-    sf::Texture texture1;
-    sf::Sprite monImage = chargerImageDansLosange("./images/WhiteRook.png",matrice1[15], 0.2f, 0.2f, texture1);
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Variables pour le drag and drop
     bool isDragging = false;
     sf::Vector2f offsetImage;
     int selectedPieceIndex = -1;
-    
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Dessin de l'interface
     while (window.isOpen()) {
@@ -360,7 +379,8 @@ int main() {
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
                 sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-                // Vérifier si on clique sur l'image
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                // Vérification de si on clique sur l'image
                 for (size_t i = 0; i < WhitePieces.size(); ++i) {
                     if (WhitePieces[i].getGlobalBounds().contains(mousePos)) {
                         isDragging = true;
@@ -386,7 +406,9 @@ int main() {
                     }
                 }
             }
-            // Déplacer l'image avec la souris
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Déplacement de l'image avec la souris
             if (event.type == sf::Event::MouseMoved && isDragging) {
                 sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                 if (selectedPieceIndex < WhitePieces.size()) {
@@ -397,67 +419,68 @@ int main() {
                     BlackPieces[selectedPieceIndex - WhitePieces.size() - RedPieces.size()].setPosition(mousePos - offsetImage);
                 }
             }
-            // Relâcher l'image
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Relâchement de l'image
             if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
                 isDragging = false;
                 sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-                // Vérifier si l'image est dans un losange
                 bool placed = false;
                 if(PieceDansMatrice(mousePos, matrice1)){
                     for (const auto& losange : matrice1) {
-                        if (losange.getGlobalBounds().contains(mousePos)) {
+                        if (PieceDansLosange(losange, mousePos)) {
                             PlacementPiece(selectedPieceIndex,losange,WhitePieces,BlackPieces,RedPieces);
                             placed = true;
                             break;
                         }
                     }
                 }
-                else if(PieceDansMatrice(mousePos, matrice2)){
+                else if(!placed && PieceDansMatrice(mousePos, matrice2)){
                     for (const auto& losange : matrice2) {
-                        if (losange.getGlobalBounds().contains(mousePos)) {
+                        if (PieceDansLosange(losange, mousePos)) {
                             PlacementPiece(selectedPieceIndex,losange,WhitePieces,BlackPieces,RedPieces);
                             placed = true;
                             break;
                         }
                     }
                 }
-                else if(PieceDansMatrice(mousePos, matrice3)){
+                else if(!placed && PieceDansMatrice(mousePos, matrice3)){
                     for (const auto& losange : matrice3) {
-                        if (losange.getGlobalBounds().contains(mousePos)) {
+                        if (PieceDansLosange(losange, mousePos)) {
                             PlacementPiece(selectedPieceIndex,losange,WhitePieces,BlackPieces,RedPieces);
                             placed = true;
                             break;
                         }
                     }
                 }
-                else if(PieceDansMatrice(mousePos, matrice4)){
+                else if(!placed && PieceDansMatrice(mousePos, matrice4)){
                     for (const auto& losange : matrice4) {
-                        if (losange.getGlobalBounds().contains(mousePos)) {
+                        if (PieceDansLosange(losange, mousePos)) {
                             PlacementPiece(selectedPieceIndex,losange,WhitePieces,BlackPieces,RedPieces);
                             placed = true;
                             break;
                         }
                     }
                 }
-                else if(PieceDansMatrice(mousePos, matrice5)){
+                else if(!placed && PieceDansMatrice(mousePos, matrice5)){
                     for (const auto& losange : matrice5) {
-                        if (losange.getGlobalBounds().contains(mousePos)) {
+                        if (PieceDansLosange(losange, mousePos)) {
                             PlacementPiece(selectedPieceIndex,losange,WhitePieces,BlackPieces,RedPieces);
                             placed = true;
                             break;
                         }
                     }
                 }
-                else if(PieceDansMatrice(mousePos, matrice6)){
+                else if(!placed && PieceDansMatrice(mousePos, matrice6)){
                     for (const auto& losange : matrice6) {
-                        if (losange.getGlobalBounds().contains(mousePos)) {
+                        if (PieceDansLosange(losange, mousePos)) {
                             PlacementPiece(selectedPieceIndex,losange,WhitePieces,BlackPieces,RedPieces);
                             placed = true;
                             break;
                         }
                     }
                 }
-
+                
             }
         }
 
@@ -503,8 +526,7 @@ int main() {
             window.draw(piece);
         }
 
-        window.draw(monImage);
-    window.display();
+        window.display();
     }
     return 0;
 }
