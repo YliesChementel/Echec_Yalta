@@ -112,6 +112,39 @@ sf::Sprite chargerImageDansLosange(const std::string& cheminFichier, const sf::C
     return sprite;
 }
 
+std::vector<sf::Texture> loadTextures(const std::vector<std::string>& filePaths) {
+    std::vector<sf::Texture> textures;
+    for (const auto& path : filePaths) {
+        sf::Texture texture;
+        if (!texture.loadFromFile(path)) {
+            std::cerr << "Erreur : Impossible de charger l'image " << path << std::endl;
+        }
+        textures.push_back(texture);
+    }
+    return textures;
+}
+
+std::vector<sf::Sprite> CreerPiece(const std::vector<std::string>& cheminFichiers, const std::vector<sf::ConvexShape> matriceA, const std::vector<sf::ConvexShape> matriceB,  std::vector<sf::Texture>& textures) {
+    std::vector<sf::Sprite> Pieces;
+    Pieces.push_back(chargerImageDansLosange("./images/"+ cheminFichiers[0], matriceA[15], 0.2f, 0.2f, textures[0]));
+    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[1], matriceA[11], 0.2f, 0.2f, textures[1]));
+    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[2], matriceA[7], 0.2f, 0.2f, textures[2]));
+    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[3], matriceA[3], 0.2f, 0.2f, textures[3]));
+    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[4], matriceB[12], 0.2f, 0.2f, textures[4]));
+    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[5], matriceB[13], 0.2f, 0.2f, textures[5]));
+    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[6], matriceB[14], 0.2f, 0.2f, textures[6]));
+    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[7], matriceB[15], 0.2f, 0.2f, textures[7]));
+    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[8], matriceA[14], 0.2f, 0.2f, textures[8]));
+    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[9], matriceA[10], 0.2f, 0.2f, textures[9]));
+    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[10], matriceA[6], 0.2f, 0.2f, textures[10]));
+    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[11], matriceA[2], 0.2f, 0.2f, textures[11]));
+    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[12], matriceB[8], 0.2f, 0.2f, textures[12]));
+    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[13], matriceB[9], 0.2f, 0.2f, textures[13]));
+    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[14], matriceB[10], 0.2f, 0.2f, textures[14]));
+    Pieces.push_back(chargerImageDansLosange("./images/"+cheminFichiers[15], matriceB[11], 0.2f, 0.2f, textures[15]));
+    return Pieces;
+}
+
 
 
 int main() {
@@ -256,60 +289,35 @@ int main() {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Création des pièces du jeu
-    sf::Texture texture1, texture2, texture3, texture4, texture5, texture6, texture7, texture8, texture9, texture10, texture11, texture12, texture13, texture14, texture15, texture16;
+    std::vector<std::string> texturePathWhite = {
+        "WhiteRook.png", "WhiteKnight.png", "WhiteBishop.png", "WhiteKing.png",
+        "WhiteQueen.png", "WhiteBishop.png", "WhiteKnight.png", "WhiteRook.png",
+        "WhitePawn.png", "WhitePawn.png", "WhitePawn.png", "WhitePawn.png",
+        "WhitePawn.png", "WhitePawn.png", "WhitePawn.png", "WhitePawn.png"
+    };
+    std::vector<sf::Texture> texturesWhite = loadTextures(texturePathWhite);
+    std::vector<sf::Sprite> WhitePieces = CreerPiece(texturePathWhite, matrice1, matrice2, texturesWhite);
 
+    std::vector<std::string> texturePathRed = {
+        "RedRook.png", "RedKnight.png", "RedBishop.png", "RedKing.png",
+        "RedQueen.png", "RedBishop.png", "RedKnight.png", "RedRook.png",
+        "RedPawn.png", "RedPawn.png", "RedPawn.png", "RedPawn.png",
+        "RedPawn.png", "RedPawn.png", "RedPawn.png", "RedPawn.png"
+    };
+    std::vector<sf::Texture> texturesRed = loadTextures(texturePathWhite);
+    std::vector<sf::Sprite> RedPieces = CreerPiece(texturePathRed, matrice4, matrice3, texturesRed);
+
+    std::vector<std::string> texturePathBlack = {
+        "BlackRook.png", "BlackKnight.png", "BlackBishop.png", "BlackKing.png",
+        "BlackQueen.png", "BlackBishop.png", "BlackKnight.png", "BlackRook.png",
+        "BlackPawn.png", "BlackPawn.png", "BlackPawn.png", "BlackPawn.png",
+        "BlackPawn.png", "BlackPawn.png", "BlackPawn.png", "BlackPawn.png"
+    };
+    std::vector<sf::Texture> texturesBlack = loadTextures(texturePathBlack);
+    std::vector<sf::Sprite> BlackPieces = CreerPiece(texturePathBlack, matrice5, matrice6, texturesBlack);
+
+    sf::Texture texture1;
     sf::Sprite monImage = chargerImageDansLosange("./images/WhiteRook.png",matrice1[15], 0.2f, 0.2f, texture1);
-    sf::Sprite monImage2 = chargerImageDansLosange("./images/WhiteKnight.png",matrice1[11], 0.2f, 0.2f, texture2);
-    sf::Sprite monImage3 = chargerImageDansLosange("./images/WhiteBishop.png",matrice1[7], 0.2f, 0.2f, texture3);
-    sf::Sprite monImage4 = chargerImageDansLosange("./images/WhiteKing.png",matrice1[3], 0.2f, 0.2f, texture4);
-    sf::Sprite monImage5 = chargerImageDansLosange("./images/WhiteQueen.png",matrice2[12], 0.2f, 0.2f, texture5);
-    sf::Sprite monImage6 = chargerImageDansLosange("./images/WhiteBishop.png",matrice2[13], 0.2f, 0.2f, texture6);
-    sf::Sprite monImage7 = chargerImageDansLosange("./images/WhiteKnight.png",matrice2[14], 0.2f, 0.2f, texture7);
-    sf::Sprite monImage8 = chargerImageDansLosange("./images/WhiteRook.png",matrice2[15], 0.2f, 0.2f, texture8);
-    sf::Sprite monImage9 = chargerImageDansLosange("./images/WhitePawn.png",matrice1[14], 0.2f, 0.2f, texture9);
-    sf::Sprite monImage10 = chargerImageDansLosange("./images/WhitePawn.png",matrice1[10], 0.2f, 0.2f, texture10);
-    sf::Sprite monImage11 = chargerImageDansLosange("./images/WhitePawn.png",matrice1[6], 0.2f, 0.2f, texture11);
-    sf::Sprite monImage12 = chargerImageDansLosange("./images/WhitePawn.png",matrice1[2], 0.2f, 0.2f, texture12);
-    sf::Sprite monImage13 = chargerImageDansLosange("./images/WhitePawn.png",matrice2[8], 0.2f, 0.2f, texture13);
-    sf::Sprite monImage14 = chargerImageDansLosange("./images/WhitePawn.png",matrice2[9], 0.2f, 0.2f, texture14);
-    sf::Sprite monImage15 = chargerImageDansLosange("./images/WhitePawn.png",matrice2[10], 0.2f, 0.2f, texture15);
-    sf::Sprite monImage16 = chargerImageDansLosange("./images/WhitePawn.png",matrice2[11], 0.2f, 0.2f, texture16);
-
-    sf::Texture texture17, texture18, texture19, texture20, texture21, texture22, texture23, texture24, texture25, texture26, texture27, texture28, texture29, texture30, texture31, texture32;
-    sf::Sprite monImage17 = chargerImageDansLosange("./images/BlackRook.png",matrice6[15], 0.2f, 0.2f, texture17);
-    sf::Sprite monImage18 = chargerImageDansLosange("./images/BlackKnight.png",matrice6[14], 0.2f, 0.2f, texture18);
-    sf::Sprite monImage19 = chargerImageDansLosange("./images/BlackBishop.png",matrice6[13], 0.2f, 0.2f, texture19);
-    sf::Sprite monImage21 = chargerImageDansLosange("./images/BlackQueen.png",matrice6[12], 0.2f, 0.2f, texture21);
-    sf::Sprite monImage20 = chargerImageDansLosange("./images/BlackKing.png",matrice5[3], 0.2f, 0.2f, texture20);
-    sf::Sprite monImage22 = chargerImageDansLosange("./images/BlackBishop.png",matrice5[7], 0.2f, 0.2f, texture22);
-    sf::Sprite monImage23 = chargerImageDansLosange("./images/BlackKnight.png",matrice5[11], 0.2f, 0.2f, texture23);
-    sf::Sprite monImage24 = chargerImageDansLosange("./images/BlackRook.png",matrice5[15], 0.2f, 0.2f, texture24);
-    sf::Sprite monImage25 = chargerImageDansLosange("./images/BlackPawn.png",matrice6[8], 0.2f, 0.2f, texture25);
-    sf::Sprite monImage26 = chargerImageDansLosange("./images/BlackPawn.png",matrice6[9], 0.2f, 0.2f, texture26);
-    sf::Sprite monImage27 = chargerImageDansLosange("./images/BlackPawn.png",matrice6[10], 0.2f, 0.2f, texture27);
-    sf::Sprite monImage28 = chargerImageDansLosange("./images/BlackPawn.png",matrice6[11], 0.2f, 0.2f, texture28);
-    sf::Sprite monImage29 = chargerImageDansLosange("./images/BlackPawn.png",matrice5[2], 0.2f, 0.2f, texture29);
-    sf::Sprite monImage30 = chargerImageDansLosange("./images/BlackPawn.png",matrice5[6], 0.2f, 0.2f, texture30);
-    sf::Sprite monImage31 = chargerImageDansLosange("./images/BlackPawn.png",matrice5[10], 0.2f, 0.2f, texture31);
-    sf::Sprite monImage32 = chargerImageDansLosange("./images/BlackPawn.png",matrice5[14], 0.2f, 0.2f, texture32);
-
-    sf::Texture texture33, texture34, texture35, texture36, texture37, texture38, texture39, texture40, texture41, texture42, texture43, texture44, texture45, texture46, texture47, texture48;
-    sf::Sprite monImage33 = chargerImageDansLosange("./images/RedRook.png",matrice3[15], 0.2f, 0.2f, texture33);
-    sf::Sprite monImage34 = chargerImageDansLosange("./images/RedKnight.png",matrice3[14], 0.2f, 0.2f, texture34);
-    sf::Sprite monImage35 = chargerImageDansLosange("./images/RedBishop.png",matrice3[13], 0.2f, 0.2f, texture35);
-    sf::Sprite monImage36 = chargerImageDansLosange("./images/RedQueen.png",matrice3[12], 0.2f, 0.2f, texture36);
-    sf::Sprite monImage37 = chargerImageDansLosange("./images/RedKing.png",matrice4[3], 0.2f, 0.2f, texture37);
-    sf::Sprite monImage38 = chargerImageDansLosange("./images/RedBishop.png",matrice4[7], 0.2f, 0.2f, texture38);
-    sf::Sprite monImage39 = chargerImageDansLosange("./images/RedKnight.png",matrice4[11], 0.2f, 0.2f, texture39);
-    sf::Sprite monImage40 = chargerImageDansLosange("./images/RedRook.png",matrice4[15], 0.2f, 0.2f, texture40);
-    sf::Sprite monImage41 = chargerImageDansLosange("./images/RedPawn.png",matrice3[8], 0.2f, 0.2f, texture41);
-    sf::Sprite monImage42 = chargerImageDansLosange("./images/RedPawn.png",matrice3[9], 0.2f, 0.2f, texture42);
-    sf::Sprite monImage43 = chargerImageDansLosange("./images/RedPawn.png",matrice3[10], 0.2f, 0.2f, texture43);
-    sf::Sprite monImage44 = chargerImageDansLosange("./images/RedPawn.png",matrice3[11], 0.2f, 0.2f, texture44);
-    sf::Sprite monImage45 = chargerImageDansLosange("./images/RedPawn.png",matrice4[2], 0.2f, 0.2f, texture45);
-    sf::Sprite monImage46 = chargerImageDansLosange("./images/RedPawn.png",matrice4[6], 0.2f, 0.2f, texture46);
-    sf::Sprite monImage47 = chargerImageDansLosange("./images/RedPawn.png",matrice4[10], 0.2f, 0.2f, texture47);
-    sf::Sprite monImage48 = chargerImageDansLosange("./images/RedPawn.png",matrice4[14], 0.2f, 0.2f, texture48);
 
     bool isDragging = false;
     sf::Vector2f offsetImage;
@@ -342,6 +350,52 @@ int main() {
             // Relâcher l'image
             if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
                 isDragging = false;
+                sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                if (monImage.getGlobalBounds().contains(mousePos)) {// Vérifier si l'image est dans un losange
+                    
+                    for (const auto& losange : matrice1) {
+                        if (losange.getGlobalBounds().contains(mousePos)) {
+                            sf::Vector2f centre = calculerCentreLosange(losange);
+                            monImage.setPosition(centre.x - monImage.getGlobalBounds().width / 2.0f, centre.y - monImage.getGlobalBounds().height / 2.0f);
+                            break;
+                        }
+                    }
+                    for (const auto& losange : matrice2) {
+                        if (losange.getGlobalBounds().contains(mousePos)) {
+                            sf::Vector2f centre = calculerCentreLosange(losange);
+                            monImage.setPosition(centre.x - monImage.getGlobalBounds().width / 2.0f, centre.y - monImage.getGlobalBounds().height / 2.0f);
+                            break;
+                        }
+                    }
+                    for (const auto& losange : matrice3) {
+                        if (losange.getGlobalBounds().contains(mousePos)) {
+                            sf::Vector2f centre = calculerCentreLosange(losange);
+                            monImage.setPosition(centre.x - monImage.getGlobalBounds().width / 2.0f, centre.y - monImage.getGlobalBounds().height / 2.0f);
+                            break;
+                        }
+                    }
+                    for (const auto& losange : matrice4) {
+                        if (losange.getGlobalBounds().contains(mousePos)) {
+                            sf::Vector2f centre = calculerCentreLosange(losange);
+                            monImage.setPosition(centre.x - monImage.getGlobalBounds().width / 2.0f, centre.y - monImage.getGlobalBounds().height / 2.0f);
+                            break;
+                        }
+                    }
+                    for (const auto& losange : matrice5) {
+                        if (losange.getGlobalBounds().contains(mousePos)) {
+                            sf::Vector2f centre = calculerCentreLosange(losange);
+                            monImage.setPosition(centre.x - monImage.getGlobalBounds().width / 2.0f, centre.y - monImage.getGlobalBounds().height / 2.0f);
+                            break;
+                        }
+                    }
+                    for (const auto& losange : matrice6) {
+                        if (losange.getGlobalBounds().contains(mousePos)) {
+                            sf::Vector2f centre = calculerCentreLosange(losange);
+                            monImage.setPosition(centre.x - monImage.getGlobalBounds().width / 2.0f, centre.y - monImage.getGlobalBounds().height / 2.0f);
+                            break;
+                        }
+                    }
+                }
             }
         }
 
@@ -375,54 +429,19 @@ int main() {
             window.draw(losange);
         }
 
+        for (const auto& piece : WhitePieces) {
+            window.draw(piece);
+        }
+
+        for (const auto& piece : RedPieces) {
+            window.draw(piece);
+        }
+
+        for (const auto& piece : BlackPieces) {
+            window.draw(piece);
+        }
+
         window.draw(monImage);
-        window.draw(monImage2);
-        window.draw(monImage3);
-        window.draw(monImage4);
-        window.draw(monImage5);
-        window.draw(monImage6);
-        window.draw(monImage7);
-        window.draw(monImage8);
-        window.draw(monImage9);
-        window.draw(monImage10);
-        window.draw(monImage11);
-        window.draw(monImage12);
-        window.draw(monImage13);
-        window.draw(monImage14);
-        window.draw(monImage15);
-        window.draw(monImage16);
-        window.draw(monImage17);
-        window.draw(monImage18);
-        window.draw(monImage19);
-        window.draw(monImage20);
-        window.draw(monImage21);
-        window.draw(monImage22);
-        window.draw(monImage23);
-        window.draw(monImage24);
-        window.draw(monImage25);
-        window.draw(monImage26);
-        window.draw(monImage27);
-        window.draw(monImage28);
-        window.draw(monImage29);
-        window.draw(monImage30);
-        window.draw(monImage31);
-        window.draw(monImage32);
-        window.draw(monImage33);
-        window.draw(monImage34);
-        window.draw(monImage35);
-        window.draw(monImage36);
-        window.draw(monImage37);
-        window.draw(monImage38);
-        window.draw(monImage39);
-        window.draw(monImage40);
-        window.draw(monImage41);
-        window.draw(monImage42);
-        window.draw(monImage43);
-        window.draw(monImage44);
-        window.draw(monImage45);
-        window.draw(monImage46);
-        window.draw(monImage47);
-        window.draw(monImage48);
     window.display();
     }
     return 0;
