@@ -145,12 +145,39 @@ std::vector<sf::Sprite> CreerPiece(const std::vector<std::string>& cheminFichier
     return Pieces;
 }
 
+bool PieceDansMatrice(const sf::Vector2f& point, const std::vector<sf::ConvexShape> matrice){
+    std::vector<sf::Vector2i> polygon = {
+        sf::Vector2i(matrice[0].getPoint(0).x, matrice[0].getPoint(0).y),
+        sf::Vector2i(matrice[3].getPoint(1).x, matrice[3].getPoint(1).y),
+        sf::Vector2i(matrice[15].getPoint(2).x, matrice[15].getPoint(2).y),
+        sf::Vector2i(matrice[12].getPoint(3).x, matrice[12].getPoint(3).y)
+    };
+    bool inside = false;
 
+    for (int i = 0, j = 4 - 1; i < 4; j = i++) {
+        if ((point.y > polygon[i].y) != (point.y > polygon[j].y) &&(point.x < (polygon[j].x - polygon[i].x) * (point.y - polygon[i].y) / (polygon[j].y - polygon[i].y) + polygon[i].x)) {
+            inside = !inside;
+        }
+    }
+
+    return inside;
+}
+
+void PlacementPiece(int& selectedPieceIndex,const sf::ConvexShape losange,std::vector<sf::Sprite>& WhitePieces,std::vector<sf::Sprite>& BlackPieces,std::vector<sf::Sprite>& RedPieces){
+    sf::Vector2f centre = calculerCentreLosange(losange);
+    if (selectedPieceIndex < WhitePieces.size()) {
+        WhitePieces[selectedPieceIndex].setPosition(centre.x - WhitePieces[selectedPieceIndex].getGlobalBounds().width / 2.0f, centre.y - WhitePieces[selectedPieceIndex].getGlobalBounds().height / 2.0f);
+    } else if (selectedPieceIndex < WhitePieces.size() + RedPieces.size()) {
+        RedPieces[selectedPieceIndex - WhitePieces.size()].setPosition(centre.x - RedPieces[selectedPieceIndex - WhitePieces.size()].getGlobalBounds().width / 2.0f, centre.y - RedPieces[selectedPieceIndex - WhitePieces.size()].getGlobalBounds().height / 2.0f);
+    } else {
+        BlackPieces[selectedPieceIndex - WhitePieces.size() - RedPieces.size()].setPosition(centre.x - BlackPieces[selectedPieceIndex - WhitePieces.size() - RedPieces.size()].getGlobalBounds().width / 2.0f, centre.y - BlackPieces[selectedPieceIndex - WhitePieces.size() - RedPieces.size()].getGlobalBounds().height / 2.0f);
+    }
+}
 
 int main() {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode(1200, 1000), "Echec Yalta",sf::Style::Default,settings);
+    sf::RenderWindow window(sf::VideoMode(1150, 1000), "Echec Yalta",sf::Style::Default,settings);
     std::vector<float> side_lengths = {450, 460, 460, 450, 460, 460};
     std::vector<sf::Vector2f> points;
     
@@ -321,6 +348,7 @@ int main() {
 
     bool isDragging = false;
     sf::Vector2f offsetImage;
+    int selectedPieceIndex = -1;
     
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Dessin de l'interface
@@ -330,72 +358,106 @@ int main() {
             if (event.type == sf::Event::Closed)
                 window.close();
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-            }
-
-            // Vérifier si on clique sur l'image
-            if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
                 sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-                
-                if (monImage.getGlobalBounds().contains(mousePos)) {
-                    isDragging = true;
-                    offsetImage = monImage.getPosition() - mousePos;
+
+                // Vérifier si on clique sur l'image
+                for (size_t i = 0; i < WhitePieces.size(); ++i) {
+                    if (WhitePieces[i].getGlobalBounds().contains(mousePos)) {
+                        isDragging = true;
+                        selectedPieceIndex = i;
+                        offsetImage = mousePos - WhitePieces[i].getPosition();
+                        break;
+                    }
+                }
+                for (size_t i = 0; i < RedPieces.size(); ++i) {
+                    if (RedPieces[i].getGlobalBounds().contains(mousePos)) {
+                        isDragging = true;
+                        selectedPieceIndex = i + WhitePieces.size();
+                        offsetImage = mousePos - RedPieces[i].getPosition();
+                        break;
+                    }
+                }
+                for (size_t i = 0; i < BlackPieces.size(); ++i) {
+                    if (BlackPieces[i].getGlobalBounds().contains(mousePos)) {
+                        isDragging = true;
+                        selectedPieceIndex = i + WhitePieces.size() + RedPieces.size();
+                        offsetImage = mousePos - BlackPieces[i].getPosition();
+                        break;
+                    }
                 }
             }
             // Déplacer l'image avec la souris
             if (event.type == sf::Event::MouseMoved && isDragging) {
                 sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-                monImage.setPosition(mousePos + offsetImage);
+                if (selectedPieceIndex < WhitePieces.size()) {
+                    WhitePieces[selectedPieceIndex].setPosition(mousePos - offsetImage);
+                } else if (selectedPieceIndex < WhitePieces.size() + RedPieces.size()) {
+                    RedPieces[selectedPieceIndex - WhitePieces.size()].setPosition(mousePos - offsetImage);
+                } else {
+                    BlackPieces[selectedPieceIndex - WhitePieces.size() - RedPieces.size()].setPosition(mousePos - offsetImage);
+                }
             }
             // Relâcher l'image
             if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
                 isDragging = false;
                 sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-                if (monImage.getGlobalBounds().contains(mousePos)) {// Vérifier si l'image est dans un losange
-                    
+                // Vérifier si l'image est dans un losange
+                bool placed = false;
+                if(PieceDansMatrice(mousePos, matrice1)){
                     for (const auto& losange : matrice1) {
                         if (losange.getGlobalBounds().contains(mousePos)) {
-                            sf::Vector2f centre = calculerCentreLosange(losange);
-                            monImage.setPosition(centre.x - monImage.getGlobalBounds().width / 2.0f, centre.y - monImage.getGlobalBounds().height / 2.0f);
-                            break;
-                        }
-                    }
-                    for (const auto& losange : matrice2) {
-                        if (losange.getGlobalBounds().contains(mousePos)) {
-                            sf::Vector2f centre = calculerCentreLosange(losange);
-                            monImage.setPosition(centre.x - monImage.getGlobalBounds().width / 2.0f, centre.y - monImage.getGlobalBounds().height / 2.0f);
-                            break;
-                        }
-                    }
-                    for (const auto& losange : matrice3) {
-                        if (losange.getGlobalBounds().contains(mousePos)) {
-                            sf::Vector2f centre = calculerCentreLosange(losange);
-                            monImage.setPosition(centre.x - monImage.getGlobalBounds().width / 2.0f, centre.y - monImage.getGlobalBounds().height / 2.0f);
-                            break;
-                        }
-                    }
-                    for (const auto& losange : matrice4) {
-                        if (losange.getGlobalBounds().contains(mousePos)) {
-                            sf::Vector2f centre = calculerCentreLosange(losange);
-                            monImage.setPosition(centre.x - monImage.getGlobalBounds().width / 2.0f, centre.y - monImage.getGlobalBounds().height / 2.0f);
-                            break;
-                        }
-                    }
-                    for (const auto& losange : matrice5) {
-                        if (losange.getGlobalBounds().contains(mousePos)) {
-                            sf::Vector2f centre = calculerCentreLosange(losange);
-                            monImage.setPosition(centre.x - monImage.getGlobalBounds().width / 2.0f, centre.y - monImage.getGlobalBounds().height / 2.0f);
-                            break;
-                        }
-                    }
-                    for (const auto& losange : matrice6) {
-                        if (losange.getGlobalBounds().contains(mousePos)) {
-                            sf::Vector2f centre = calculerCentreLosange(losange);
-                            monImage.setPosition(centre.x - monImage.getGlobalBounds().width / 2.0f, centre.y - monImage.getGlobalBounds().height / 2.0f);
+                            PlacementPiece(selectedPieceIndex,losange,WhitePieces,BlackPieces,RedPieces);
+                            placed = true;
                             break;
                         }
                     }
                 }
+                else if(PieceDansMatrice(mousePos, matrice2)){
+                    for (const auto& losange : matrice2) {
+                        if (losange.getGlobalBounds().contains(mousePos)) {
+                            PlacementPiece(selectedPieceIndex,losange,WhitePieces,BlackPieces,RedPieces);
+                            placed = true;
+                            break;
+                        }
+                    }
+                }
+                else if(PieceDansMatrice(mousePos, matrice3)){
+                    for (const auto& losange : matrice3) {
+                        if (losange.getGlobalBounds().contains(mousePos)) {
+                            PlacementPiece(selectedPieceIndex,losange,WhitePieces,BlackPieces,RedPieces);
+                            placed = true;
+                            break;
+                        }
+                    }
+                }
+                else if(PieceDansMatrice(mousePos, matrice4)){
+                    for (const auto& losange : matrice4) {
+                        if (losange.getGlobalBounds().contains(mousePos)) {
+                            PlacementPiece(selectedPieceIndex,losange,WhitePieces,BlackPieces,RedPieces);
+                            placed = true;
+                            break;
+                        }
+                    }
+                }
+                else if(PieceDansMatrice(mousePos, matrice5)){
+                    for (const auto& losange : matrice5) {
+                        if (losange.getGlobalBounds().contains(mousePos)) {
+                            PlacementPiece(selectedPieceIndex,losange,WhitePieces,BlackPieces,RedPieces);
+                            placed = true;
+                            break;
+                        }
+                    }
+                }
+                else if(PieceDansMatrice(mousePos, matrice6)){
+                    for (const auto& losange : matrice6) {
+                        if (losange.getGlobalBounds().contains(mousePos)) {
+                            PlacementPiece(selectedPieceIndex,losange,WhitePieces,BlackPieces,RedPieces);
+                            placed = true;
+                            break;
+                        }
+                    }
+                }
+
             }
         }
 
