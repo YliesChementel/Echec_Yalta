@@ -7,6 +7,27 @@
 #include <vector>
 #include <array>
 
+class PieceImage {
+    public:
+        PieceImage(const sf::Sprite& sprite, const sf::ConvexShape& tile)
+            : sprite(sprite), tile(tile) {}
+    
+        sf::Sprite getSprite() const { return sprite; }
+        sf::ConvexShape getTile() const { return tile; }
+    
+        void setSprite(const sf::Sprite& sprite) { this->sprite = sprite; }
+        void setTile(const sf::ConvexShape& tile) { this->tile = tile; }
+    
+        void setPosition(const sf::Vector2f& position, const sf::ConvexShape& tilePosition) {
+            sprite.setPosition(position);
+            tile.setPosition(position);
+        }
+    
+    private:
+        sf::Sprite sprite;        
+        sf::ConvexShape tile;   
+};
+
 class Board {
     private:
         sf::ConvexShape hexagon;
@@ -26,6 +47,10 @@ class Board {
         std::vector<sf::Texture> texturesBlack;
         std::vector<sf::Sprite> RedPieces;
         std::vector<sf::Texture> texturesRed;
+
+        std::vector<sf::PieceImage> White;
+        std::vector<sf::PieceImage> Black;
+        std::vector<sf::PieceImage> Red;
 public:
     Board();
     
@@ -59,12 +84,12 @@ public:
     const sf::ConvexShape& getHexagon2() const { return hexagon2; }
     const std::vector<std::array<sf::Vertex, 2>>& getLines() const { return lines; }
     const std::vector<sf::Text>& getCoordText() const { return coordText; }
-    const std::vector<sf::ConvexShape>& getMatrice1() const { return matrice1; }
-    const std::vector<sf::ConvexShape>& getMatrice2() const { return matrice2; }
-    const std::vector<sf::ConvexShape>& getMatrice3() const { return matrice3; }
-    const std::vector<sf::ConvexShape>& getMatrice4() const { return matrice4; }
-    const std::vector<sf::ConvexShape>& getMatrice5() const { return matrice5; }
-    const std::vector<sf::ConvexShape>& getMatrice6() const { return matrice6; }
+    std::vector<sf::ConvexShape>& getMatrice1()  { return matrice1; }
+    std::vector<sf::ConvexShape>& getMatrice2()  { return matrice2; }
+    std::vector<sf::ConvexShape>& getMatrice3()  { return matrice3; }
+    std::vector<sf::ConvexShape>& getMatrice4()  { return matrice4; }
+    std::vector<sf::ConvexShape>& getMatrice5()  { return matrice5; }
+    std::vector<sf::ConvexShape>& getMatrice6()  { return matrice6; }
     std::vector<sf::Sprite>& getWhitePieces() { return WhitePieces; }
     std::vector<sf::Sprite>& getBlackPieces() { return BlackPieces; }
     std::vector<sf::Sprite>& getRedPieces() { return RedPieces; }

@@ -1,8 +1,8 @@
 #include "Controller.hpp"
 #include <iostream>
 
-BoardController::BoardController(Board& board, BoardView& view, sf::RenderWindow& window)
-    : board(board), view(view), window(window), isDragging(false), selectedPieceIndex(-1) {handleSound();}
+BoardController::BoardController(Board& board, BoardView& view, sf::RenderWindow& window,Jeu& jeu)
+    : board(board), view(view), window(window),jeu(jeu) , isDragging(false), selectedPieceIndex(-1) {handleSound();}
 
 void BoardController::run() {
     while (window.isOpen()) {
@@ -60,6 +60,8 @@ void BoardController::handleMousePressed(const sf::Event& event) {
             isDragging = true;
             selectedPieceIndex = static_cast<int>(i);  // index pour WhitePieces
             offsetImage = mousePos - white[i].getPosition();
+            
+            view.changeColorTile(board.getMatrice1()); 
             return;
         }
     }
@@ -140,6 +142,7 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
     }
     isDragging = false;
     selectedPieceIndex = -1;
+    view.changeColorTile2(board.getMatrice1());
 }
 
 void BoardController::handleSound() {
@@ -149,3 +152,8 @@ void BoardController::handleSound() {
     }
     this->sound.setBuffer(this->buffer);
 }
+
+/*
+void BoardController::handleCoup(int selectedPieceIndex) {
+
+}*/

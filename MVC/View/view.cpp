@@ -49,3 +49,29 @@ void BoardView::drawPieces(const std::vector<sf::Sprite>& whites, const std::vec
         window.draw(piece);
     }
 }
+
+void BoardView::changeColorTile(std::vector<sf::ConvexShape>& losanges) {
+    for (auto& losange : losanges) {
+        sf::Color actuel = losange.getFillColor();
+
+        // Appliquer un filtre noir
+        sf::Color darkerColor(
+            actuel.r * 0.5, actuel.g * 0.5, actuel.b * 0.5, actuel.a
+        );
+
+        losange.setFillColor(darkerColor);
+    }
+}
+
+void BoardView::changeColorTile2(std::vector<sf::ConvexShape>& losanges) {
+    for (auto& losange : losanges) {
+        sf::Color actuel = losange.getFillColor();
+
+        // Appliquer un filtre noir
+        sf::Color darkerColor(
+            actuel.r * 2, actuel.g * 2, actuel.b * 2, actuel.a
+        );
+
+        losange.setFillColor(darkerColor);
+    }
+}

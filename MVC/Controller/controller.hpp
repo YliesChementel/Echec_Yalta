@@ -5,16 +5,18 @@
 #include <SFML/Audio.hpp>
 #include "model.hpp"
 #include "view.hpp"
+#include "Jeu.h"
 
 class BoardController {
 public:
-    BoardController(Board& board, BoardView& view, sf::RenderWindow& window);
+    BoardController(Board& board, BoardView& view, sf::RenderWindow& window,Jeu& jeu);
     void run();// Démarre la boucle principale de l'application
 
 private:
     Board& board;
     BoardView& view;
     sf::RenderWindow& window;
+    Jeu& jeu;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Variables pour le drag & drop

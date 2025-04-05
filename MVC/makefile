@@ -9,7 +9,11 @@ CXXFLAGS = -std=c++17 -IModel -IView -IController
 SRC = main.cpp \
       Model/model.cpp \
       View/view.cpp \
-      Controller/controller.cpp
+      Controller/controller.cpp \
+	  Model/Jeu.cpp \
+	  Model/Plateau.cpp \
+      Model/Joueur.cpp \
+      Model/Piece.cpp
 
 # Librairies SFML
 LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
