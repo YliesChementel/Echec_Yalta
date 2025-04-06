@@ -352,3 +352,47 @@ void Board::PlacementPiece(int& selectedPieceIndex, const sf::ConvexShape& losan
     }
 }
 
+
+void Board::ReplacementPiece(int& selectedPieceIndex, int camp, int matriceIndex, std::vector<PieceImage>& pieces, const std::vector<std::vector<sf::ConvexShape>> matrices) {
+    int tileIndex = pieces[selectedPieceIndex].getTilePositions()[0];
+    const sf::ConvexShape& losange = matrices[matriceIndex - 1][tileIndex];
+    
+    if (camp==0) {
+        ReplacementPieceWhite(selectedPieceIndex, losange, pieces);
+    } else if (camp==1) {
+        ReplacementPieceRed(selectedPieceIndex, losange, pieces);
+    } else {
+        ReplacementPieceBlack(selectedPieceIndex, losange, pieces);
+    }
+}
+
+
+void Board::ReplacementPieceWhite(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& White) {
+    sf::Vector2f centre = calculerCentreLosange(losange);
+        White[selectedPieceIndex].getSprite().setPosition(
+        centre.x - White[selectedPieceIndex].getSprite().getGlobalBounds().width / 2.0f,
+        centre.y - White[selectedPieceIndex].getSprite().getGlobalBounds().height / 2.0f
+        );
+}
+
+void Board::ReplacementPieceRed(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& Red) {
+    sf::Vector2f centre = calculerCentreLosange(losange);
+        Red[selectedPieceIndex].getSprite().setPosition(
+        centre.x - Red[selectedPieceIndex].getSprite().getGlobalBounds().width / 2.0f,
+        centre.y - Red[selectedPieceIndex].getSprite().getGlobalBounds().height / 2.0f
+        );
+}
+
+void Board::ReplacementPieceBlack(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& Black) {
+    sf::Vector2f centre = calculerCentreLosange(losange);
+        Black[selectedPieceIndex].getSprite().setPosition(
+        centre.x - Black[selectedPieceIndex].getSprite().getGlobalBounds().width / 2.0f,
+        centre.y - Black[selectedPieceIndex].getSprite().getGlobalBounds().height / 2.0f
+        );
+}
+
+
+
+
+
+

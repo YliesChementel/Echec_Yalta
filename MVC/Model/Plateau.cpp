@@ -245,10 +245,7 @@ std::vector<std::pair<int, int>> Plateau::RenvoyerCoupsPossibles(int xOrigine, i
     Piece* piece = matrice[xOrigine][yOrigine];
     if (!piece) {
         std::cout << "Aucune pièce à cette position.\n";
-        std::cout << xOrigine << " " << yOrigine << std::endl;
     }
-    std::cout << "Type de pièce : " << piece->GetType() << std::endl;
-    AffichageMatrice();
     std::vector<std::pair<int, int>> coupsPossibles = ObtenirCoupsPossibles(piece, xOrigine, yOrigine);
     return coupsPossibles;
 }

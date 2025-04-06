@@ -79,6 +79,11 @@ public:
     
     void PlacementPiece(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& White, std::vector<PieceImage>& Black, std::vector<PieceImage>& Red);
 
+    void ReplacementPiece(int& selectedPieceIndex, int camp, int matriceIndex, std::vector<PieceImage>& pieces, const std::vector<std::vector<sf::ConvexShape>> matrices);
+    void ReplacementPieceWhite(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& White);
+    void ReplacementPieceBlack(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& Black);
+    void ReplacementPieceRed(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& Red);
+
     const sf::ConvexShape& getHexagon() const { return hexagon; }
     const sf::ConvexShape& getHexagon2() const { return hexagon2; }
     const std::vector<std::array<sf::Vertex, 2>>& getLines() const { return lines; }
