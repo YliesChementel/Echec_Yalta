@@ -36,6 +36,8 @@ private:
     void handleMouseMoved(const sf::Event& event);
     void handleMouseReleased(const sf::Event& event);
 
+
+    std::vector<std::vector<int>> tilesToChangeColor;
     void handleCoup(std::vector<int>& tilePositions);
 
 };

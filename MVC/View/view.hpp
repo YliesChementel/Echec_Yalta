@@ -13,9 +13,8 @@ class BoardView {
         void drawPieces(const std::vector<PieceImage>& white, const std::vector<PieceImage>& red, const std::vector<PieceImage>& black);
         void drawLines(const std::vector<std::array<sf::Vertex, 2>>& lines);
         void drawText(const std::vector<sf::Text>& texts);
-        void changeColorTile(std::vector<sf::ConvexShape>& losanges);
-        void changeColorTile2(std::vector<sf::ConvexShape>& losanges);
-        void changeColorTileTest(sf::ConvexShape& losange);
+        void changeColorTileDark(sf::ConvexShape& losange);
+        void changeColorTileBright(sf::ConvexShape& losange);
         void clear();
         void display();
     

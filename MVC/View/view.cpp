@@ -50,41 +50,22 @@ void BoardView::drawPieces(const std::vector<PieceImage>& whites, const std::vec
     }
 }
 
-void BoardView::changeColorTile(std::vector<sf::ConvexShape>& losanges) {
-    for (auto& losange : losanges) {
-        sf::Color actuel = losange.getFillColor();
-
-        // Appliquer un filtre noir
-        sf::Color darkerColor(
-            actuel.r * 0.5, actuel.g * 0.5, actuel.b * 0.5, actuel.a
-        );
-
-        losange.setFillColor(darkerColor);
-    }
-}
-
-// Dans View/view.cpp
-void BoardView::changeColorTileTest(sf::ConvexShape& losange) {
+void BoardView::changeColorTileDark(sf::ConvexShape& losange) {
     sf::Color actuel = losange.getFillColor();
 
-    // Appliquer un filtre noir
     sf::Color darkerColor(
-        actuel.r * 2, actuel.g * 2, actuel.b * 2, actuel.a
+        actuel.r * 0.5, actuel.g * 0.5, actuel.b * 0.5, actuel.a
     );
 
     losange.setFillColor(darkerColor);
 }
 
+void BoardView::changeColorTileBright(sf::ConvexShape& losange) {
+    sf::Color actuel = losange.getFillColor();
 
-void BoardView::changeColorTile2(std::vector<sf::ConvexShape>& losanges) {
-    for (auto& losange : losanges) {
-        sf::Color actuel = losange.getFillColor();
+    sf::Color brighterColor(
+        actuel.r * 2, actuel.g * 2, actuel.b * 2, actuel.a
+    );
 
-        // Appliquer un filtre noir
-        sf::Color darkerColor(
-            actuel.r * 2, actuel.g * 2, actuel.b * 2, actuel.a
-        );
-
-        losange.setFillColor(darkerColor);
-    }
+    losange.setFillColor(brighterColor);
 }

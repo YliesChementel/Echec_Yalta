@@ -137,7 +137,27 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
     }
     isDragging = false;
     selectedPieceIndex = -1;
-    //view.changeColorTile2(board.getMatrice1());
+    for(const auto& tile : tilesToChangeColor) {
+        if(tile[1]==1){
+            view.changeColorTileBright(board.getMatrice1()[tile[0]]);
+        }
+        else if(tile[1]==2){
+            view.changeColorTileBright(board.getMatrice2()[tile[0]]);
+        }
+        else if(tile[1]==3){
+            view.changeColorTileBright(board.getMatrice3()[tile[0]]);
+        }
+        else if(tile[1]==4){
+            view.changeColorTileBright(board.getMatrice4()[tile[0]]);
+        }
+        else if(tile[1]==5){
+            view.changeColorTileBright(board.getMatrice5()[tile[0]]);
+        }
+        else if(tile[1]==6){
+            view.changeColorTileBright(board.getMatrice6()[tile[0]]);
+        }
+    }
+    tilesToChangeColor.clear();
 }
 
 void BoardController::handleSound() {
@@ -248,32 +268,38 @@ void BoardController::handleCoup(std::vector<int>& tilePositions) {
         if(matrice == 1) {
             int index = coordToIndexForSubmatrix(coup.first,coup.second, matrice);
             std::cout << "index matrice 1: " << index << std::endl;
-            view.changeColorTileTest(board.getMatrice1()[index]);
+            view.changeColorTileDark(board.getMatrice1()[index]);
+            tilesToChangeColor.push_back({index, matrice});
         }
         else if(matrice == 2) {
             int index = coordToIndexForSubmatrix(coup.first, coup.second-4, matrice);
             std::cout << "index matrice 2: " << index << std::endl;
-            view.changeColorTileTest(board.getMatrice2()[index]);
+            view.changeColorTileDark(board.getMatrice2()[index]);
+            tilesToChangeColor.push_back({index, matrice});
         }
         else if(matrice == 3) {
             int index = coordToIndexForSubmatrix(coup.first-4, coup.second,matrice);
             std::cout << "index matrice 3: " << index << std::endl;
-            view.changeColorTileTest(board.getMatrice3()[index]);
+            view.changeColorTileDark(board.getMatrice3()[index]);
+            tilesToChangeColor.push_back({index, matrice});
         }
         else if(matrice == 4) {
             int index = coordToIndexForSubmatrix(coup.first-4, coup.second-8, matrice);
             std::cout << "index matrice 4: " << index << std::endl;
-            view.changeColorTileTest(board.getMatrice4()[index]);
+            view.changeColorTileDark(board.getMatrice4()[index]);
+            tilesToChangeColor.push_back({index, matrice});
         }
         else if(matrice == 5) {
             int index = coordToIndexForSubmatrix(coup.first-8, coup.second-4, matrice);
             std::cout << "index matrice 5: " << index << std::endl;
-            view.changeColorTileTest(board.getMatrice5()[index]);
+            view.changeColorTileDark(board.getMatrice5()[index]);
+            tilesToChangeColor.push_back({index, matrice});
         }
         else if(matrice == 6) {
             int index = coordToIndexForSubmatrix(coup.first-8, coup.second-8, matrice);
             std::cout << "index matrice 6: " << index << std::endl;
-            view.changeColorTileTest(board.getMatrice6()[index]);
+            view.changeColorTileDark(board.getMatrice6()[index]);
+            tilesToChangeColor.push_back({index, matrice});
         }
     }
 
