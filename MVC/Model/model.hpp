@@ -9,23 +9,25 @@
 
 class PieceImage {
     public:
-        PieceImage(const sf::Sprite& sprite, const sf::ConvexShape& tile)
-            : sprite(sprite), tile(tile) {}
+        PieceImage(const sf::Sprite& sprite, const std::vector<int>& tilePositions)
+            : sprite(sprite), tilePositions(tilePositions) {}
     
-        sf::Sprite getSprite() const { return sprite; }
-        sf::ConvexShape getTile() const { return tile; }
+        sf::Sprite& getSprite() { return sprite; }  //  version pour modifier les pièces
+        const sf::Sprite& getSprite() const { return sprite; }  // version sans modifier l'objet
+
+        std::vector<int>& getTilePositions()  { return tilePositions; }
     
         void setSprite(const sf::Sprite& sprite) { this->sprite = sprite; }
-        void setTile(const sf::ConvexShape& tile) { this->tile = tile; }
+        void setTileId(const std::vector<int>& tilePositions) { this->tilePositions = tilePositions; }
     
-        void setPosition(const sf::Vector2f& position, const sf::ConvexShape& tilePosition) {
+        void setPosition(const sf::Vector2f& position, const std::vector<int>& tilePosition) {
             sprite.setPosition(position);
-            tile.setPosition(position);
+            this->tilePositions==tilePosition;
         }
     
     private:
-        sf::Sprite sprite;        
-        sf::ConvexShape tile;   
+        sf::Sprite sprite;     
+        std::vector<int> tilePositions;
 };
 
 class Board {
@@ -41,16 +43,13 @@ class Board {
         std::vector<sf::ConvexShape> matrice4;
         std::vector<sf::ConvexShape> matrice5;
         std::vector<sf::ConvexShape> matrice6;
-        std::vector<sf::Sprite> WhitePieces;
+        std::vector<PieceImage> WhitePieces;
         std::vector<sf::Texture> texturesWhite;
-        std::vector<sf::Sprite> BlackPieces;
+        std::vector<PieceImage> BlackPieces;
         std::vector<sf::Texture> texturesBlack;
-        std::vector<sf::Sprite> RedPieces;
+        std::vector<PieceImage> RedPieces;
         std::vector<sf::Texture> texturesRed;
 
-        std::vector<sf::PieceImage> White;
-        std::vector<sf::PieceImage> Black;
-        std::vector<sf::PieceImage> Red;
 public:
     Board();
     
@@ -72,13 +71,13 @@ public:
 
     sf::Sprite chargerImageDansLosange(const sf::ConvexShape& shape, float scaleX, float scaleY, sf::Texture& texture);
 
-    std::vector<sf::Sprite> CreerPiece( const std::vector<sf::ConvexShape> matriceA, const std::vector<sf::ConvexShape> matriceB,  std::vector<sf::Texture>& textures);
+    std::vector<PieceImage> CreerPiece(const std::vector<sf::ConvexShape> matriceA, const std::vector<sf::ConvexShape> matriceB, int positionMatriceA, int positionMatriceB, std::vector<sf::Texture>& textures);
 
     bool PieceDansMatrice(const sf::Vector2f& point, const std::vector<sf::ConvexShape> matrice);
 
     bool PieceDansLosange(const sf::ConvexShape& shape, const sf::Vector2f& point);
     
-    void PlacementPiece(int& selectedPieceIndex,const sf::ConvexShape losange,std::vector<sf::Sprite>& WhitePieces,std::vector<sf::Sprite>& BlackPieces,std::vector<sf::Sprite>& RedPieces);
+    void PlacementPiece(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& White, std::vector<PieceImage>& Black, std::vector<PieceImage>& Red);
 
     const sf::ConvexShape& getHexagon() const { return hexagon; }
     const sf::ConvexShape& getHexagon2() const { return hexagon2; }
@@ -90,8 +89,8 @@ public:
     std::vector<sf::ConvexShape>& getMatrice4()  { return matrice4; }
     std::vector<sf::ConvexShape>& getMatrice5()  { return matrice5; }
     std::vector<sf::ConvexShape>& getMatrice6()  { return matrice6; }
-    std::vector<sf::Sprite>& getWhitePieces() { return WhitePieces; }
-    std::vector<sf::Sprite>& getBlackPieces() { return BlackPieces; }
-    std::vector<sf::Sprite>& getRedPieces() { return RedPieces; }
+    std::vector<PieceImage>& getWhitePieces() { return WhitePieces; }
+    std::vector<PieceImage>& getBlackPieces() { return BlackPieces; }
+    std::vector<PieceImage>& getRedPieces() { return RedPieces; }
 };
 #endif // MODEL_HPP

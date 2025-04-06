@@ -35,6 +35,9 @@ private:
     void handleMousePressed(const sf::Event& event);
     void handleMouseMoved(const sf::Event& event);
     void handleMouseReleased(const sf::Event& event);
+
+    void handleCoup(std::vector<int>& tilePositions);
+
 };
 
 #endif // BOARD_CONTROLLER_HPP
