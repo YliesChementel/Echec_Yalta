@@ -27,11 +27,14 @@ protected:
     int determineSousMatrice(int x, int y) const;
 
     //Ajustement obligatoirement pour toutes les pièces pour que le plateau fonctionne comme un plateau normal
-    void ajustementCoordonnees(int& xOrigine, int& yOrigine, int& xCoup, int& yCoup) const;
+    void ajustementCoordonnees(int& xOrigine, int& yOrigine, int& xdestination, int& ydestination,int& xCoup, int& yCoup) const;
 
-    void ajustementCoordonnees2(int& xOrigine, int& yOrigine, int& xdestination, int& ydestination,int& xCoup, int& yCoup) const;
+    void ajustementRosasse(int xOrigine, int yOrigine, int xCoup, int yCoup, std::vector<std::pair<int, int>>& coupsPossibles);
 
     void recursive(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector<std::pair<int, int>>& coupsPossibles);
+
+    void Coup(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector<std::pair<int, int>>& coupsPossibles);
+    void CoupPion(int xOrigine, int yOrigine,std::vector<std::pair<int, int>>& coupsPossibles, int arret);
 };
 
 
@@ -64,6 +67,59 @@ class Fou : public Piece {
             recursive(xOrigine,yOrigine,directions[2].first,directions[2].second,coupsPossibles);
             recursive(xOrigine,yOrigine,directions[4].first,directions[4].second,coupsPossibles);
             recursive(xOrigine,yOrigine,directions[6].first,directions[6].second,coupsPossibles);
+            return coupsPossibles;
+        }
+};
+
+class Reine : public Piece {
+    public:
+        Reine(int camp, Plateau& plateau) : Piece(camp, plateau) {}
+        int GetCamp() { return Piece::GetCamp(); }
+        void SetCamp(int camp) { Piece::SetCamp(camp); }
+        std::string GetType() const override  { return "R"; }
+        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine){
+            std::vector<std::pair<int, int>> coupsPossibles;
+            recursive(xOrigine,yOrigine,directions[0].first,directions[0].second,coupsPossibles);
+            recursive(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles);
+            recursive(xOrigine,yOrigine,directions[2].first,directions[2].second,coupsPossibles);
+            recursive(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles);
+            recursive(xOrigine,yOrigine,directions[4].first,directions[4].second,coupsPossibles);
+            recursive(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles);
+            recursive(xOrigine,yOrigine,directions[6].first,directions[6].second,coupsPossibles);
+            recursive(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles);
+            return coupsPossibles;
+        }
+};
+
+class Roi : public Piece {
+    public:
+        Roi(int camp, Plateau& plateau) : Piece(camp, plateau) {}
+        int GetCamp() { return Piece::GetCamp(); }
+        void SetCamp(int camp) { Piece::SetCamp(camp); }
+        std::string GetType() const override  { return "r"; }
+        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine){
+            std::vector<std::pair<int, int>> coupsPossibles;
+            Coup(xOrigine,yOrigine,directions[0].first,directions[0].second,coupsPossibles);
+            Coup(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles);
+            Coup(xOrigine,yOrigine,directions[2].first,directions[2].second,coupsPossibles);
+            Coup(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles);
+            Coup(xOrigine,yOrigine,directions[4].first,directions[4].second,coupsPossibles);
+            Coup(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles);
+            Coup(xOrigine,yOrigine,directions[6].first,directions[6].second,coupsPossibles);
+            Coup(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles);
+            return coupsPossibles;
+        }
+};
+
+class Pion : public Piece {
+    public:
+        Pion(int camp, Plateau& plateau) : Piece(camp, plateau) {}
+        int GetCamp() { return Piece::GetCamp(); }
+        void SetCamp(int camp) { Piece::SetCamp(camp); }
+        std::string GetType() const override  { return "P"; }
+        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine){
+            std::vector<std::pair<int, int>> coupsPossibles;
+            CoupPion(xOrigine,yOrigine,coupsPossibles,0);
             return coupsPossibles;
         }
 };
