@@ -56,10 +56,6 @@ void Plateau::PlacerPiece(Piece** ListePiece1, Piece** ListePiece2, Piece** List
     }
 }
 
-
-
-
-
 void Plateau::AffichageMatrice() {
     std::cout << "   ";
     for (int j = 0; j < 12; ++j) {
@@ -94,7 +90,7 @@ void Plateau::AffichageMatrice() {
     }
 }
 
-std::vector<std::pair<int, int>> Plateau::DeplacerPiece2(int xOrigine, int yOrigine) {
+std::vector<std::pair<int, int>> Plateau::DeplacerPiece(int xOrigine, int yOrigine) {
     Piece* piece = matrice[xOrigine][yOrigine];
     return piece->DeplacementCoup(xOrigine,yOrigine);
 }
@@ -103,10 +99,52 @@ void Plateau::DeplacementAutoriser(int xOrigine, int yOrigine,int xCoup,int yCou
     matrice[xCoup][yCoup] = matrice[xOrigine][yOrigine];
     matrice[xOrigine][yOrigine] = nullptr;
 
-    std::cout << "Pièce déplacée de (" << xOrigine << "," << yOrigine 
-              << ") vers (" << xCoup << "," << yCoup << ")" << std::endl;
+    std::cout << "Pièce déplacée de (" << xOrigine << "," << yOrigine << ") vers (" << xCoup << "," << yCoup << ")" << std::endl;
 }
 
+void Plateau::AfficherCoupsPossibles(std::vector<std::pair<int, int>> coupsPossibles) {
+    
+    std::cout << "   ";
+    for (int j = 0; j < 12; ++j) {
+        std::cout << j << " ";
+    }
+    std::cout << std::endl;
+
+    for (int i = 0; i < 12; ++i) {
+        if (i < 10) {
+            std::cout << i << "  ";
+        } else {
+            std::cout << i << " ";
+        }
+
+        for (int j = 0; j < 12; ++j) {
+            bool estCoupPossible = false;
+            for (const auto& coup : coupsPossibles) {
+                if (coup.first == i && coup.second == j) {
+                    estCoupPossible = true;
+                    break;
+                }
+            }
+
+            if (matrice[i][j] != nullptr) {
+                std::cout << matrice[i][j]->GetType() << " ";
+            } else if (estCoupPossible) {
+                std::cout << "O ";
+            } else {
+                if ((i < 4 && j > 7) || (i > 7 && j < 4)) { // Case non existante du plateau yalta
+                    std::cout << "  ";
+                } else if ((i > 3 && i < 8) && (j > 3 && j < 8)) { // Case non existante du plateau yalta (milieu)
+                    std::cout << "  ";
+                } else {
+                    std::cout << "X ";
+                }
+            }
+        }
+        std::cout << std::endl;
+    }
+}
+
+/*
 bool Plateau::DeplacerPiece(int tourJoueur,int xOrigine, int yOrigine, int xCoup, int yCoup) {
     Piece* piece = matrice[xOrigine][yOrigine];
     if(piece->GetCamp() != tourJoueur){
@@ -175,46 +213,4 @@ std::vector<std::pair<int, int>> Plateau::ObtenirCoupsPossibles(Piece* piece, in
     }
 
     return coupsPossibles;
-}
-
-void Plateau::AfficherCoupsPossibles(std::vector<std::pair<int, int>> coupsPossibles) {
-    
-    std::cout << "   ";
-    for (int j = 0; j < 12; ++j) {
-        std::cout << j << " ";
-    }
-    std::cout << std::endl;
-
-    for (int i = 0; i < 12; ++i) {
-        if (i < 10) {
-            std::cout << i << "  ";
-        } else {
-            std::cout << i << " ";
-        }
-
-        for (int j = 0; j < 12; ++j) {
-            bool estCoupPossible = false;
-            for (const auto& coup : coupsPossibles) {
-                if (coup.first == i && coup.second == j) {
-                    estCoupPossible = true;
-                    break;
-                }
-            }
-
-            if (matrice[i][j] != nullptr) {
-                std::cout << matrice[i][j]->GetType() << " ";
-            } else if (estCoupPossible) {
-                std::cout << "O ";
-            } else {
-                if ((i < 4 && j > 7) || (i > 7 && j < 4)) { // Case non existante du plateau yalta
-                    std::cout << "  ";
-                } else if ((i > 3 && i < 8) && (j > 3 && j < 8)) { // Case non existante du plateau yalta (milieu)
-                    std::cout << "  ";
-                } else {
-                    std::cout << "X ";
-                }
-            }
-        }
-        std::cout << std::endl;
-    }
-}
+}*/

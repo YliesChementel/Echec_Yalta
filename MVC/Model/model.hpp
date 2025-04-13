@@ -9,8 +9,8 @@
 
 class PieceImage {
     public:
-        PieceImage(const sf::Sprite& sprite, const std::vector<int>& tilePositions)
-            : sprite(sprite), tilePositions(tilePositions) {}
+        PieceImage(const sf::Sprite& sprite, const std::vector<int>& tilePositions, const std::string& camp)
+            : sprite(sprite), tilePositions(tilePositions), camp(camp) {}
     
         sf::Sprite& getSprite() { return sprite; }  //  version pour modifier les pièces
         const sf::Sprite& getSprite() const { return sprite; }  // version sans modifier l'objet
@@ -18,16 +18,23 @@ class PieceImage {
         std::vector<int>& getTilePositions()  { return tilePositions; }
     
         void setSprite(const sf::Sprite& sprite) { this->sprite = sprite; }
-        void setTileId(const std::vector<int>& tilePositions) { this->tilePositions = tilePositions; }
+        void setTilePositions(const std::vector<int>& tilePositions) { this->tilePositions = tilePositions; }
     
         void setPosition(const sf::Vector2f& position, const std::vector<int>& tilePosition) {
             sprite.setPosition(position);
             this->tilePositions==tilePosition;
         }
+        std::string& getCamp(){
+            return camp;
+        }
+        void setCamp(std::string camp){
+            this->camp=camp;
+        }
     
     private:
         sf::Sprite sprite;     
         std::vector<int> tilePositions;
+        std::string camp;
 };
 
 class Board {
@@ -71,13 +78,13 @@ public:
 
     sf::Sprite chargerImageDansLosange(const sf::ConvexShape& shape, float scaleX, float scaleY, sf::Texture& texture);
 
-    std::vector<PieceImage> CreerPiece(const std::vector<sf::ConvexShape> matriceA, const std::vector<sf::ConvexShape> matriceB, int positionMatriceA, int positionMatriceB, std::vector<sf::Texture>& textures);
+    std::vector<PieceImage> CreerPiece(const std::vector<sf::ConvexShape> matriceA, const std::vector<sf::ConvexShape> matriceB, int positionMatriceA, int positionMatriceB, std::vector<sf::Texture>& textures,std::string camp);
 
     bool PieceDansMatrice(const sf::Vector2f& point, const std::vector<sf::ConvexShape> matrice);
 
     bool PieceDansLosange(const sf::ConvexShape& shape, const sf::Vector2f& point);
     
-    void PlacementPiece(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& White, std::vector<PieceImage>& Black, std::vector<PieceImage>& Red);
+    void PlacementPiece(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& White, std::vector<PieceImage>& Black, std::vector<PieceImage>& Red,int IndexMat,int IndexLos);
 
     void ReplacementPiece(int& selectedPieceIndex, int camp, int matriceIndex, std::vector<PieceImage>& pieces, const std::vector<std::vector<sf::ConvexShape>> matrices);
     void ReplacementPieceWhite(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& White);

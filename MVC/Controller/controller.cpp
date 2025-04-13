@@ -110,11 +110,16 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
     bool placed = false;
 
     // Lambda pour tester sur une matrice donnée
-    auto tryPlaceInMatrix = [&](const std::vector<sf::ConvexShape>& matrice) -> bool {
+    auto tryPlaceInMatrix = [&](const std::vector<sf::ConvexShape>& matrice,int indexMatrice) -> bool {
         if (board.PieceDansMatrice(mousePos, matrice)) {
-            for (const auto& losange : matrice) {
+            for (size_t i = 0; i < matrice.size(); ++i) {
+                const auto& losange = matrice[i];
                 if (board.PieceDansLosange(losange, mousePos)) {
-                    board.PlacementPiece(selectedPieceIndex, losange, board.getWhitePieces(),board.getBlackPieces(),board.getRedPieces());
+                    std::vector<int> positions = {static_cast<int>(i), indexMatrice};
+                    std::cout << "position 1 " << i << " " << indexMatrice<<std::endl;
+                    std::cout << "position 2 " << board.getWhitePieces()[selectedPieceIndex].getTilePositions()[0] << " " << board.getWhitePieces()[selectedPieceIndex].getTilePositions()[1]<<std::endl;
+                    handleCoupJouer(board.getWhitePieces()[selectedPieceIndex].getTilePositions(),positions);
+                    board.PlacementPiece(selectedPieceIndex, losange, board.getWhitePieces(), board.getBlackPieces(), board.getRedPieces(),indexMatrice,i);
                     return true;
                 }
             }
@@ -123,12 +128,12 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
     };
 
     // Vérifier dans les 6 matrices
-    if (tryPlaceInMatrix(board.getMatrice1()) ||
-        tryPlaceInMatrix(board.getMatrice2()) ||
-        tryPlaceInMatrix(board.getMatrice3()) ||
-        tryPlaceInMatrix(board.getMatrice4()) ||
-        tryPlaceInMatrix(board.getMatrice5()) ||
-        tryPlaceInMatrix(board.getMatrice6())) {
+    if (tryPlaceInMatrix(board.getMatrice1(),1) ||
+        tryPlaceInMatrix(board.getMatrice2(),2) ||
+        tryPlaceInMatrix(board.getMatrice3(),3) ||
+        tryPlaceInMatrix(board.getMatrice4(),4) ||
+        tryPlaceInMatrix(board.getMatrice5(),5) ||
+        tryPlaceInMatrix(board.getMatrice6(),6)) {
         placed = true;
     }
     else{
@@ -272,8 +277,8 @@ void BoardController::handleCoup(std::vector<int>& tilePositions) {
         {1, 3}, {1, 2}, {1, 1}, {1, 0},
         {0, 3}, {0, 2}, {0, 1}, {0, 0}
     };
-    std::pair<int, int> coup = indexToCoordForSubmatrix(tilePositions[0], tilePositions[1]);
-    std::vector<std::pair<int, int>> coupsPossibles = jeu.GetPlateau().RenvoyerCoupsPossibles(coup.first,coup.second);
+    std::pair<int, int> coupOrigine = indexToCoordForSubmatrix(tilePositions[0], tilePositions[1]);
+    std::vector<std::pair<int, int>> coupsPossibles = jeu.GetPlateau().RenvoyerCoupsPossibles(coupOrigine.first,coupOrigine.second);
 
     for (const auto& coup : coupsPossibles) {
         int matrice = determineSousMatrice(coup.first,coup.second);
@@ -309,4 +314,12 @@ void BoardController::handleCoup(std::vector<int>& tilePositions) {
         }
     }
 
+}
+
+void BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std::vector<int>& tilePositionsDestination){
+    std::cout<< "coup origine " << tilePositionsOrigine[0] << " " << tilePositionsOrigine[1]<< std::endl;
+    std::cout<< "coup destination " << tilePositionsDestination[0] << " " << tilePositionsDestination[1]<< std::endl;
+    std::pair<int, int> coupOrigine = indexToCoordForSubmatrix(tilePositionsOrigine[0], tilePositionsOrigine[1]);
+    std::pair<int, int> coupDestination = indexToCoordForSubmatrix(tilePositionsDestination[0], tilePositionsDestination[1]);
+    jeu.GetPlateau().DeplacerPiece(1,coupOrigine.first, coupOrigine.second, coupDestination.first, coupDestination.second);
 }

@@ -27,7 +27,7 @@ Jeu::Jeu(){
             std::cout << "Entrer les coordonnées de son coup" << std::endl;
             std::cin >> xCoup >> yCoup;
             tour=plateau.DeplacerPiece(tourJoueur,xOrigine, yOrigine, xCoup, yCoup);*/
-            std::vector<std::pair<int, int>> coups = plateau.DeplacerPiece2(xOrigine,yOrigine);
+            std::vector<std::pair<int, int>> coups = plateau.DeplacerPiece(xOrigine,yOrigine);
             for (const auto& coup : coups) {
                 std::cout << "(" << coup.first << ", " << coup.second << ")" << std::endl;
             }
@@ -65,16 +65,16 @@ void Jeu::InitListePiece(Joueur& joueur, int camp) {
 void Jeu::InitListePiece(Joueur& joueur, int camp) {
     Piece** liste = new Piece*[16];
     for (int i = 0; i < 8; i++) {
-        liste[i] = new Cavalier(camp,plateau);
+        liste[i] = new Fou(camp,plateau);
     }
-    liste[8] = new Cavalier(camp,plateau);
-    liste[9] = new Cavalier(camp,plateau);
-    liste[10] = new Cavalier(camp,plateau);
-    liste[11] = new Cavalier(camp,plateau);
-    liste[12] = new Cavalier(camp,plateau);
-    liste[13] = new Cavalier(camp,plateau);
-    liste[14] = new Cavalier(camp,plateau);
-    liste[15] = new Cavalier(camp,plateau);
+    liste[8] = new Fou(camp,plateau);
+    liste[9] = new Fou(camp,plateau);
+    liste[10] = new Fou(camp,plateau);
+    liste[11] = new Fou(camp,plateau);
+    liste[12] = new Fou(camp,plateau);
+    liste[13] = new Fou(camp,plateau);
+    liste[14] = new Fou(camp,plateau);
+    liste[15] = new Fou(camp,plateau);
     joueur.setListePiece(liste);
 }
 

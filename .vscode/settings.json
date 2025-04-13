@@ -56,6 +56,7 @@
         "xstring": "cpp",
         "xtr1common": "cpp",
         "xutility": "cpp",
-        "array": "cpp"
+        "array": "cpp",
+        "algorithm": "cpp"
     }
 }

@@ -39,6 +39,7 @@ private:
 
     std::vector<std::vector<int>> tilesToChangeColor;
     void handleCoup(std::vector<int>& tilePositions);
+    void handleCoupJouer(std::vector<int>& tilePositionsOrigine,std::vector<int>& tilePositionsDestination);
 
 };
 

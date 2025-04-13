@@ -145,7 +145,7 @@ Board::Board() {
         "WhitePawn.png", "WhitePawn.png", "WhitePawn.png", "WhitePawn.png"
     };
     this->texturesWhite = loadTextures(texturePathWhite);
-    this->WhitePieces = CreerPiece(this->matrice1, this->matrice2, 1, 2, texturesWhite);
+    this->WhitePieces = CreerPiece(this->matrice1, this->matrice2, 1, 2, texturesWhite, "White");
 
     std::vector<std::string> texturePathRed = {
         "RedRook.png", "RedKnight.png", "RedBishop.png", "RedKing.png",
@@ -154,7 +154,7 @@ Board::Board() {
         "RedPawn.png", "RedPawn.png", "RedPawn.png", "RedPawn.png"
     };
     this->texturesRed = loadTextures(texturePathRed);
-    this->RedPieces = CreerPiece(this->matrice4, this->matrice3, 4, 3, texturesRed);
+    this->RedPieces = CreerPiece(this->matrice4, this->matrice3, 4, 3, texturesRed,"Red");
 
     std::vector<std::string> texturePathBlack = {
         "BlackRook.png", "BlackKnight.png", "BlackBishop.png", "BlackKing.png",
@@ -163,7 +163,7 @@ Board::Board() {
         "BlackPawn.png", "BlackPawn.png", "BlackPawn.png", "BlackPawn.png"
     };
     this->texturesBlack = loadTextures(texturePathBlack);
-    this->BlackPieces = CreerPiece(this->matrice5, this->matrice6, 5, 6,texturesBlack);
+    this->BlackPieces = CreerPiece(this->matrice5, this->matrice6, 5, 6,texturesBlack,"Black");
 
 }
 
@@ -270,26 +270,25 @@ std::vector<sf::Texture> Board::loadTextures(const std::vector<std::string>& fil
     return textures;
 }
 
-std::vector<PieceImage> Board::CreerPiece(const std::vector<sf::ConvexShape> matriceA, const std::vector<sf::ConvexShape> matriceB, int positionMatriceA, int positionMatriceB, std::vector<sf::Texture>& textures) {
+std::vector<PieceImage> Board::CreerPiece(const std::vector<sf::ConvexShape> matriceA, const std::vector<sf::ConvexShape> matriceB, int positionMatriceA, int positionMatriceB, std::vector<sf::Texture>& textures,std::string camp) {
     std::vector<PieceImage> pieceImage;
     sf:: Texture texture;
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[15], 0.2f, 0.2f,textures[0]),std::vector<int>{15, positionMatriceA}));
-
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[11], 0.2f, 0.2f, textures[1]),std::vector<int>{11, positionMatriceA}));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[7], 0.2f, 0.2f, textures[2]),std::vector<int>{7, positionMatriceA}));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[3], 0.2f, 0.2f, textures[3]),std::vector<int>{3, positionMatriceA}));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[12], 0.2f, 0.2f, textures[4]),std::vector<int>{12, positionMatriceB}));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[13], 0.2f, 0.2f, textures[5]),std::vector<int>{13, positionMatriceB}));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[14], 0.2f, 0.2f, textures[6]),std::vector<int>{14, positionMatriceB}));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[15], 0.2f, 0.2f, textures[7]),std::vector<int>{15, positionMatriceB}));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[14], 0.2f, 0.2f, textures[8]),std::vector<int>{14, positionMatriceA}));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[10], 0.2f, 0.2f, textures[9]),std::vector<int>{10, positionMatriceA}));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[6], 0.2f, 0.2f, textures[10]),std::vector<int>{6, positionMatriceA}));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[2], 0.2f, 0.2f, textures[11]),std::vector<int>{2, positionMatriceA}));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[8], 0.2f, 0.2f, textures[12]),std::vector<int>{8, positionMatriceB}));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[9], 0.2f, 0.2f, textures[13]),std::vector<int>{9, positionMatriceB}));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[10], 0.2f, 0.2f, textures[14]),std::vector<int>{10, positionMatriceB}));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[11], 0.2f, 0.2f, textures[15]),std::vector<int>{11, positionMatriceB}));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[15], 0.2f, 0.2f,textures[0]),std::vector<int>{15, positionMatriceA},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[11], 0.2f, 0.2f, textures[1]),std::vector<int>{11, positionMatriceA},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[7], 0.2f, 0.2f, textures[2]),std::vector<int>{7, positionMatriceA},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[3], 0.2f, 0.2f, textures[3]),std::vector<int>{3, positionMatriceA},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[12], 0.2f, 0.2f, textures[4]),std::vector<int>{12, positionMatriceB},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[13], 0.2f, 0.2f, textures[5]),std::vector<int>{13, positionMatriceB},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[14], 0.2f, 0.2f, textures[6]),std::vector<int>{14, positionMatriceB},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[15], 0.2f, 0.2f, textures[7]),std::vector<int>{15, positionMatriceB},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[14], 0.2f, 0.2f, textures[8]),std::vector<int>{14, positionMatriceA},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[10], 0.2f, 0.2f, textures[9]),std::vector<int>{10, positionMatriceA},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[6], 0.2f, 0.2f, textures[10]),std::vector<int>{6, positionMatriceA},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[2], 0.2f, 0.2f, textures[11]),std::vector<int>{2, positionMatriceA},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[8], 0.2f, 0.2f, textures[12]),std::vector<int>{8, positionMatriceB},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[9], 0.2f, 0.2f, textures[13]),std::vector<int>{9, positionMatriceB},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[10], 0.2f, 0.2f, textures[14]),std::vector<int>{10, positionMatriceB},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[11], 0.2f, 0.2f, textures[15]),std::vector<int>{11, positionMatriceB},camp));
     return pieceImage;
 }
 
@@ -330,7 +329,7 @@ bool Board::PieceDansLosange(const sf::ConvexShape& shape, const sf::Vector2f& p
 }
 
 
-void Board::PlacementPiece(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& White, std::vector<PieceImage>& Black, std::vector<PieceImage>& Red) {
+void Board::PlacementPiece(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& White, std::vector<PieceImage>& Black, std::vector<PieceImage>& Red,int IndexMat,int IndexLos) {
     sf::Vector2f centre = calculerCentreLosange(losange);
 
     // Modifier la position en fonction du type de pièce
@@ -339,6 +338,7 @@ void Board::PlacementPiece(int& selectedPieceIndex, const sf::ConvexShape& losan
         centre.x - White[selectedPieceIndex].getSprite().getGlobalBounds().width / 2.0f,
         centre.y - White[selectedPieceIndex].getSprite().getGlobalBounds().height / 2.0f
         );
+        White[selectedPieceIndex].setTilePositions({IndexLos,IndexMat});
     } else if (selectedPieceIndex < White.size() + Red.size()) {
         Red[selectedPieceIndex - White.size()].getSprite().setPosition(
         centre.x - Red[selectedPieceIndex - White.size()].getSprite().getGlobalBounds().width / 2.0f,
@@ -356,7 +356,7 @@ void Board::PlacementPiece(int& selectedPieceIndex, const sf::ConvexShape& losan
 void Board::ReplacementPiece(int& selectedPieceIndex, int camp, int matriceIndex, std::vector<PieceImage>& pieces, const std::vector<std::vector<sf::ConvexShape>> matrices) {
     int tileIndex = pieces[selectedPieceIndex].getTilePositions()[0];
     const sf::ConvexShape& losange = matrices[matriceIndex - 1][tileIndex];
-    
+
     if (camp==0) {
         ReplacementPieceWhite(selectedPieceIndex, losange, pieces);
     } else if (camp==1) {
