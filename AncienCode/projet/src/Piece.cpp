@@ -304,6 +304,67 @@ void Piece::CoupPion(int xOrigine, int yOrigine, std::vector<std::pair<int, int>
     }
 }
 
+void Piece::CoupCavalier(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector<std::pair<int, int>>& coupsPossibles,int verification,bool methodeDeux) {
+    int xdestination = xOrigine + xCoup;
+    int ydestination = yOrigine + yCoup;
+    if((yOrigine==7 && ydestination==8) && ((xCoup==0 && yCoup==1) || (xCoup==-1 && yCoup==1) || (xCoup==1 && yCoup==1))){
+        std::cout << "Mur de la matrice 5" << std::endl;
+    }
+    else if((xOrigine==7 && xdestination==8) && ((xCoup==1 && yCoup==-1) || (xCoup==1 && yCoup==0) || (xCoup==1 && yCoup==1))){
+        std::cout << "Mur de la matrice 4" << std::endl;
+    }
+    else{
+        ajustementCoordonnees(xOrigine,yOrigine,xdestination,ydestination,xCoup,yCoup);
+        if (xdestination < 0 || xdestination >= 12 || ydestination < 0 || ydestination >= 12) {//Bord du plateau
+            std::cout << "Déplacement hors du plateau" << std::endl;
+        }
+        else if((xdestination < 4 && ydestination > 7) || (xdestination > 7 && ydestination < 4)) {// Case non existante du plateau yalta
+            std::cout << "Case non existante" << std::endl;
+        }
+        else if((yOrigine==7 && ydestination==8) && (xCoup==0 && yCoup==1)){
+            std::cout << "Mur de la matrice 5" << std::endl;
+        }
+        else if(verification==0){
+            if(methodeDeux){
+                CoupCavalier(xdestination,ydestination,xCoup,yCoup,coupsPossibles,1,true);
+            }
+            else{
+                if(xCoup==0){
+                    CoupCavalier(xdestination,ydestination,-1,0,coupsPossibles,1,false);
+                    CoupCavalier(xdestination,ydestination,1,0,coupsPossibles,1,false);
+                }
+                else{
+                    CoupCavalier(xdestination,ydestination,0,-1,coupsPossibles,1,false);
+                    CoupCavalier(xdestination,ydestination,0,1,coupsPossibles,1,false);
+                }
+            }
+            
+        }
+        else if(verification==1){
+            if(methodeDeux){
+                if(xCoup==0){
+                    CoupCavalier(xdestination,ydestination,-1,0,coupsPossibles,2,true);
+                    CoupCavalier(xdestination,ydestination,1,0,coupsPossibles,2,true);
+                }
+                else{
+                    CoupCavalier(xdestination,ydestination,0,-1,coupsPossibles,2,true);
+                    CoupCavalier(xdestination,ydestination,0,1,coupsPossibles,2,true);
+                }
+            }
+            else{
+                CoupCavalier(xdestination,ydestination,xCoup,yCoup,coupsPossibles,2,false);
+            }
+        }
+        else if (plateau.matrice[xdestination][ydestination] == nullptr){
+            coupsPossibles.emplace_back(xdestination, ydestination);
+        }
+    }
+
+}
+
+
+
+
 /*
 void Piece::ajustementRosasse(int xOrigine, int yOrigine, int xCoup, int yCoup, std::vector<std::pair<int, int>>& coupsPossibles){
     if((xOrigine==3 && yOrigine==3) && (xCoup==1 && yCoup==1)){
@@ -339,4 +400,6 @@ void Piece::ajustementRosasse(int xOrigine, int yOrigine, int xCoup, int yCoup, 
         recursive(3,3, -1, -1, coupsPossibles);
     }
 }
+
 */
+

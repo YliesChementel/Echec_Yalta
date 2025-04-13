@@ -3,6 +3,8 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <algorithm>
+
 
 class Plateau;
 
@@ -35,6 +37,8 @@ protected:
 
     void Coup(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector<std::pair<int, int>>& coupsPossibles);
     void CoupPion(int xOrigine, int yOrigine,std::vector<std::pair<int, int>>& coupsPossibles, int arret);
+    void CoupCavalier(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector<std::pair<int, int>>& coupsPossibles,int verification,bool methodeDeux);
+
 };
 
 
@@ -54,6 +58,53 @@ class Tour : public Piece {
         }
 };
 
+class Cavalier : public Piece {
+    public:
+        Cavalier(int camp, Plateau& plateau) : Piece(camp, plateau) {}
+        int GetCamp() { return Piece::GetCamp(); }
+        void SetCamp(int camp) { Piece::SetCamp(camp); }
+        std::string GetType() const override  { return "C"; }
+        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine){
+            std::vector<std::pair<int, int>> coupsPossibles;
+            CoupCavalier(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles,0,false);
+            CoupCavalier(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles,0,false);
+            CoupCavalier(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles,0,false);
+            CoupCavalier(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles,0,false);
+
+            CoupCavalier(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles,0,true);
+            CoupCavalier(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles,0,true);
+            CoupCavalier(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles,0,true);
+            CoupCavalier(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles,0,true);
+
+            ////////////////////////////////////////////////////
+            //Trier les doublons
+            std::sort(coupsPossibles.begin(), coupsPossibles.end());
+            auto last = std::unique(coupsPossibles.begin(), coupsPossibles.end());
+            coupsPossibles.erase(last, coupsPossibles.end());
+
+            if(xOrigine==3 && yOrigine==3){
+                coupsPossibles.emplace_back(8, 8);
+            }
+            else if(xOrigine==3 && yOrigine==4){
+                coupsPossibles.emplace_back(4, 8);
+            }
+            else if(xOrigine==4 && yOrigine==3){
+                coupsPossibles.emplace_back(8, 4);
+            }
+            else if(xOrigine==8 && yOrigine==8){
+                coupsPossibles.emplace_back(3, 3);
+
+            }
+            else if(xOrigine==8 && yOrigine==4){
+                coupsPossibles.emplace_back(4, 3);
+            }
+            else if(xOrigine==4 && yOrigine==8){
+                coupsPossibles.emplace_back(3, 4);
+            }
+
+            return coupsPossibles;
+        }
+};
 
 class Fou : public Piece {
     public:

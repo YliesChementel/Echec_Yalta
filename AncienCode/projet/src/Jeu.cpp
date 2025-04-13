@@ -65,16 +65,16 @@ void Jeu::InitListePiece(Joueur& joueur, int camp) {
 void Jeu::InitListePiece(Joueur& joueur, int camp) {
     Piece** liste = new Piece*[16];
     for (int i = 0; i < 8; i++) {
-        liste[i] = new Pion(camp,plateau);
+        liste[i] = new Cavalier(camp,plateau);
     }
-    liste[8] = new Pion(camp,plateau);
-    liste[9] = new Pion(camp,plateau);
-    liste[10] = new Pion(camp,plateau);
-    liste[11] = new Pion(camp,plateau);
-    liste[12] = new Pion(camp,plateau);
-    liste[13] = new Pion(camp,plateau);
-    liste[14] = new Pion(camp,plateau);
-    liste[15] = new Pion(camp,plateau);
+    liste[8] = new Cavalier(camp,plateau);
+    liste[9] = new Cavalier(camp,plateau);
+    liste[10] = new Cavalier(camp,plateau);
+    liste[11] = new Cavalier(camp,plateau);
+    liste[12] = new Cavalier(camp,plateau);
+    liste[13] = new Cavalier(camp,plateau);
+    liste[14] = new Cavalier(camp,plateau);
+    liste[15] = new Cavalier(camp,plateau);
     joueur.setListePiece(liste);
 }
 
