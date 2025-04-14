@@ -3,9 +3,7 @@
 #include "Plateau.h"
 
 
-std::vector<std::pair<int, int>> Piece::DeplacementCoup(int xOrigine, int yOrigine){
-    return;
-}
+std::vector<std::pair<int, int>> Piece::DeplacementCoup(int xOrigine, int yOrigine){}
 
 int Piece::GetCamp() {
     return camp;
@@ -155,6 +153,9 @@ void Piece::CoupRecursif(int xOrigine, int yOrigine, int xCoup, int yCoup,std::v
             coupsPossibles.emplace_back(xdestination, ydestination);
             CoupRecursif(xdestination, ydestination, xCoup, yCoup, coupsPossibles);
         }
+        else if(plateau.matrice[xdestination][ydestination] != nullptr && plateau.matrice[xdestination][ydestination]->GetCamp()!=this->GetCamp()){
+            coupsPossibles.emplace_back(xdestination, ydestination);
+        }
     }
 }
 
@@ -209,6 +210,9 @@ void Piece::CoupCavalier(int xOrigine, int yOrigine, int xCoup, int yCoup,std::v
         else if (plateau.matrice[xdestination][ydestination] == nullptr){
             coupsPossibles.emplace_back(xdestination, ydestination);
         }
+        else if(plateau.matrice[xdestination][ydestination] != nullptr && plateau.matrice[xdestination][ydestination]->GetCamp()!=this->GetCamp()){
+            coupsPossibles.emplace_back(xdestination, ydestination);
+        }
     }
 }
 
@@ -254,6 +258,9 @@ void Piece::CoupRoi(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector
         else if (plateau.matrice[xdestination][ydestination] == nullptr){
             coupsPossibles.emplace_back(xdestination, ydestination);
         }
+        else if(plateau.matrice[xdestination][ydestination] != nullptr && plateau.matrice[xdestination][ydestination]->GetCamp()!=this->GetCamp()){
+            coupsPossibles.emplace_back(xdestination, ydestination);
+        }
     }
 }
 
@@ -262,33 +269,20 @@ void Piece::CoupPion(int xOrigine, int yOrigine, std::vector<std::pair<int, int>
         int xdestination;
         int ydestination;
         int xCoup;
-        int yCoup;
+        int yCoup = 0;
 
         int matriceOrigine = determineSousMatrice(xOrigine, yOrigine);
 
         if(this->camp==1){
             xCoup=1;
-            yCoup=0;
         }
         else if(this->camp==2){
-            if(matriceOrigine==6 || matriceOrigine==5){
-                xCoup=1;
-                yCoup=0;
-            }
-            else{
-                xCoup=-1;
-                yCoup=0;
-            }
+            if(matriceOrigine==6 || matriceOrigine==5){ xCoup=1; }
+            else{ xCoup=-1; }
         }
         else{
-            if(matriceOrigine==4 || matriceOrigine==3){
-                xCoup=1;
-                yCoup=0;
-            }else{
-                xCoup=-1;
-                yCoup=0;
-            }
-            
+            if(matriceOrigine==4 || matriceOrigine==3){ xCoup=1; }
+            else{ xCoup=-1; }
         }
         xdestination = xOrigine + xCoup;
         ydestination = yOrigine + yCoup;
@@ -297,6 +291,66 @@ void Piece::CoupPion(int xOrigine, int yOrigine, std::vector<std::pair<int, int>
         }
         else{
             ajustementCoordonnees(xOrigine,yOrigine,xdestination,ydestination,xCoup,yCoup);
+            if(arret==0){
+                int xcapture = xOrigine + xCoup;
+                int ycapture = yOrigine + 1;
+                int yCoupTemp = 1;
+                ajustementCoordonnees(xOrigine,yOrigine,xcapture,ycapture,xCoup,yCoupTemp);
+                if(plateau.matrice[xcapture][ycapture] != nullptr && plateau.matrice[xcapture][ycapture]->GetCamp()!=this->GetCamp()){
+                    coupsPossibles.emplace_back(xcapture, ycapture);
+                }
+                xcapture = xOrigine + xCoup;
+                ycapture = yOrigine - 1;
+                yCoupTemp = -1;
+                ajustementCoordonnees(xOrigine,yOrigine,xcapture,ycapture,xCoup,yCoupTemp);
+                if(plateau.matrice[xcapture][ycapture] != nullptr && plateau.matrice[xcapture][ycapture]->GetCamp()!=this->GetCamp()){
+                    coupsPossibles.emplace_back(xcapture, ycapture);
+                }
+
+                if(xOrigine==3 && yOrigine==3){
+                    if(plateau.matrice[4][8] != nullptr && plateau.matrice[4][8]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(4, 8);
+                    }
+                    if(plateau.matrice[8][4] != nullptr && plateau.matrice[8][4]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(8, 4);
+                    }
+                }
+                else if(xOrigine==3 && yOrigine==4){
+                    if(plateau.matrice[8][8] != nullptr && plateau.matrice[8][8]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(8, 8);
+                    }
+                }
+                else if(xOrigine==4 && yOrigine==3){
+                    if(plateau.matrice[8][8] != nullptr && plateau.matrice[8][8]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(8, 8);
+                    }
+                }
+                else if(xOrigine==8 && yOrigine==8){
+                    if(plateau.matrice[3][4] != nullptr && plateau.matrice[3][4]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(3, 4);
+                    }
+                    if(plateau.matrice[4][3] != nullptr && plateau.matrice[4][3]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(4, 3);
+                    }
+                }
+                else if(xOrigine==8 && yOrigine==4){
+                    if(plateau.matrice[4][8] != nullptr && plateau.matrice[4][8]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(4, 8);
+                    }
+                    if(plateau.matrice[3][3] != nullptr && plateau.matrice[3][3]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(3, 3);
+                    }
+                }
+                else if(xOrigine==4 && yOrigine==8){
+                    if(plateau.matrice[8][4] != nullptr && plateau.matrice[8][4]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(8, 4);
+                    }
+                    if(plateau.matrice[3][3] != nullptr && plateau.matrice[3][3]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(3, 3);
+                    }
+                }
+            }
+
             if (xdestination < 0 || xdestination >= 12 || ydestination < 0 || ydestination >= 12) {//Bord du plateau
                 std::cout << "Déplacement hors du plateau" << std::endl;
             }
@@ -307,6 +361,80 @@ void Piece::CoupPion(int xOrigine, int yOrigine, std::vector<std::pair<int, int>
                 coupsPossibles.emplace_back(xdestination, ydestination);
                 CoupPion(xdestination,ydestination,coupsPossibles,arret+=1);
             }
+
+            
         }
     }
 }
+
+
+/*
+
+int xcapture = xOrigine + xCoup;
+int ycapture = yOrigine + 1;
+int yCoupTemp = 1;
+ajustementCoordonnees(xOrigine,yOrigine,xcapture,ycapture,xCoup,yCoupTemp);
+if(plateau.matrice[xcapture][ycapture] != nullptr && plateau.matrice[xcapture][ycapture]->GetCamp()!=this->GetCamp()){
+    coupsPossibles.emplace_back(xcapture, ycapture);
+}
+xcapture = xOrigine + xCoup;
+ycapture = yOrigine - 1;
+yCoupTemp = -1;
+ajustementCoordonnees(xOrigine,yOrigine,xcapture,ycapture,xCoup,yCoupTemp);
+if(plateau.matrice[xcapture][ycapture] != nullptr && plateau.matrice[xcapture][ycapture]->GetCamp()!=this->GetCamp()){
+    coupsPossibles.emplace_back(xcapture, ycapture);
+}
+
+
+
+void Piece::CoupPion(int xOrigine, int yOrigine, std::vector<std::pair<int, int>>& coupsPossibles, int arret) {
+    if(arret!=2){
+        int xdestination;
+        int ydestination;
+        int xCoup;
+        int yCoup = 0;
+
+        int matriceOrigine = determineSousMatrice(xOrigine, yOrigine);
+
+        if(this->camp==1){
+            xCoup=1;
+        }
+        else if(this->camp==2){
+            if(matriceOrigine==6 || matriceOrigine==5){ xCoup=1; }
+            else{ xCoup=-1; }
+        }
+        else{
+            if(matriceOrigine==4 || matriceOrigine==3){ xCoup=1; }
+            else{ xCoup=-1; }
+        }
+        xdestination = xOrigine + xCoup;
+        ydestination = yOrigine + yCoup;
+        if((xOrigine==7 && xdestination==8) && (xCoup==1 && yCoup==0)){
+            std::cout << "Mur de la matrice 4" << std::endl;
+        }
+        else{
+            ajustementCoordonnees(xOrigine,yOrigine,xdestination,ydestination,xCoup,yCoup);
+            if(arret==0){
+                int yCoupTemp = 1;
+                CoupRoi(xOrigine,yOrigine,xCoup,yCoupTemp,coupsPossibles);
+                yCoupTemp = -1;
+                CoupRoi(xOrigine,yOrigine,xCoup,yCoupTemp,coupsPossibles);
+            }
+
+            if (xdestination < 0 || xdestination >= 12 || ydestination < 0 || ydestination >= 12) {//Bord du plateau
+                std::cout << "Déplacement hors du plateau" << std::endl;
+            }
+            else if((xdestination < 4 && ydestination > 7) || (xdestination > 7 && ydestination < 4)) {// Case non existante du plateau yalta
+                std::cout << "Case non existante" << std::endl;
+            }
+            else if (plateau.matrice[xdestination][ydestination] == nullptr){
+                coupsPossibles.emplace_back(xdestination, ydestination);
+                CoupPion(xdestination,ydestination,coupsPossibles,arret+=1);
+            }
+
+            
+        }
+    }
+}
+
+*/

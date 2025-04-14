@@ -96,6 +96,10 @@ std::vector<std::pair<int, int>> Plateau::DeplacerPiece(int xOrigine, int yOrigi
 }
 
 void Plateau::DeplacementAutoriser(int xOrigine, int yOrigine,int xCoup,int yCoup){
+    if (matrice[xCoup][yCoup] != nullptr) {
+            std::cout << "Capture" << std::endl;
+    }
+
     matrice[xCoup][yCoup] = matrice[xOrigine][yOrigine];
     matrice[xOrigine][yOrigine] = nullptr;
 
