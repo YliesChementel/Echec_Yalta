@@ -1,6 +1,7 @@
 #ifndef PLATEAU_H
 #define PLATEAU_H
 #include "Piece.h"
+#include "Joueur.h"
 #include <vector>
 
 class Piece;
@@ -16,7 +17,8 @@ public:
     void AfficherCoupsPossibles(std::vector<std::pair<int, int>> coupsPossibles);
     Piece* matrice[12][12];
     
-    void DeplacementAutoriser(int xOrigine, int yOrigine,int xCoup,int yCoup);
+    void DeplacementAutoriser(int xOrigine, int yOrigine,int xCoup,int yCoup,Joueur* ListeJoueur);
+    void VerifierEnEchec(Joueur* ListeJoueur);
 };
 
 

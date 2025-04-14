@@ -36,7 +36,7 @@ Jeu::Jeu(){
             std::cin >> xCoup >> yCoup;
             for (const auto& coup : coups) {
                 if(coup.first == xCoup  && coup.second == yCoup ){
-                    plateau.DeplacementAutoriser(xOrigine,yOrigine,xCoup,yCoup);
+                    plateau.DeplacementAutoriser(xOrigine,yOrigine,xCoup,yCoup,ListeJoueur);
                 }
             }
             plateau.AffichageMatrice();
@@ -67,14 +67,14 @@ void Jeu::InitListePiece(Joueur& joueur, int camp) {
     for (int i = 0; i < 8; i++) {
         liste[i] = new Pion(camp,plateau);
     }
-    liste[8] = new Pion(camp,plateau);
-    liste[9] = new Pion(camp,plateau);
-    liste[10] = new Pion(camp,plateau);
-    liste[11] = new Pion(camp,plateau);
-    liste[12] = new Pion(camp,plateau);
-    liste[13] = new Pion(camp,plateau);
-    liste[14] = new Pion(camp,plateau);
-    liste[15] = new Pion(camp,plateau);
+    liste[8] = new Tour(camp,plateau);
+    liste[9] = new Cavalier(camp,plateau);
+    liste[10] = new Fou(camp,plateau);
+    liste[11] = new Reine(camp,plateau);
+    liste[12] = new Roi(camp,plateau);
+    liste[13] = new Fou(camp,plateau);
+    liste[14] = new Cavalier(camp,plateau);
+    liste[15] = new Tour(camp,plateau);
     joueur.setListePiece(liste);
 }
 

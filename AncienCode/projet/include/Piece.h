@@ -13,11 +13,17 @@ Piece(int camp, Plateau& plateau) : camp(camp), plateau(plateau) {}
     virtual std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine);
     int GetCamp();
     void SetCamp(int camp);
+    int GetXPosition(){ return xPosition;};
+    int GetYPosition(){ return yPosition;};
+    void SetXPosition(int xPosition){this->xPosition=xPosition;};
+    void SetYPosition(int yPosition){this->yPosition=yPosition;};
     virtual std::string GetType() const = 0;
 
 private:
     int camp;
     Plateau& plateau;
+    int xPosition;
+    int yPosition;
 
 protected:
     std::vector<std::pair<int, int>> directions = {{-1,-1},{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1}};

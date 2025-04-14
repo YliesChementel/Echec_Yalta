@@ -18,31 +18,47 @@ void Plateau::PlacerPiece(Piece** ListePiece1, Piece** ListePiece2, Piece** List
 
     // Placer les pièces du joueur 1
     for (int j = 0; j < 8; ++j) {
+        ListePiece1[index1]->SetXPosition(1);
+        ListePiece1[index1]->SetYPosition(j);
         matrice[1][j] = ListePiece1[index1++];
     }
     for (int j = 0; j < 8; ++j) {
+        ListePiece1[index1]->SetXPosition(0);
+        ListePiece1[index1]->SetYPosition(j);
         matrice[0][j] = ListePiece1[index1++];
     }
 
     // Placer les pièces du joueur 2
     for (int j = 0; j < 4; ++j) {
+        ListePiece2[index2]->SetXPosition(6);
+        ListePiece2[index2]->SetYPosition(j);
         matrice[6][j] = ListePiece2[index2++];
     }
     for (int j = 8; j < 12; ++j) {
+        ListePiece2[index2]->SetXPosition(6);
+        ListePiece2[index2]->SetYPosition(j);
         matrice[6][j] = ListePiece2[index2++];
     }
     for (int j = 0; j < 4; ++j) {
+        ListePiece2[index2]->SetXPosition(7);
+        ListePiece2[index2]->SetYPosition(j);
         matrice[7][j] = ListePiece2[index2++];
     }
     for (int j = 8; j < 12; ++j) {
+        ListePiece2[index2]->SetXPosition(7);
+        ListePiece2[index2]->SetYPosition(j);
         matrice[7][j] = ListePiece2[index2++];
     }
 
     // Placer les pièces du joueur 3
     for (int j = 4; j < 12; ++j) {
+        ListePiece3[index3]->SetXPosition(10);
+        ListePiece3[index3]->SetYPosition(j);
         matrice[10][j] = ListePiece3[index3++];
     }
     for (int j = 4; j < 12; ++j) {
+        ListePiece3[index3]->SetXPosition(11);
+        ListePiece3[index3]->SetYPosition(j);
         matrice[11][j] = ListePiece3[index3++];
     }
 
@@ -95,15 +111,28 @@ std::vector<std::pair<int, int>> Plateau::DeplacerPiece(int xOrigine, int yOrigi
     return piece->DeplacementCoup(xOrigine,yOrigine);
 }
 
-void Plateau::DeplacementAutoriser(int xOrigine, int yOrigine,int xCoup,int yCoup){
+void Plateau::DeplacementAutoriser(int xOrigine, int yOrigine,int xCoup,int yCoup, Joueur* ListeJoueur){
     if (matrice[xCoup][yCoup] != nullptr) {
             std::cout << "Capture" << std::endl;
+            if(matrice[xCoup][yCoup]->GetCamp()==0){
+                ListeJoueur[0].retirerPiece(matrice[xCoup][yCoup]);
+            }
+            else if(matrice[xCoup][yCoup]->GetCamp()==1){
+                ListeJoueur[1].retirerPiece(matrice[xCoup][yCoup]);
+            }
+            else{
+                ListeJoueur[2].retirerPiece(matrice[xCoup][yCoup]);
+            }
     }
 
     matrice[xCoup][yCoup] = matrice[xOrigine][yOrigine];
     matrice[xOrigine][yOrigine] = nullptr;
 
+    matrice[xCoup][yCoup]->SetXPosition(xCoup);
+    matrice[xCoup][yCoup]->SetYPosition(yCoup);
+
     std::cout << "Pièce déplacée de (" << xOrigine << "," << yOrigine << ") vers (" << xCoup << "," << yCoup << ")" << std::endl;
+    VerifierEnEchec(ListeJoueur);
 }
 
 void Plateau::AfficherCoupsPossibles(std::vector<std::pair<int, int>> coupsPossibles) {
@@ -148,73 +177,65 @@ void Plateau::AfficherCoupsPossibles(std::vector<std::pair<int, int>> coupsPossi
     }
 }
 
-/*
-bool Plateau::DeplacerPiece(int tourJoueur,int xOrigine, int yOrigine, int xCoup, int yCoup) {
-    Piece* piece = matrice[xOrigine][yOrigine];
-    if(piece->GetCamp() != tourJoueur){
-        std::cout << "Ce n'est pas votre pièce" << std::endl;
-        return false;
-    };
-    
-    std::cout << "Type de pièce déplacée : " << piece->GetType() << std::endl;
-    if (piece == nullptr || !piece->Deplacement(xOrigine, yOrigine, xCoup, yCoup)) {
-        std::cout << "Déplacement invalide" << std::endl;
-        return false;
-    }
-    
+void Plateau::VerifierEnEchec(Joueur* ListeJoueur){
+    std::vector<std::pair<int, int>> coupsEchecBlanc;
+    std::vector<std::pair<int, int>> coupsEchecRouge;
+    std::vector<std::pair<int, int>> coupsEchecNoir;
+    std::vector<std::pair<int, int>> coups;
+    std::pair<int, int> roiBlanc;
+    std::pair<int, int> roiRouge;
+    std::pair<int, int> roiNoir;
 
-    if (matrice[xOrigine][yOrigine] == nullptr) { //verif si la pièce est présente
-        std::cout << "Aucune pièce à cette position" << std::endl;
-        return false;
-    }
 
-    if (xCoup < 0 || xCoup >= 12 || yCoup < 0 || yCoup >= 12) {//Bord du plateau
-        std::cout << "Déplacement hors du plateau" << std::endl;
-        return false;
-    }
-
-    if ((xCoup < 4 && yCoup > 7) || (xCoup >7 && yCoup < 4)) {// Case non existante du plateau yalta
-        std::cout << "Case non existante" << std::endl;
-        return false;
-    }
-
-    if((xCoup >3 && xCoup < 8) && (yCoup > 3 && yCoup < 8)){// Case non existante du plateau yalta (milieu)
-        std::cout << "Case non existante du plateau yalta (milieu)" << std::endl;
-        return false;
-    }
-
-    if (matrice[xCoup][yCoup] != nullptr) {
-        if(matrice[xCoup][yCoup]->GetCamp() == tourJoueur){
-            std::cout << "Vous essayez de capturer votre propre pièce" << std::endl;
-            return false;
+    Piece** listeBlanc = ListeJoueur[0].getListePiece();
+    for(int i=0;i < ListeJoueur[0].getTaille();i++){
+        if(listeBlanc[i]->GetType()!="r"){
+            coups = listeBlanc[i]->DeplacementCoup(listeBlanc[i]->GetXPosition(),listeBlanc[i]->GetYPosition());
+            coupsEchecBlanc.insert(coupsEchecBlanc.end(), coups.begin(), coups.end());
         }
         else{
-            std::cout << "Capture" << std::endl;
+            roiBlanc={listeBlanc[i]->GetXPosition(), listeBlanc[i]->GetYPosition()};
         }
     }
 
-    matrice[xCoup][yCoup] = matrice[xOrigine][yOrigine];
-    matrice[xOrigine][yOrigine] = nullptr;
+    Piece** listeRouge = ListeJoueur[1].getListePiece();
+    for(int i=0;i < ListeJoueur[1].getTaille();i++){
+        if(listeRouge[i]->GetType()!="r"){
+            coups = listeRouge[i]->DeplacementCoup(listeRouge[i]->GetXPosition(),listeRouge[i]->GetYPosition());
+            coupsEchecRouge.insert(coupsEchecRouge.end(), coups.begin(), coups.end());
+        }
+        else {
+            roiRouge={listeRouge[i]->GetXPosition(), listeRouge[i]->GetYPosition()};
+        }
+    }
 
-    std::cout << "Pièce déplacée de (" << xOrigine << "," << yOrigine 
-              << ") vers (" << xCoup << "," << yCoup << ")" << std::endl;
-    
-    return true;
+    Piece** listeNoir = ListeJoueur[2].getListePiece();
+    for(int i=0;i < ListeJoueur[2].getTaille();i++){
+        if(listeNoir[i]->GetType()!="r"){
+            coups = listeNoir[i]->DeplacementCoup(listeNoir[i]->GetXPosition(),listeNoir[i]->GetYPosition());
+            coupsEchecNoir.insert(coupsEchecNoir.end(), coups.begin(), coups.end());
+        }
+        else{
+            roiNoir={listeNoir[i]->GetXPosition(), listeNoir[i]->GetYPosition()};
+        }
+    }
+
+    for (const auto& coup : coupsEchecBlanc) {
+        if(coup==roiNoir || coup==roiRouge){
+            std::cout<< "ECHEC"<< std::endl;
+            break;
+        }
+    }
+    for (const auto& coup : coupsEchecRouge) {
+        if(coup==roiNoir || coup==roiBlanc){
+            std::cout<< "ECHEC"<< std::endl;
+            break;
+        }
+    }
+    for (const auto& coup : coupsEchecNoir) {
+        if(coup==roiBlanc || coup==roiRouge){
+            std::cout<< "ECHEC"<< std::endl;
+            break;
+        }
+    }
 }
-
-std::vector<std::pair<int, int>> Plateau::ObtenirCoupsPossibles(Piece* piece, int xOrigine, int yOrigine) {
-    std::vector<std::pair<int, int>> coupsPossibles;
-
-    for (int i = 0; i < 12; ++i) {
-        for (int j = 0; j < 12; ++j) {
-            if ((i < 4 && j > 7) || (i > 7 && j < 4) || (i > 3 && i < 8 && j > 3 && j < 8)) {// Vérification des cases non existantes
-                continue;
-            }
-            if (piece->Deplacement(xOrigine, yOrigine, i, j)) {
-                coupsPossibles.emplace_back(i, j);
-            }
-        }
-    }
-
-    return coupsPossibles;
-}*/
