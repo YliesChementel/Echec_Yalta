@@ -36,7 +36,7 @@ Jeu::Jeu(){
             std::cin >> xCoup >> yCoup;
             for (const auto& coup : coups) {
                 if(coup.first == xCoup  && coup.second == yCoup ){
-                    plateau.DeplacementAutoriser(xOrigine,yOrigine,xCoup,yCoup,ListeJoueur,plateau.matrice);
+                    plateau.Deplacement(xOrigine,yOrigine,xCoup,yCoup,ListeJoueur,plateau.matrice);
                 }
             }
             plateau.AffichageMatrice(plateau.matrice);

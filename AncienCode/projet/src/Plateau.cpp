@@ -157,7 +157,7 @@ std::vector<std::pair<int, int>> Plateau::DeplacerPiece(int xOrigine, int yOrigi
 }
 
 // Fonction qui déplace une pièce via les coordonnées données et gère la capture d'une pièce, ainsi que la mise en echec et echec et mat
-void Plateau::DeplacementAutoriser(int xOrigine, int yOrigine,int xCoup,int yCoup, Joueur* ListeJoueur, Piece* matrice[12][12]){
+void Plateau::Deplacement(int xOrigine, int yOrigine,int xCoup,int yCoup, Joueur* ListeJoueur, Piece* matrice[12][12]){
     if (matrice[xCoup][yCoup] != nullptr) {
             std::cout << "Capture" << std::endl;
             if(matrice[xCoup][yCoup]->GetCamp()==1){
@@ -185,7 +185,7 @@ void Plateau::DeplacementAutoriser(int xOrigine, int yOrigine,int xCoup,int yCou
             std::cout << camp << " ";
         std::cout << std::endl;
         if (std::count(camps.begin(), camps.end(), "blanc") != 0) {
-            if (EstEchecEtMatBlanc(ListeJoueur)) {
+            if (EstEchecEtMat(0, "blanc", ListeJoueur)) {
                 std::cout << "Fin de la partie pour le joueur Blanc !" << std::endl;
             }
             else{
@@ -193,7 +193,7 @@ void Plateau::DeplacementAutoriser(int xOrigine, int yOrigine,int xCoup,int yCou
             }
         }
         else if(std::count(camps.begin(), camps.end(), "rouge") != 0){
-            if (EstEchecEtMatRouge(ListeJoueur)) {
+            if (EstEchecEtMat(1, "rouge", ListeJoueur)) {
                 std::cout << "Fin de la partie pour le joueur Rouge !" << std::endl;
             }
             else{
@@ -201,7 +201,7 @@ void Plateau::DeplacementAutoriser(int xOrigine, int yOrigine,int xCoup,int yCou
             }
         }
         else{
-            if (EstEchecEtMatNoir(ListeJoueur)) {
+            if (EstEchecEtMat(2, "noir", ListeJoueur)) {
                 std::cout << "Fin de la partie pour le joueur Noir !" << std::endl;
             }
             else{
@@ -215,10 +215,10 @@ void Plateau::DeplacementAutoriser(int xOrigine, int yOrigine,int xCoup,int yCou
 }
 
 
-// Fonction similaire à DeplacementAutoriser mais sera utiliser par la copie du plateau pour la détection des echec et mat
+// Fonction similaire à Deplacement mais sera utiliser par la copie du plateau pour la détection des echec et mat
 void DeplacementPourCopie(int xOrigine, int yOrigine,int xCoup,int yCoup, Joueur* ListeJoueur, Piece* matrice[12][12]){
     if (matrice[xCoup][yCoup] != nullptr) {
-            std::cout << "Capture" << std::endl;
+            //std::cout << "Capture" << std::endl;
             if(matrice[xCoup][yCoup]->GetCamp()==1){
                 ListeJoueur[0].retirerPiece(matrice[xCoup][yCoup]);
             }
@@ -236,7 +236,7 @@ void DeplacementPourCopie(int xOrigine, int yOrigine,int xCoup,int yCoup, Joueur
     matrice[xCoup][yCoup]->SetXPosition(xCoup);
     matrice[xCoup][yCoup]->SetYPosition(yCoup);
 
-    std::cout << "Pièce déplacée de (" << xOrigine << "," << yOrigine << ") vers (" << xCoup << "," << yCoup << ")" << std::endl;
+    //std::cout << "Pièce déplacée de (" << xOrigine << "," << yOrigine << ") vers (" << xCoup << "," << yCoup << ")" << std::endl;
 }
 
 // Fonction pour faire des copies des listes de pièces des joueurs, et prendre leurs tailles
@@ -376,19 +376,13 @@ std::vector<std::string> Plateau::VerifierEnEchec(Joueur* ListeJoueur, Piece* ma
     return campsEnEchec;
 }
 
-bool Plateau::EstEchecEtMatBlanc(Joueur* ListeJoueur) {
-    std::vector<std::string> campsEnEchec = VerifierEnEchec(ListeJoueur, this->matrice); // Vérifie d'abord s’il y a échec
+bool Plateau::EstEchecEtMat(int indexJoueur, std::string nomJoueur, Joueur* ListeJoueur) {
 
-    if (std::count(campsEnEchec.begin(), campsEnEchec.end(), "blanc") == 0) { // Si blanc n'est pas en échec, alors ce n'est pas échec et mat
-        return false;
-    }
+    Piece** listePieces = ListeJoueur[indexJoueur].getListePiece();
+    int taille = ListeJoueur[indexJoueur].getTaille();
 
-    Piece** listeBlanc = ListeJoueur[0].getListePiece();// Récupère les pièces blanches
-    int tailleBlanc = ListeJoueur[0].getTaille();
-
-    for (int i = 0; i < tailleBlanc; ++i) { // Pour chaque pièce blanche, on teste tous les déplacements possibles
-        Piece* piece = listeBlanc[i];
-
+    for (int i = 0; i < taille; ++i) {
+        Piece* piece = listePieces[i];
         std::vector<std::pair<int, int>> coupsPossibles = piece->DeplacementCoup(piece->GetXPosition(), piece->GetYPosition(), this->matrice);
 
         for (const auto& coup : coupsPossibles) {
@@ -398,118 +392,28 @@ bool Plateau::EstEchecEtMatBlanc(Joueur* ListeJoueur) {
             int tailleBlancCopie, tailleRougeCopie ,tailleNoirCopie;
             Piece** listeBlancCopie = copierListePiece(copie, 1, tailleBlancCopie);
             Piece** listeRougeCopie = copierListePiece(copie, 2, tailleRougeCopie);
-            Piece** listeNoirCopie = copierListePiece(copie, 3, tailleNoirCopie);
+            Piece** listeNoirCopie  = copierListePiece(copie, 3, tailleNoirCopie);
 
             Joueur* ListeJoueurCopie = new Joueur[3];
             ListeJoueurCopie[0].setListePiece(listeBlancCopie); ListeJoueurCopie[0].setTaille(tailleBlancCopie);
             ListeJoueurCopie[1].setListePiece(listeRougeCopie); ListeJoueurCopie[1].setTaille(tailleRougeCopie);
             ListeJoueurCopie[2].setListePiece(listeNoirCopie);  ListeJoueurCopie[2].setTaille(tailleNoirCopie);
 
-            DeplacementPourCopie(piece->GetXPosition(), piece->GetYPosition(), coup.first, coup.second, ListeJoueurCopie, copie); // On applique le coup sur la copie
+            DeplacementPourCopie(piece->GetXPosition(), piece->GetYPosition(), coup.first, coup.second, ListeJoueurCopie, copie);
 
-            AffichageMatrice(copie);
+            //AffichageMatrice(copie);
 
-            std::vector<std::string> campsEnEchecVerif = VerifierEnEchec(ListeJoueurCopie, copie); // Vérifie s’il y a encore échec après le déplacement dans la copie
+            std::vector<std::string> campsEnEchecVerif = VerifierEnEchec(ListeJoueurCopie, copie);
 
-            if (std::count(campsEnEchecVerif.begin(), campsEnEchecVerif.end(), "blanc") == 0) { // Si blanc n'est pas en échec, alors ce n'est pas échec et mat
+            if (std::count(campsEnEchecVerif.begin(), campsEnEchecVerif.end(), nomJoueur) == 0) {
                 LibererMatrice(copie);
                 return false;
             }
+
             LibererMatrice(copie);
         }
     }
-    std::cout << "Les Blancs sont en ÉCHEC ET MAT !" << std::endl;
-    return true;
-}
 
-bool Plateau::EstEchecEtMatRouge(Joueur* ListeJoueur) {
-    std::vector<std::string> campsEnEchec = VerifierEnEchec(ListeJoueur, this->matrice); // Vérifie d'abord s’il y a échec
-    
-    if (std::count(campsEnEchec.begin(), campsEnEchec.end(), "rouge") == 0) { // Si rouge n'est pas en échec, alors ce n'est pas échec et mat
-        return false;
-    }
-
-    Piece** listeRouge = ListeJoueur[1].getListePiece(); // Récupère les pièces rouges
-    int tailleRouge = ListeJoueur[1].getTaille();
-
-    for (int i = 0; i < tailleRouge; ++i) { // Pour chaque pièce rouge, on teste tous les déplacements possibles
-        Piece* piece = listeRouge[i];
-
-        std::vector<std::pair<int, int>> coupsPossibles = piece->DeplacementCoup(piece->GetXPosition(), piece->GetYPosition(), this->matrice);
-
-        for (const auto& coup : coupsPossibles) {
-            Piece* copie[12][12];
-            CopierMatrice(copie, this->matrice);
-
-            int tailleBlancCopie, tailleRougeCopie ,tailleNoirCopie;
-            Piece** listeBlancCopie = copierListePiece(copie, 1, tailleBlancCopie);
-            Piece** listeRougeCopie = copierListePiece(copie, 2, tailleRougeCopie);
-            Piece** listeNoirCopie = copierListePiece(copie, 3, tailleNoirCopie);
-
-            Joueur* ListeJoueurCopie = new Joueur[3];
-            ListeJoueurCopie[0].setListePiece(listeBlancCopie); ListeJoueurCopie[0].setTaille(tailleBlancCopie);
-            ListeJoueurCopie[1].setListePiece(listeRougeCopie); ListeJoueurCopie[1].setTaille(tailleRougeCopie);
-            ListeJoueurCopie[2].setListePiece(listeNoirCopie);  ListeJoueurCopie[2].setTaille(tailleNoirCopie);
-
-            DeplacementPourCopie(piece->GetXPosition(), piece->GetYPosition(), coup.first, coup.second, ListeJoueurCopie, copie); // On applique le coup sur la copie
-
-            AffichageMatrice(copie);
-
-            std::vector<std::string> campsEnEchecVerif = VerifierEnEchec(ListeJoueurCopie, copie); // Vérifie s’il y a encore échec après le déplacement dans la copie
-
-            if (std::count(campsEnEchecVerif.begin(), campsEnEchecVerif.end(), "rouge") == 0) { // Si blanc n'est pas en échec, alors ce n'est pas échec et mat
-                LibererMatrice(copie);
-                return false;
-            }
-            LibererMatrice(copie);
-        }
-    }
-    std::cout << "Les Rouges sont en ÉCHEC ET MAT !" << std::endl;
-    return true;
-}
-
-bool Plateau::EstEchecEtMatNoir(Joueur* ListeJoueur) {
-    std::vector<std::string> campsEnEchec = VerifierEnEchec(ListeJoueur, this->matrice); // Vérifie d'abord s’il y a échec
-    
-    if (std::count(campsEnEchec.begin(), campsEnEchec.end(), "noir") == 0) { // Si noir n'est pas en échec, alors ce n'est pas échec et mat
-        return false;
-    }
-    
-    Piece** listeNoir = ListeJoueur[2].getListePiece(); // Récupère les pièces noires
-    int tailleNoir = ListeJoueur[2].getTaille();
-
-    for (int i = 0; i < tailleNoir; ++i) { // Pour chaque pièce Noir, on teste tous les déplacements possibles
-        Piece* piece = listeNoir[i];
-
-        std::vector<std::pair<int, int>> coupsPossibles = piece->DeplacementCoup(piece->GetXPosition(), piece->GetYPosition(), this->matrice);
-
-        for (const auto& coup : coupsPossibles) {
-            Piece* copie[12][12];
-            CopierMatrice(copie, this->matrice);
-
-            int tailleBlancCopie, tailleRougeCopie ,tailleNoirCopie;
-            Piece** listeBlancCopie = copierListePiece(copie, 1, tailleBlancCopie);
-            Piece** listeRougeCopie = copierListePiece(copie, 2, tailleRougeCopie);
-            Piece** listeNoirCopie = copierListePiece(copie, 3, tailleNoirCopie);
-
-            Joueur* ListeJoueurCopie = new Joueur[3];
-            ListeJoueurCopie[0].setListePiece(listeBlancCopie); ListeJoueurCopie[0].setTaille(tailleBlancCopie);
-            ListeJoueurCopie[1].setListePiece(listeRougeCopie); ListeJoueurCopie[1].setTaille(tailleRougeCopie);
-            ListeJoueurCopie[2].setListePiece(listeNoirCopie);  ListeJoueurCopie[2].setTaille(tailleNoirCopie);
-
-            DeplacementPourCopie(piece->GetXPosition(), piece->GetYPosition(), coup.first, coup.second, ListeJoueurCopie, copie); // On applique le coup sur la copie
-
-            AffichageMatrice(copie);
-
-            std::vector<std::string> campsEnEchecVerif = VerifierEnEchec(ListeJoueurCopie, copie); // Vérifie s’il y a encore échec après le déplacement dans la copie
-
-            if (std::count(campsEnEchecVerif.begin(), campsEnEchecVerif.end(), "noir") == 0) { // Si blanc n'est pas en échec, alors ce n'est pas échec et mat
-                LibererMatrice(copie);
-                return false;
-            }
-            LibererMatrice(copie);
-        }
-    }
-    std::cout << "Les Noir sont en ÉCHEC ET MAT !" << std::endl;
+    std::cout << "Les " << nomJoueur << "s sont en ÉCHEC ET MAT !" << std::endl;
     return true;
 }
