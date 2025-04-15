@@ -17,6 +17,10 @@ int Joueur::getTaille(){
     return tailleListePiece;
 }
 
+int Joueur::setTaille(int tailleListePiece){
+    this->tailleListePiece = tailleListePiece;
+}
+
 void Joueur::setListePiece(Piece** liste) {
     if (listePiece != nullptr) {
         for (int i = 0; i < 16; ++i) {

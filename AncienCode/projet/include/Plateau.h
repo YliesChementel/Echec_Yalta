@@ -11,14 +11,18 @@ public:
     Plateau();
     void InitMatrice();
     void PlacerPiece(Piece** ListePiece1, Piece** ListePiece2, Piece** ListePiece3);
-    void AffichageMatrice();
+    void AffichageMatrice(Piece* matrice[12][12]);
     std::vector<std::pair<int, int>> DeplacerPiece(int xOrigine, int yOrigine);
     std::vector<std::pair<int, int>> ObtenirCoupsPossibles(Piece* piece, int xOrigine, int yOrigine);
     void AfficherCoupsPossibles(std::vector<std::pair<int, int>> coupsPossibles);
     Piece* matrice[12][12];
     
-    void DeplacementAutoriser(int xOrigine, int yOrigine,int xCoup,int yCoup,Joueur* ListeJoueur);
-    void VerifierEnEchec(Joueur* ListeJoueur);
+    void DeplacementAutoriser(int xOrigine, int yOrigine,int xCoup,int yCoup,Joueur* ListeJoueur, Piece* matrice[12][12]);
+    std::vector<std::string> VerifierEnEchec(Joueur* ListeJoueur, Piece* matrice[12][12]);
+
+    bool EstEchecEtMatBlanc(Joueur* ListeJoueur);
+    bool EstEchecEtMatRouge(Joueur* ListeJoueur);
+    bool EstEchecEtMatNoir(Joueur* ListeJoueur);
 };
 
 

@@ -5,12 +5,10 @@
 #include <vector>
 #include <algorithm>
 
-class Plateau;
-
 class Piece {
 public:
-Piece(int camp, Plateau& plateau) : camp(camp), plateau(plateau) {}
-    virtual std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine);
+Piece(int camp) : camp(camp) {}
+    virtual std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine,Piece* matrice[12][12]);
     int GetCamp();
     void SetCamp(int camp);
     int GetXPosition(){ return xPosition;};
@@ -19,9 +17,13 @@ Piece(int camp, Plateau& plateau) : camp(camp), plateau(plateau) {}
     void SetYPosition(int yPosition){this->yPosition=yPosition;};
     virtual std::string GetType() const = 0;
 
+    // Méthode virtuelle pure pour cloner une pièce
+    virtual Piece* clone() const = 0;
+    // Destructeur virtuel pour éviter les fuites de mémoire en cas de suppression à travers un pointeur de base.
+    virtual ~Piece() {}
+
 private:
     int camp;
-    Plateau& plateau;
     int xPosition;
     int yPosition;
 
@@ -35,46 +37,56 @@ protected:
     void ajustementCoordonnees(int& xOrigine, int& yOrigine, int& xdestination, int& ydestination,int& xCoup, int& yCoup) const;
 
     //Différents types de coup des pièces 
-    void CoupRecursif(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector<std::pair<int, int>>& coupsPossibles);
-    void CoupCavalier(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector<std::pair<int, int>>& coupsPossibles,int verification,bool methodeDeux);
-    void CoupRoi(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector<std::pair<int, int>>& coupsPossibles);
-    void CoupPion(int xOrigine, int yOrigine,std::vector<std::pair<int, int>>& coupsPossibles, int arret);
+    void CoupRecursif(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector<std::pair<int, int>>& coupsPossibles,Piece* matrice[12][12]);
+    void CoupCavalier(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector<std::pair<int, int>>& coupsPossibles,int verification,bool methodeDeux,Piece* matrice[12][12]);
+    void CoupRoi(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector<std::pair<int, int>>& coupsPossibles,Piece* matrice[12][12]);
+    void CoupPion(int xOrigine, int yOrigine,std::vector<std::pair<int, int>>& coupsPossibles, int arret,Piece* matrice[12][12]);
 };
 
 
 class Tour : public Piece {
     public:
-        Tour(int camp, Plateau& plateau) : Piece(camp, plateau) {}
+        Tour(int camp) : Piece(camp) {}
         int GetCamp() { return Piece::GetCamp(); }
         void SetCamp(int camp) { Piece::SetCamp(camp); }
         std::string GetType() const override  { return "T"; }
-        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine){
+
+        virtual Piece* clone() const override {
+            return new Tour(*this);
+        }
+
+        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine, Piece* matrice[12][12]){
             std::vector<std::pair<int, int>> coupsPossibles;
-            CoupRecursif(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles);
-            CoupRecursif(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles);
-            CoupRecursif(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles);
-            CoupRecursif(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles);
+            CoupRecursif(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles,matrice);
             return coupsPossibles;
         }
 };
 
 class Cavalier : public Piece {
     public:
-        Cavalier(int camp, Plateau& plateau) : Piece(camp, plateau) {}
+        Cavalier(int camp) : Piece(camp) {}
         int GetCamp() { return Piece::GetCamp(); }
         void SetCamp(int camp) { Piece::SetCamp(camp); }
         std::string GetType() const override  { return "C"; }
-        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine){
-            std::vector<std::pair<int, int>> coupsPossibles;
-            CoupCavalier(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles,0,false);
-            CoupCavalier(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles,0,false);
-            CoupCavalier(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles,0,false);
-            CoupCavalier(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles,0,false);
 
-            CoupCavalier(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles,0,true);
-            CoupCavalier(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles,0,true);
-            CoupCavalier(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles,0,true);
-            CoupCavalier(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles,0,true);
+        virtual Piece* clone() const override {
+            return new Cavalier(*this);
+        }
+
+        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine,Piece* matrice[12][12]){
+            std::vector<std::pair<int, int>> coupsPossibles;
+            CoupCavalier(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles,0,false,matrice);
+            CoupCavalier(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles,0,false,matrice);
+            CoupCavalier(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles,0,false,matrice);
+            CoupCavalier(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles,0,false,matrice);
+
+            CoupCavalier(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles,0,true,matrice);
+            CoupCavalier(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles,0,true,matrice);
+            CoupCavalier(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles,0,true,matrice);
+            CoupCavalier(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles,0,true,matrice);
 
             ////////////////////////////////////////////////////
             //Trier les doublons
@@ -108,69 +120,89 @@ class Cavalier : public Piece {
 
 class Fou : public Piece {
     public:
-        Fou(int camp, Plateau& plateau) : Piece(camp, plateau) {}
+        Fou(int camp) : Piece(camp) {}
         int GetCamp() { return Piece::GetCamp(); }
         void SetCamp(int camp) { Piece::SetCamp(camp); }
         std::string GetType() const override  { return "F"; }
-        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine){
+
+        virtual Piece* clone() const override {
+            return new Fou(*this);
+        }
+
+        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine, Piece* matrice[12][12]){
             std::vector<std::pair<int, int>> coupsPossibles;
-            CoupRecursif(xOrigine,yOrigine,directions[0].first,directions[0].second,coupsPossibles);
-            CoupRecursif(xOrigine,yOrigine,directions[2].first,directions[2].second,coupsPossibles);
-            CoupRecursif(xOrigine,yOrigine,directions[4].first,directions[4].second,coupsPossibles);
-            CoupRecursif(xOrigine,yOrigine,directions[6].first,directions[6].second,coupsPossibles);
+            CoupRecursif(xOrigine,yOrigine,directions[0].first,directions[0].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[2].first,directions[2].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[4].first,directions[4].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[6].first,directions[6].second,coupsPossibles,matrice);
             return coupsPossibles;
         }
 };
 
 class Reine : public Piece {
     public:
-        Reine(int camp, Plateau& plateau) : Piece(camp, plateau) {}
+        Reine(int camp) : Piece(camp) {}
         int GetCamp() { return Piece::GetCamp(); }
         void SetCamp(int camp) { Piece::SetCamp(camp); }
         std::string GetType() const override  { return "R"; }
-        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine){
+
+        virtual Piece* clone() const override {
+            return new Reine(*this);
+        }
+
+        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine, Piece* matrice[12][12]){
             std::vector<std::pair<int, int>> coupsPossibles;
-            CoupRecursif(xOrigine,yOrigine,directions[0].first,directions[0].second,coupsPossibles);
-            CoupRecursif(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles);
-            CoupRecursif(xOrigine,yOrigine,directions[2].first,directions[2].second,coupsPossibles);
-            CoupRecursif(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles);
-            CoupRecursif(xOrigine,yOrigine,directions[4].first,directions[4].second,coupsPossibles);
-            CoupRecursif(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles);
-            CoupRecursif(xOrigine,yOrigine,directions[6].first,directions[6].second,coupsPossibles);
-            CoupRecursif(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles);
+            CoupRecursif(xOrigine,yOrigine,directions[0].first,directions[0].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[2].first,directions[2].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[4].first,directions[4].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[6].first,directions[6].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles,matrice);
             return coupsPossibles;
         }
 };
 
 class Roi : public Piece {
     public:
-        Roi(int camp, Plateau& plateau) : Piece(camp, plateau) {}
+        Roi(int camp) : Piece(camp) {}
         int GetCamp() { return Piece::GetCamp(); }
         void SetCamp(int camp) { Piece::SetCamp(camp); }
         std::string GetType() const override  { return "r"; }
-        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine){
+
+        virtual Piece* clone() const override {
+            return new Roi(*this);
+        }
+
+        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine,Piece* matrice[12][12]){
             std::vector<std::pair<int, int>> coupsPossibles;
-            CoupRoi(xOrigine,yOrigine,directions[0].first,directions[0].second,coupsPossibles);
-            CoupRoi(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles);
-            CoupRoi(xOrigine,yOrigine,directions[2].first,directions[2].second,coupsPossibles);
-            CoupRoi(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles);
-            CoupRoi(xOrigine,yOrigine,directions[4].first,directions[4].second,coupsPossibles);
-            CoupRoi(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles);
-            CoupRoi(xOrigine,yOrigine,directions[6].first,directions[6].second,coupsPossibles);
-            CoupRoi(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles);
+            CoupRoi(xOrigine,yOrigine,directions[0].first,directions[0].second,coupsPossibles,matrice);
+            CoupRoi(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles,matrice);
+            CoupRoi(xOrigine,yOrigine,directions[2].first,directions[2].second,coupsPossibles,matrice);
+            CoupRoi(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles,matrice);
+            CoupRoi(xOrigine,yOrigine,directions[4].first,directions[4].second,coupsPossibles,matrice);
+            CoupRoi(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles,matrice);
+            CoupRoi(xOrigine,yOrigine,directions[6].first,directions[6].second,coupsPossibles,matrice);
+            CoupRoi(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles,matrice);
             return coupsPossibles;
         }
 };
 
 class Pion : public Piece {
     public:
-        Pion(int camp, Plateau& plateau) : Piece(camp, plateau) {}
+        Pion(int camp) : Piece(camp) {}
         int GetCamp() { return Piece::GetCamp(); }
         void SetCamp(int camp) { Piece::SetCamp(camp); }
         std::string GetType() const override  { return "P"; }
-        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine){
+
+        virtual Piece* clone() const override {
+            return new Pion(*this);
+        }
+
+        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine,Piece* matrice[12][12]){
             std::vector<std::pair<int, int>> coupsPossibles;
-            CoupPion(xOrigine,yOrigine,coupsPossibles,0);
+            CoupPion(xOrigine,yOrigine,coupsPossibles,0,matrice);
             return coupsPossibles;
         }
 };
