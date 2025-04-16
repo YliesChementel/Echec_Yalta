@@ -45,22 +45,17 @@ Jeu::Jeu(){
         std::cout << std::endl;
     } */
 }
+
+//Interessant pour empecher un coup hors du possible
 /*
-void Jeu::InitListePiece(Joueur& joueur, int camp) {
-    Piece** liste = new Piece*[16];
-    for (int i = 0; i < 8; i++) {
-        liste[i] = new Pion(camp);
+ std::cin >> xCoup >> yCoup;
+for (const auto& coup : coups) {
+    if(coup.first == xCoup  && coup.second == yCoup ){
+        plateau.Deplacement(xOrigine,yOrigine,xCoup,yCoup,ListeJoueur,plateau.matrice);
     }
-    liste[8] = new Tour(camp);
-    liste[9] = new Cavalier(camp);
-    liste[10] = new Fou(camp);
-    liste[11] = new Reine(camp);
-    liste[12] = new Roi(camp);
-    liste[13] = new Fou(camp);
-    liste[14] = new Cavalier(camp);
-    liste[15] = new Tour(camp);
-    joueur.setListePiece(liste);
-}*/
+}
+
+*/
 
 void Jeu::InitListePiece(Joueur& joueur, int camp) {
     Piece** liste = new Piece*[16];
@@ -70,8 +65,15 @@ void Jeu::InitListePiece(Joueur& joueur, int camp) {
     liste[8] = new Tour(camp);
     liste[9] = new Cavalier(camp);
     liste[10] = new Fou(camp);
-    liste[11] = new Reine(camp);
-    liste[12] = new Roi(camp);
+    if(camp==2){
+        liste[11] = new Reine(camp);
+        liste[12] = new Roi(camp);
+        
+    }
+    else{
+        liste[11] = new Roi(camp);
+        liste[12] = new Reine(camp);
+    }
     liste[13] = new Fou(camp);
     liste[14] = new Cavalier(camp);
     liste[15] = new Tour(camp);

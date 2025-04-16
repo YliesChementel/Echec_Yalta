@@ -116,11 +116,34 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
                 const auto& losange = matrice[i];
                 if (board.PieceDansLosange(losange, mousePos)) {
                     std::vector<int> positions = {static_cast<int>(i), indexMatrice};
-                    std::cout << "position 1 " << i << " " << indexMatrice<<std::endl;
-                    std::cout << "position 2 " << board.getWhitePieces()[selectedPieceIndex].getTilePositions()[0] << " " << board.getWhitePieces()[selectedPieceIndex].getTilePositions()[1]<<std::endl;
-                    handleCoupJouer(board.getWhitePieces()[selectedPieceIndex].getTilePositions(),positions);
-                    board.PlacementPiece(selectedPieceIndex, losange, board.getWhitePieces(), board.getBlackPieces(), board.getRedPieces(),indexMatrice,i);
-                    return true;
+                    std::cout << "Origine losange : " << i << " - matrice :" << indexMatrice<<std::endl;/////////////////////////////////////////////////////
+                    if (selectedPieceIndex < board.getWhitePieces().size()) {
+                        if(handleCoupJouer(board.getWhitePieces()[selectedPieceIndex].getTilePositions(),positions)){
+                            board.PlacementPiece(selectedPieceIndex, losange, board.getWhitePieces(), board.getBlackPieces(), board.getRedPieces(),indexMatrice,i);
+                            return true;
+                        }
+                        else{
+                            return false;
+                        }
+                    } else if (selectedPieceIndex < board.getWhitePieces().size() + board.getRedPieces().size()) {
+                        if(handleCoupJouer(board.getRedPieces()[selectedPieceIndex - board.getWhitePieces().size()].getTilePositions(),positions)){
+                            board.PlacementPiece(selectedPieceIndex, losange, board.getWhitePieces(), board.getBlackPieces(), board.getRedPieces(),indexMatrice,i);
+                            return true;
+                        }
+                        else{
+                            return false;
+                        }
+                    } else {
+                        if(handleCoupJouer(board.getBlackPieces()[selectedPieceIndex - board.getWhitePieces().size() - board.getRedPieces().size()].getTilePositions(),positions)){
+                            board.PlacementPiece(selectedPieceIndex, losange, board.getWhitePieces(), board.getBlackPieces(), board.getRedPieces(),indexMatrice,i);
+                            return true;
+                        }
+                        else{
+                            return false;
+                        }
+                    }
+                    //board.PlacementPiece(selectedPieceIndex, losange, board.getWhitePieces(), board.getBlackPieces(), board.getRedPieces(),indexMatrice,i);
+                    //return true;
                 }
             }
         }
@@ -278,9 +301,9 @@ void BoardController::handleCoup(std::vector<int>& tilePositions) {
         {0, 3}, {0, 2}, {0, 1}, {0, 0}
     };
     std::pair<int, int> coupOrigine = indexToCoordForSubmatrix(tilePositions[0], tilePositions[1]);
-    std::vector<std::pair<int, int>> coupsPossibles = jeu.GetPlateau().DeplacerPiece(coupOrigine.first,coupOrigine.second);
+    this->coupsPossibles = jeu.GetPlateau().DeplacerPiece(coupOrigine.first,coupOrigine.second);
 
-    for (const auto& coup : coupsPossibles) {
+    for (const auto& coup : this->coupsPossibles) {
         int matrice = determineSousMatrice(coup.first,coup.second);
         if(matrice == 1) {
             int index = coordToIndexForSubmatrix(coup.first,coup.second, matrice);
@@ -316,11 +339,21 @@ void BoardController::handleCoup(std::vector<int>& tilePositions) {
 
 }
 
-void BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std::vector<int>& tilePositionsDestination){
+bool BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std::vector<int>& tilePositionsDestination){
     std::cout<< "coup origine " << tilePositionsOrigine[0] << " " << tilePositionsOrigine[1]<< std::endl;
     std::cout<< "coup destination " << tilePositionsDestination[0] << " " << tilePositionsDestination[1]<< std::endl;
     std::pair<int, int> coupOrigine = indexToCoordForSubmatrix(tilePositionsOrigine[0], tilePositionsOrigine[1]);
     std::pair<int, int> coupDestination = indexToCoordForSubmatrix(tilePositionsDestination[0], tilePositionsDestination[1]);
-    //jeu.GetPlateau().DeplacerPiece(1,coupOrigine.first, coupOrigine.second, coupDestination.first, coupDestination.second);
-    jeu.GetPlateau().Deplacement(coupOrigine.first,coupOrigine.second,coupDestination.first,coupDestination.second,jeu.GetListeJoueur(),jeu.GetPlateau().matrice);
+    bool coupAutoriser = false;
+    if(coupOrigine!=coupDestination){
+        for (const auto& coup : this->coupsPossibles) {
+            if(coupDestination==coup){
+                jeu.GetPlateau().Deplacement(coupOrigine.first,coupOrigine.second,coupDestination.first,coupDestination.second,jeu.GetListeJoueur(),jeu.GetPlateau().matrice);
+                coupAutoriser = true;
+                return true;
+            }
+        }
+        std::cout<<"coup non autoriser"<<std::endl;
+    }
+    return false;
 }

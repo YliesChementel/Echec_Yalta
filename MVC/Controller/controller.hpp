@@ -18,6 +18,10 @@ private:
     sf::RenderWindow& window;
     Jeu& jeu;
 
+    /////////////////
+    //
+    std::vector<std::pair<int, int>> coupsPossibles;
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Variables pour le drag & drop
     bool isDragging;
@@ -39,7 +43,7 @@ private:
 
     std::vector<std::vector<int>> tilesToChangeColor;
     void handleCoup(std::vector<int>& tilePositions);
-    void handleCoupJouer(std::vector<int>& tilePositionsOrigine,std::vector<int>& tilePositionsDestination);
+    bool handleCoupJouer(std::vector<int>& tilePositionsOrigine,std::vector<int>& tilePositionsDestination);
 
 };
 

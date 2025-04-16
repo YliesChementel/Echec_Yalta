@@ -344,11 +344,13 @@ void Board::PlacementPiece(int& selectedPieceIndex, const sf::ConvexShape& losan
         centre.x - Red[selectedPieceIndex - White.size()].getSprite().getGlobalBounds().width / 2.0f,
         centre.y - Red[selectedPieceIndex - White.size()].getSprite().getGlobalBounds().height / 2.0f
         );
+        Red[selectedPieceIndex - White.size()].setTilePositions({IndexLos,IndexMat});
     } else {
         Black[selectedPieceIndex - White.size() - Red.size()].getSprite().setPosition(
         centre.x - Black[selectedPieceIndex - White.size() - Red.size()].getSprite().getGlobalBounds().width / 2.0f,
         centre.y - Black[selectedPieceIndex - White.size() - Red.size()].getSprite().getGlobalBounds().height / 2.0f
         );
+        Black[selectedPieceIndex - White.size() - Red.size()].setTilePositions({IndexLos,IndexMat});
     }
 }
 
