@@ -11,9 +11,9 @@ Jeu::Jeu(){
         InitListePiece(ListeJoueur[i], i + 1);
     }
     plateau.PlacerPiece(ListeJoueur[0].getListePiece(), ListeJoueur[1].getListePiece(), ListeJoueur[2].getListePiece());
-    //plateau.AffichageMatrice();
+    /*plateau.AffichageMatrice(plateau.matrice);
 
-    /*int xOrigine, yOrigine, xCoup, yCoup;
+    int xOrigine, yOrigine, xCoup, yCoup;
     bool tour;
     while(etatDeParti==false){
         tour=false;
@@ -22,16 +22,45 @@ Jeu::Jeu(){
         while(tour==false){
             std::cout << "Entrer les coordonnées de la pièce" << std::endl;
             std::cin >> xOrigine >> yOrigine;
-            std::cout << "Coup Possibles" << std::endl;
+            /*std::cout << "Coup Possibles" << std::endl;
             plateau.AfficherCoupsPossibles(xOrigine,yOrigine);
             std::cout << "Entrer les coordonnées de son coup" << std::endl;
             std::cin >> xCoup >> yCoup;
-            tour=plateau.DeplacerPiece(tourJoueur,xOrigine, yOrigine, xCoup, yCoup);
+            tour=plateau.DeplacerPiece(tourJoueur,xOrigine, yOrigine, xCoup, yCoup);*/ /*
+            std::vector<std::pair<int, int>> coups = plateau.DeplacerPiece(xOrigine,yOrigine);
+            for (const auto& coup : coups) {
+                std::cout << "(" << coup.first << ", " << coup.second << ")" << std::endl;
+            }
+            plateau.AfficherCoupsPossibles(coups);
+            std::cout << "Entrer les coordonnées de son coup" << std::endl;
+            std::cin >> xCoup >> yCoup;
+            for (const auto& coup : coups) {
+                if(coup.first == xCoup  && coup.second == yCoup ){
+                    plateau.Deplacement(xOrigine,yOrigine,xCoup,yCoup,ListeJoueur,plateau.matrice);
+                }
+            }
+            plateau.AffichageMatrice(plateau.matrice);
         }
-        plateau.AffichageMatrice();
+        plateau.AffichageMatrice(plateau.matrice);
         std::cout << std::endl;
-    }*/
+    } */
 }
+/*
+void Jeu::InitListePiece(Joueur& joueur, int camp) {
+    Piece** liste = new Piece*[16];
+    for (int i = 0; i < 8; i++) {
+        liste[i] = new Pion(camp);
+    }
+    liste[8] = new Tour(camp);
+    liste[9] = new Cavalier(camp);
+    liste[10] = new Fou(camp);
+    liste[11] = new Reine(camp);
+    liste[12] = new Roi(camp);
+    liste[13] = new Fou(camp);
+    liste[14] = new Cavalier(camp);
+    liste[15] = new Tour(camp);
+    joueur.setListePiece(liste);
+}*/
 
 void Jeu::InitListePiece(Joueur& joueur, int camp) {
     Piece** liste = new Piece*[16];
@@ -41,36 +70,13 @@ void Jeu::InitListePiece(Joueur& joueur, int camp) {
     liste[8] = new Tour(camp);
     liste[9] = new Cavalier(camp);
     liste[10] = new Fou(camp);
-    if(camp==2){
-        liste[11] = new Reine(camp);
-        liste[12] = new Roi(camp);
-        
-    }
-    else{
-        liste[11] = new Roi(camp);
-        liste[12] = new Reine(camp);
-    }
+    liste[11] = new Reine(camp);
+    liste[12] = new Roi(camp);
     liste[13] = new Fou(camp);
     liste[14] = new Cavalier(camp);
     liste[15] = new Tour(camp);
     joueur.setListePiece(liste);
 }
-/*
-void Jeu::InitListePiece(Joueur& joueur, int camp) {
-    Piece** liste = new Piece*[16];
-    for (int i = 0; i < 8; i++) {
-        liste[i] = new Fou(camp);
-    }
-    liste[8] = new Fou(camp);
-    liste[9] = new Fou(camp);
-    liste[10] = new Fou(camp);
-    liste[11] = new Fou(camp);
-    liste[12] = new Roi(camp);
-    liste[13] = new Fou(camp);
-    liste[14] = new Fou(camp);
-    liste[15] = new Fou(camp);
-    joueur.setListePiece(liste);
-}*/
 
 void Jeu::ChangerTourJoueur() {
    /*if(tourJoueur==1){

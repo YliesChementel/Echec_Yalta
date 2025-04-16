@@ -278,7 +278,7 @@ void BoardController::handleCoup(std::vector<int>& tilePositions) {
         {0, 3}, {0, 2}, {0, 1}, {0, 0}
     };
     std::pair<int, int> coupOrigine = indexToCoordForSubmatrix(tilePositions[0], tilePositions[1]);
-    std::vector<std::pair<int, int>> coupsPossibles = jeu.GetPlateau().RenvoyerCoupsPossibles(coupOrigine.first,coupOrigine.second);
+    std::vector<std::pair<int, int>> coupsPossibles = jeu.GetPlateau().DeplacerPiece(coupOrigine.first,coupOrigine.second);
 
     for (const auto& coup : coupsPossibles) {
         int matrice = determineSousMatrice(coup.first,coup.second);
@@ -321,5 +321,6 @@ void BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std
     std::cout<< "coup destination " << tilePositionsDestination[0] << " " << tilePositionsDestination[1]<< std::endl;
     std::pair<int, int> coupOrigine = indexToCoordForSubmatrix(tilePositionsOrigine[0], tilePositionsOrigine[1]);
     std::pair<int, int> coupDestination = indexToCoordForSubmatrix(tilePositionsDestination[0], tilePositionsDestination[1]);
-    jeu.GetPlateau().DeplacerPiece(1,coupOrigine.first, coupOrigine.second, coupDestination.first, coupDestination.second);
+    //jeu.GetPlateau().DeplacerPiece(1,coupOrigine.first, coupOrigine.second, coupDestination.first, coupDestination.second);
+    jeu.GetPlateau().Deplacement(coupOrigine.first,coupOrigine.second,coupDestination.first,coupDestination.second,jeu.GetListeJoueur(),jeu.GetPlateau().matrice);
 }

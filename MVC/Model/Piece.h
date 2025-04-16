@@ -2,311 +2,209 @@
 #define PIECE_H
 #include <string>
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 class Piece {
 public:
-    Piece(int camp = 0);
-    virtual bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup);
+Piece(int camp) : camp(camp) {}
+    virtual std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine,Piece* matrice[12][12]);
     int GetCamp();
     void SetCamp(int camp);
+    int GetXPosition(){ return xPosition;};
+    int GetYPosition(){ return yPosition;};
+    void SetXPosition(int xPosition){this->xPosition=xPosition;};
+    void SetYPosition(int yPosition){this->yPosition=yPosition;};
     virtual std::string GetType() const = 0;
+
+    // Méthode virtuelle pure pour cloner une pièce
+    virtual Piece* clone() const = 0;
+    // Destructeur virtuel pour éviter les fuites de mémoire en cas de suppression à travers un pointeur de base.
+    virtual ~Piece() {}
 
 private:
     int camp;
+    int xPosition;
+    int yPosition;
 
 protected:
+    std::vector<std::pair<int, int>> directions = {{-1,-1},{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1}};
+
     // Détermine la sous-matrice en fonction des coordonnées
-    int determineSousMatrice(int x, int y) const {
-        if (x < 4 && y < 4) return 1; // haut gauche
-        if (x < 4 && y >= 4 && y < 8) return 2; // haut milieu
-        if (y < 4 && x >= 4 && x < 8) return 3; // milieu gauche
-        if (y >= 7 && x >= 4 && x < 8) return 4; // milieu droite
-        if (x >= 7 && y >= 4 && y < 8) return 5; // bas milieu
-        if (x >= 7 && y >= 7) return 6; // bas droite
-        return 0;
-    }
+    int determineSousMatrice(int x, int y) const;
 
     //Ajustement obligatoirement pour toutes les pièces pour que le plateau fonctionne comme un plateau normal
-    void ajustementCoordonnees(int& xOrigine, int& yOrigine, int& xCoup, int& yCoup) const {
-        int matriceOrigine = determineSousMatrice(xOrigine, yOrigine);
-        int matriceDestination = determineSousMatrice(xCoup, yCoup);
-        
-        if (matriceOrigine == 4 && matriceDestination == 6) { xOrigine = 11 - xOrigine;} // matrice milieu-droite inversé verticalement
-        else if (matriceOrigine == 6 && matriceDestination == 4) { xCoup = 11 - xCoup;} // matrice milieu-droite inversé verticalement
+    void ajustementCoordonnees(int& xOrigine, int& yOrigine, int& xdestination, int& ydestination,int& xCoup, int& yCoup) const;
 
-        else if (matriceOrigine == 5 && matriceDestination == 6) { yOrigine = 11 - yOrigine;}// matrice bas-milieu inversé horizontalement
-        else if (matriceOrigine == 6 && matriceDestination == 5) { yCoup = 11 - yCoup; } // matrice bas-milieu inversé horizontalement
-
-        else if (matriceOrigine == 2 && matriceDestination == 5) {  xCoup -= 4;} // chemin plus court entre haut-milieu et bas-milieu
-        else if (matriceOrigine == 5 && matriceDestination == 2) { xOrigine -= 4;} // chemin plus court entre haut-milieu et bas-milieu 
-        
-        else if (matriceOrigine == 3 && matriceDestination == 4) { yCoup -= 4;} // chemin plus court entre milieu-gauche et milieu-droite
-        else if (matriceOrigine == 4 && matriceDestination == 3) { yOrigine -= 4;}// chemin plus court entre milieu-gauche et milieu-droite
-        
-        else if (matriceOrigine == 4 && matriceDestination == 5) { //Transitions entre les matrices milieu-droite et bas-milieu
-            xOrigine = 11 - xOrigine;
-            yCoup = 11 - yCoup;
-        }
-        else if (matriceOrigine == 5 && matriceDestination == 4) { //Transitions entre les matrices milieu-droite et bas-milieu
-            yOrigine = 11 - yOrigine;
-            xCoup = 11 - xCoup;
-        }
-    }
-
-    bool estAuDessusDiagonal(int x, int y)const {return y > x;}
-    bool estEnDessousDiagonal(int x, int y)const {return y < x;}
-    
-    bool estAuDessusDiagonaleMontante(int x, int y) {return y > x - 4;}  
-    bool estEnDessousDiagonaleMontante(int x, int y) {return y < x - 4;}
-    
-    bool estAuDessusDiagonaleMontante2(int x, int y) {return y > x + 4;}
-    bool estEnDessousDiagonaleMontante2(int x, int y) {return y < x + 4;}
-    
-    bool estEnDessousDiagonaleDescendante(int x, int y) const{return y > 7 - x;}
-    bool estAuDessusDiagonaleDescendante(int x, int y) const{return y < 7 - x;}
-
-    
-    void ajustementDiagonale(int& xOrigine, int& yOrigine, int& xCoup, int& yCoup,int matriceOrigine, int matriceDestination) const {
-        if (this->GetType() == "F" || this->GetType()=="R"){
-            if(xOrigine == yOrigine){//Ajustement pour les diagonales entre les sous-matrices 1 et 6
-                if  ((xOrigine == 0 || xOrigine == 1 || xOrigine == 2 || xOrigine == 3) && (matriceDestination == 4 || matriceDestination == 5)) {
-                    if(matriceDestination == 4){ yCoup -= 4; }
-                    else{ xCoup -= 4;}
-                }
-                else if((xOrigine == 11 || xOrigine == 10 || xOrigine == 9 || xOrigine == 8) && (matriceDestination == 2 || matriceDestination == 3)){
-                    if(matriceDestination == 3){
-                        xOrigine -= 4;
-                        yOrigine -= 4;
-                        xCoup = 7 - xCoup;
-                    }
-                    else{
-                        xOrigine -= 4;
-                        yOrigine -= 4;
-                        yCoup = 7 - yCoup;
-                    }
-                }
-            }
-            //pour diagonales entre les sous-matrices 6, 2 et 3
-            else if (matriceOrigine == 6 && matriceDestination == 2 && estEnDessousDiagonal(xOrigine, yOrigine)) {
-                xOrigine -= 4;
-                yOrigine -= 4;
-                yCoup = 7 - yCoup;
-            }
-            else if (matriceOrigine == 2 && matriceDestination == 6) {
-                xCoup -= 4;
-                yCoup -= 4;
-                yOrigine = 7 - yOrigine;
-            }
-            else if (matriceOrigine == 6 && matriceDestination == 3 && estAuDessusDiagonal(xOrigine, yOrigine)) {
-                xOrigine -= 4;
-                yOrigine -= 4; 
-                xCoup = 7 - xCoup;
-            }
-            else if (matriceOrigine == 3 && matriceDestination == 6) {
-                xCoup -= 4;
-                yCoup -= 4;
-                xOrigine = 7 - xOrigine;
-            }
-            //pour diagonales entre les sous-matrices 1, 4 et 5
-            else if (matriceOrigine == 1 && matriceDestination == 4 && estEnDessousDiagonal(xOrigine, yOrigine)) {yCoup -= 4;}
-            else if (matriceOrigine == 4 && matriceDestination == 1) {yOrigine -= 4;}
-            else if (matriceOrigine == 1 && matriceDestination == 5 && estAuDessusDiagonal(xOrigine, yOrigine)) {xCoup -= 4;}
-            else if (matriceOrigine == 5 && matriceDestination == 1) {xOrigine -= 4;}
-            
-        }
-    }
-
-    void ajustementCavalier(int& xOrigine, int& yOrigine, int& xCoup, int& yCoup) const {
-        int matriceOrigine = determineSousMatrice(xOrigine, yOrigine);
-        int matriceDestination = determineSousMatrice(xCoup, yCoup);
-
-        if(this->GetType() == "C"){//Pour les cavaliers (temporaire)
-            if (matriceOrigine == 6 && matriceDestination == 2) {//pour diagonales entre les sous-matrices 6, 2 et 3
-                xOrigine -= 4;
-                yOrigine -= 4;
-                yCoup = 7 - yCoup;
-            }
-            else if (matriceOrigine == 2 && matriceDestination == 6) {
-                xCoup -= 4;
-                yCoup -= 4;
-                yOrigine = 7 - yOrigine;
-            }
-            else if (matriceOrigine == 6 && matriceDestination == 3) {
-                xOrigine -= 4;
-                yOrigine -= 4; 
-                xCoup = 7 - xCoup;
-            }
-            else if (matriceOrigine == 3 && matriceDestination == 6) {
-                xCoup -= 4;
-                yCoup -= 4;
-                xOrigine = 7 - xOrigine;
-            }
-            //pour diagonales entre les sous-matrices 1, 4 et 5
-            else if (matriceOrigine == 1 && matriceDestination == 4) {yCoup -= 4;}
-            else if (matriceOrigine == 4 && matriceDestination == 1) {yOrigine -= 4;}
-            else if (matriceOrigine == 1 && matriceDestination == 5) {xCoup -= 4;}
-            else if (matriceOrigine == 5 && matriceDestination == 1) {xOrigine -= 4;}
-        }
-    }
-
-    //Certain mouvement diagonales doivent être délimité pour éviter des déplacements interdits (ici ils doivent être appliqué avant l'ajustement)
-    bool MouvementDiagonalesAvantAjustement(int xOrigine, int yOrigine, int xCoup, int yCoup, int matriceOrigine, int matriceDestination){
-        if((estAuDessusDiagonaleDescendante(xOrigine, yOrigine) && matriceOrigine==3 && matriceDestination==6)||
-        (estEnDessousDiagonaleMontante(xOrigine, yOrigine) && matriceOrigine==5 && matriceDestination==1) ||
-        (estAuDessusDiagonaleMontante(xOrigine, yOrigine) && matriceOrigine==5 && matriceDestination==4) || 
-        (estAuDessusDiagonaleMontante2(xOrigine, yOrigine) && matriceOrigine==4 && matriceDestination==1) ||
-        (estEnDessousDiagonaleMontante2(xOrigine, yOrigine) && matriceOrigine==4 && matriceDestination==5)){//vérif avant car il ne faut que les ajustement soit fait
-            return false;
-        }
-        else{
-            return true;
-        }
-    }
-
-    //Certain mouvement diagonales doivent être délimité pour éviter des déplacements interdits (ici ils doivent être appliqué apres l'ajustement)
-    bool MouvementDiagonalesApresAjustement(int xOrigine, int yOrigine, int xCoup, int yCoup, int matriceOrigine, int matriceDestination){
-        if ((matriceOrigine == 1 && matriceDestination == 6) ||//le fou et la reine ne peuvent pas aller à la matrice opposé
-        (matriceOrigine == 6 && matriceDestination == 1) ||
-        (matriceOrigine == 5 && matriceDestination == 3) ||
-        (matriceOrigine == 3 && matriceDestination == 5) ||
-        (matriceOrigine == 4 && matriceDestination == 2) ||
-        (matriceOrigine == 2 && matriceDestination == 4) || 
-        (estAuDessusDiagonal(xOrigine, yOrigine) && matriceOrigine==6 && matriceDestination==2) ||
-        (estEnDessousDiagonal(xOrigine, yOrigine) && matriceOrigine==6 && matriceDestination==3)||
-        (estEnDessousDiagonaleDescendante(xOrigine, yOrigine) && matriceOrigine==2 && matriceDestination==3) ||
-        (estAuDessusDiagonaleDescendante(xOrigine, yOrigine) && matriceOrigine==2 && matriceDestination==6) ||
-        (estEnDessousDiagonaleDescendante(xOrigine, yOrigine) && matriceOrigine==3 && matriceDestination==2) ||
-        (estEnDessousDiagonal(xOrigine, yOrigine) && matriceOrigine==1 && matriceDestination==5) ){
-            return false;
-        }
-        else{
-            return true;
-        }
-    }
-};
-
-
-class Roi : public Piece {
-public:
-    Roi(int camp = 0) : Piece(camp) {}
-    int GetCamp() { return Piece::GetCamp(); }
-    void SetCamp(int camp) { Piece::SetCamp(camp); }
-    bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override {
-        ajustementCoordonnees(xOrigine, yOrigine, xCoup, yCoup);
-        if(xCoup == xOrigine+1 || xCoup == xOrigine-1 || yCoup == yOrigine+1 || yCoup == yOrigine-1){
-            return true;
-        }
-        else if((xCoup==xOrigine+1 && yCoup==yOrigine+1)||
-        (xCoup==xOrigine-1 && yCoup==yOrigine-1)||
-        (xCoup==xOrigine-1 && yCoup==yOrigine+1)||
-        (xCoup==xOrigine+1 && yCoup==yOrigine-1)){
-            return true;
-        }
-        return false;
-    };
-    std::string GetType() const override { return "r"; }
-};
-
-class Fou : public Piece {
-public:
-    Fou(int camp = 0) : Piece(camp) {}
-    int GetCamp() { return Piece::GetCamp(); }
-    void SetCamp(int camp) { Piece::SetCamp(camp); }
-    bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override{
-        int matriceOrigine = determineSousMatrice(xOrigine, yOrigine);//le fou ne peut pas aller à la matrice opposé
-        int matriceDestination = determineSousMatrice(xCoup, yCoup);
-        if(!MouvementDiagonalesAvantAjustement(xOrigine, yOrigine, xCoup, yCoup, matriceOrigine, matriceDestination)){//vérif avant car il ne faut que les ajustement soit fait
-            return false;
-        }
-        ajustementDiagonale(xOrigine, yOrigine, xCoup, yCoup, matriceOrigine, matriceDestination);
-        ajustementCoordonnees(xOrigine, yOrigine, xCoup, yCoup);
-        if (std::abs(xCoup - xOrigine) == std::abs(yCoup - yOrigine)) {
-            if (!MouvementDiagonalesApresAjustement(xOrigine, yOrigine, xCoup, yCoup, matriceOrigine, matriceDestination)){
-                return false;
-            }
-            return true;
-        }
-        return false;
-    };
-    std::string GetType() const override { return "F"; }
+    //Différents types de coup des pièces 
+    void CoupRecursif(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector<std::pair<int, int>>& coupsPossibles,Piece* matrice[12][12]);
+    void CoupCavalier(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector<std::pair<int, int>>& coupsPossibles,int verification,bool methodeDeux,Piece* matrice[12][12]);
+    void CoupRoi(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector<std::pair<int, int>>& coupsPossibles,Piece* matrice[12][12]);
+    void CoupPion(int xOrigine, int yOrigine,std::vector<std::pair<int, int>>& coupsPossibles, int arret,Piece* matrice[12][12]);
 };
 
 
 class Tour : public Piece {
-public:
-    Tour(int camp = 0) : Piece(camp) {}
-    int GetCamp() { return Piece::GetCamp(); }
-    void SetCamp(int camp) { Piece::SetCamp(camp); }
-    bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override{
-        ajustementCoordonnees(xOrigine, yOrigine, xCoup, yCoup);
-        if((xCoup<xOrigine+8 && xCoup>xOrigine-8 && yCoup == yOrigine) || (yCoup<yOrigine+8 && yCoup>yOrigine-8 && xCoup == xOrigine)){
-            return true;
-        }
-        return false;
-    };
-    std::string GetType() const override  { return "T"; }
+    public:
+        Tour(int camp) : Piece(camp) {}
+        int GetCamp() { return Piece::GetCamp(); }
+        void SetCamp(int camp) { Piece::SetCamp(camp); }
+        std::string GetType() const override  { return "T"; }
 
-};
-
-
-class Reine : public Piece {
-public:
-    Reine(int camp = 0) : Piece(camp) {}
-    int GetCamp() { return Piece::GetCamp(); }
-    void SetCamp(int camp) { Piece::SetCamp(camp); }
-    bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override{
-        int matriceOrigine = determineSousMatrice(xOrigine, yOrigine);//la reine ne peut pas aller à la matrice opposé
-        int matriceDestination = determineSousMatrice(xCoup, yCoup);
-        if(!MouvementDiagonalesAvantAjustement(xOrigine, yOrigine, xCoup, yCoup, matriceOrigine, matriceDestination)){//vérif avant car il ne faut que les ajustement soit fait
-            return false;
-        }
-        ajustementDiagonale(xOrigine, yOrigine, xCoup, yCoup, matriceOrigine, matriceDestination);
-        ajustementCoordonnees(xOrigine, yOrigine, xCoup, yCoup);
-
-        if((xCoup<xOrigine+8 && xCoup>xOrigine-8 && yCoup == yOrigine) || (yCoup<yOrigine+8 && yCoup>yOrigine-8 && yCoup == yOrigine)){
-            return true;
+        virtual Piece* clone() const override {
+            return new Tour(*this);
         }
 
-        if (std::abs(xCoup - xOrigine) == std::abs(yCoup - yOrigine)) {
-            if (!MouvementDiagonalesApresAjustement(xOrigine, yOrigine, xCoup, yCoup, matriceOrigine, matriceDestination)){
-                return false;
-            }
-            return true;
+        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine, Piece* matrice[12][12]){
+            std::vector<std::pair<int, int>> coupsPossibles;
+            CoupRecursif(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles,matrice);
+            return coupsPossibles;
         }
-        return false;
-    };
-    std::string GetType() const override  { return "R"; }
 };
 
 class Cavalier : public Piece {
-public:
-    Cavalier(int camp = 0) : Piece(camp) {}
-    int GetCamp() { return Piece::GetCamp(); }
-    void SetCamp(int camp) { Piece::SetCamp(camp); }
-    bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override{
-        ajustementCavalier(xOrigine, yOrigine, xCoup, yCoup);
-        ajustementCoordonnees(xOrigine, yOrigine, xCoup, yCoup);
-        if( (xCoup==xOrigine+2 && (yCoup==yOrigine+1 || yCoup==yOrigine-1))  ||
-        (xCoup==xOrigine-2 && (yCoup==yOrigine+1 || yCoup==yOrigine-1))  ||
-        (yCoup==yOrigine+2 && (xCoup==xOrigine+1 || xCoup==xOrigine-1))  ||
-        (yCoup==yOrigine-2 && (xCoup==xOrigine+1 || xCoup==xOrigine-1))){
-            return true;
+    public:
+        Cavalier(int camp) : Piece(camp) {}
+        int GetCamp() { return Piece::GetCamp(); }
+        void SetCamp(int camp) { Piece::SetCamp(camp); }
+        std::string GetType() const override  { return "C"; }
+
+        virtual Piece* clone() const override {
+            return new Cavalier(*this);
         }
-        return false;
-    };
-    std::string GetType() const override  { return "C"; }
+
+        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine,Piece* matrice[12][12]){
+            std::vector<std::pair<int, int>> coupsPossibles;
+            CoupCavalier(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles,0,false,matrice);
+            CoupCavalier(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles,0,false,matrice);
+            CoupCavalier(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles,0,false,matrice);
+            CoupCavalier(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles,0,false,matrice);
+
+            CoupCavalier(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles,0,true,matrice);
+            CoupCavalier(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles,0,true,matrice);
+            CoupCavalier(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles,0,true,matrice);
+            CoupCavalier(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles,0,true,matrice);
+
+            ////////////////////////////////////////////////////
+            //Trier les doublons
+            std::sort(coupsPossibles.begin(), coupsPossibles.end());
+            auto last = std::unique(coupsPossibles.begin(), coupsPossibles.end());
+            coupsPossibles.erase(last, coupsPossibles.end());
+
+            if(xOrigine==3 && yOrigine==3){
+                coupsPossibles.emplace_back(8, 8);
+            }
+            else if(xOrigine==3 && yOrigine==4){
+                coupsPossibles.emplace_back(4, 8);
+            }
+            else if(xOrigine==4 && yOrigine==3){
+                coupsPossibles.emplace_back(8, 4);
+            }
+            else if(xOrigine==8 && yOrigine==8){
+                coupsPossibles.emplace_back(3, 3);
+
+            }
+            else if(xOrigine==8 && yOrigine==4){
+                coupsPossibles.emplace_back(4, 3);
+            }
+            else if(xOrigine==4 && yOrigine==8){
+                coupsPossibles.emplace_back(3, 4);
+            }
+
+            return coupsPossibles;
+        }
+};
+
+class Fou : public Piece {
+    public:
+        Fou(int camp) : Piece(camp) {}
+        int GetCamp() { return Piece::GetCamp(); }
+        void SetCamp(int camp) { Piece::SetCamp(camp); }
+        std::string GetType() const override  { return "F"; }
+
+        virtual Piece* clone() const override {
+            return new Fou(*this);
+        }
+
+        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine, Piece* matrice[12][12]){
+            std::vector<std::pair<int, int>> coupsPossibles;
+            CoupRecursif(xOrigine,yOrigine,directions[0].first,directions[0].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[2].first,directions[2].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[4].first,directions[4].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[6].first,directions[6].second,coupsPossibles,matrice);
+            return coupsPossibles;
+        }
+};
+
+class Reine : public Piece {
+    public:
+        Reine(int camp) : Piece(camp) {}
+        int GetCamp() { return Piece::GetCamp(); }
+        void SetCamp(int camp) { Piece::SetCamp(camp); }
+        std::string GetType() const override  { return "R"; }
+
+        virtual Piece* clone() const override {
+            return new Reine(*this);
+        }
+
+        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine, Piece* matrice[12][12]){
+            std::vector<std::pair<int, int>> coupsPossibles;
+            CoupRecursif(xOrigine,yOrigine,directions[0].first,directions[0].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[2].first,directions[2].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[4].first,directions[4].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[6].first,directions[6].second,coupsPossibles,matrice);
+            CoupRecursif(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles,matrice);
+            return coupsPossibles;
+        }
+};
+
+class Roi : public Piece {
+    public:
+        Roi(int camp) : Piece(camp) {}
+        int GetCamp() { return Piece::GetCamp(); }
+        void SetCamp(int camp) { Piece::SetCamp(camp); }
+        std::string GetType() const override  { return "r"; }
+
+        virtual Piece* clone() const override {
+            return new Roi(*this);
+        }
+
+        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine,Piece* matrice[12][12]){
+            std::vector<std::pair<int, int>> coupsPossibles;
+            CoupRoi(xOrigine,yOrigine,directions[0].first,directions[0].second,coupsPossibles,matrice);
+            CoupRoi(xOrigine,yOrigine,directions[1].first,directions[1].second,coupsPossibles,matrice);
+            CoupRoi(xOrigine,yOrigine,directions[2].first,directions[2].second,coupsPossibles,matrice);
+            CoupRoi(xOrigine,yOrigine,directions[3].first,directions[3].second,coupsPossibles,matrice);
+            CoupRoi(xOrigine,yOrigine,directions[4].first,directions[4].second,coupsPossibles,matrice);
+            CoupRoi(xOrigine,yOrigine,directions[5].first,directions[5].second,coupsPossibles,matrice);
+            CoupRoi(xOrigine,yOrigine,directions[6].first,directions[6].second,coupsPossibles,matrice);
+            CoupRoi(xOrigine,yOrigine,directions[7].first,directions[7].second,coupsPossibles,matrice);
+            return coupsPossibles;
+        }
 };
 
 class Pion : public Piece {
-public:
-    Pion(int camp = 0) : Piece(camp) {}
-    int GetCamp() { return Piece::GetCamp(); }
-    void SetCamp(int camp) { Piece::SetCamp(camp); }
-    bool Deplacement(int xOrigine, int yOrigine, int xCoup, int yCoup) override{
-        ajustementCoordonnees(xOrigine, yOrigine, xCoup, yCoup);
-        return false;
-    };
-    std::string GetType() const override  { return "P"; }
+    public:
+        Pion(int camp) : Piece(camp) {}
+        int GetCamp() { return Piece::GetCamp(); }
+        void SetCamp(int camp) { Piece::SetCamp(camp); }
+        std::string GetType() const override  { return "P"; }
+
+        virtual Piece* clone() const override {
+            return new Pion(*this);
+        }
+
+        std::vector<std::pair<int, int>> DeplacementCoup(int xOrigine, int yOrigine,Piece* matrice[12][12]){
+            std::vector<std::pair<int, int>> coupsPossibles;
+            CoupPion(xOrigine,yOrigine,coupsPossibles,0,matrice);
+            return coupsPossibles;
+        }
 };
 
 #endif
