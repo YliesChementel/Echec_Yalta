@@ -11,9 +11,9 @@ Jeu::Jeu(){
         InitListePiece(ListeJoueur[i], i + 1);
     }
     plateau.PlacerPiece(ListeJoueur[0].getListePiece(), ListeJoueur[1].getListePiece(), ListeJoueur[2].getListePiece());
-    plateau.AffichageMatrice();
+    //plateau.AffichageMatrice();
 
-    int xOrigine, yOrigine, xCoup, yCoup;
+    /*int xOrigine, yOrigine, xCoup, yCoup;
     bool tour;
     while(etatDeParti==false){
         tour=false;
@@ -30,9 +30,9 @@ Jeu::Jeu(){
         }
         plateau.AffichageMatrice();
         std::cout << std::endl;
-    }
+    }*/
 }
-/*
+
 void Jeu::InitListePiece(Joueur& joueur, int camp) {
     Piece** liste = new Piece*[16];
     for (int i = 0; i < 8; i++) {
@@ -41,14 +41,21 @@ void Jeu::InitListePiece(Joueur& joueur, int camp) {
     liste[8] = new Tour(camp);
     liste[9] = new Cavalier(camp);
     liste[10] = new Fou(camp);
-    liste[11] = new Reine(camp);
-    liste[12] = new Roi(camp);
+    if(camp==2){
+        liste[11] = new Reine(camp);
+        liste[12] = new Roi(camp);
+        
+    }
+    else{
+        liste[11] = new Roi(camp);
+        liste[12] = new Reine(camp);
+    }
     liste[13] = new Fou(camp);
     liste[14] = new Cavalier(camp);
     liste[15] = new Tour(camp);
     joueur.setListePiece(liste);
-}*/
-
+}
+/*
 void Jeu::InitListePiece(Joueur& joueur, int camp) {
     Piece** liste = new Piece*[16];
     for (int i = 0; i < 8; i++) {
@@ -63,7 +70,7 @@ void Jeu::InitListePiece(Joueur& joueur, int camp) {
     liste[14] = new Fou(camp);
     liste[15] = new Fou(camp);
     joueur.setListePiece(liste);
-}
+}*/
 
 void Jeu::ChangerTourJoueur() {
    /*if(tourJoueur==1){

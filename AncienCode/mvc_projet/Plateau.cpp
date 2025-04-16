@@ -41,10 +41,18 @@ void Plateau::PlacerPiece(Piece** ListePiece1, Piece** ListePiece2, Piece** List
 
     // Placer les pièces du joueur 3
     for (int j = 4; j < 12; ++j) {
-        matrice[10][j] = ListePiece3[index3++];
+        if(j<8){
+            matrice[10][11-j] = ListePiece3[index3++];
+        }else{
+            matrice[10][j] = ListePiece3[index3++];
+        }
     }
     for (int j = 4; j < 12; ++j) {
-        matrice[11][j] = ListePiece3[index3++];
+        if(j<8){
+            matrice[11][11-j] = ListePiece3[index3++];
+        }else{
+            matrice[11][j] = ListePiece3[index3++];
+        }
     }
 
     // Mettre les cases restantes vides 
@@ -231,4 +239,13 @@ void Plateau::AfficherCoupsPossibles(int xOrigine, int yOrigine) {
         }
         std::cout << std::endl;
     }
+}
+
+std::vector<std::pair<int, int>> Plateau::RenvoyerCoupsPossibles(int xOrigine, int yOrigine) {
+    Piece* piece = matrice[xOrigine][yOrigine];
+    if (!piece) {
+        std::cout << "Aucune pièce à cette position.\n";
+    }
+    std::vector<std::pair<int, int>> coupsPossibles = ObtenirCoupsPossibles(piece, xOrigine, yOrigine);
+    return coupsPossibles;
 }

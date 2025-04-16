@@ -85,7 +85,7 @@ void Piece::ajustementCoordonnees(int& xOrigine, int& yOrigine, int& xdestinatio
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Intéractions des matrices 4, 5 et 6 qui sont inversées
 
-    else if ((matriceOrigine == 6 && matriceDestination == 5) || (matriceOrigine == 5 && ydestination == 3)) { // Inversion horizontale de la matrice bas-milieu
+    else if ((matriceOrigine == 6 && matriceDestination == 5) || (matriceOrigine == 5 && ydestination == 3 && xdestination != 7)) { // Inversion horizontale de la matrice bas-milieu + (cas particulier 7-3)
         ydestination = 11 - ydestination;
         if ((xCoup == 0 || xCoup == 1 || xCoup == -1) && yCoup == -1) {// Pour toutes les directions où yCoup == -1, donc gauche, bas-gauche et haut-gauche
             yCoup = 1;
@@ -154,7 +154,7 @@ void Piece::CoupRecursif(int xOrigine, int yOrigine, int xCoup, int yCoup,std::v
             else if((xOrigine==4 && yOrigine==8) && (xCoup==-1 && yCoup==-1)){
                 coupsPossibles.emplace_back(8, 4);
                 coupsPossibles.emplace_back(3, 3);
-                CoupRecursif(8,4, 1, 1, coupsPossibles,matrice);
+                CoupRecursif(8,4, 1, 1, coupsPossibles,matrice);// problème ici et peut être sur les autres rosasse, car je ne vérifie pas si il y a une pièce sur la rossasse, donc il continue après la pièce
                 CoupRecursif(3,3, -1, -1, coupsPossibles,matrice);
             }
             else{
@@ -299,13 +299,16 @@ void Piece::CoupPion(int xOrigine, int yOrigine, std::vector<std::pair<int, int>
                 int ycapture = yOrigine + 1;
                 int yCoupTemp = 1;
                 ajustementCoordonnees(xOrigine,yOrigine,xcapture,ycapture,xCoup,yCoupTemp);
+
                 if(matrice[xcapture][ycapture] != nullptr && matrice[xcapture][ycapture]->GetCamp()!=this->GetCamp()){
                     coupsPossibles.emplace_back(xcapture, ycapture);
                 }
+
                 xcapture = xOrigine + xCoup;
                 ycapture = yOrigine - 1;
                 yCoupTemp = -1;
                 ajustementCoordonnees(xOrigine,yOrigine,xcapture,ycapture,xCoup,yCoupTemp);
+
                 if(matrice[xcapture][ycapture] != nullptr && matrice[xcapture][ycapture]->GetCamp()!=this->GetCamp()){
                     coupsPossibles.emplace_back(xcapture, ycapture);
                 }

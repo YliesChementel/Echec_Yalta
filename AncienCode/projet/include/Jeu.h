@@ -9,6 +9,8 @@ public:
     void ChangerTourJoueur();
     void VerifStatutJoueur();
     void InitListePiece(Joueur& joueur, int camp);
+    Plateau& GetPlateau() { return plateau; }
+    Joueur* GetListeJoueur() { return ListeJoueur; }
 
 private:
     Joueur* ListeJoueur;
