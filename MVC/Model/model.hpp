@@ -84,17 +84,20 @@ public:
 
     bool PieceDansLosange(const sf::ConvexShape& shape, const sf::Vector2f& point);
     
-    void PlacementPiece(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& White, std::vector<PieceImage>& Black, std::vector<PieceImage>& Red,int IndexMat,int IndexLos);
+    void PlacementPiece(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& listePieces, int IndexMat,int IndexLos);
 
-    void ReplacementPiece(int& selectedPieceIndex, int camp, int matriceIndex, std::vector<PieceImage>& pieces, const std::vector<std::vector<sf::ConvexShape>> matrices);
-    void ReplacementPieceWhite(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& White);
-    void ReplacementPieceBlack(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& Black);
-    void ReplacementPieceRed(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& Red);
+    void ReplacementPiece(int& selectedPieceIndex, int camp, int matriceIndex, std::vector<PieceImage>& pieces);
+
+    int determineSousMatrice(int x, int y);
+    int coordonneEnIndexDeLosange(int x, int y, int matrice);
+    std::pair<int, int> indexEnCoordonneDePlateau(int index, int sousMatrice);
+
 
     const sf::ConvexShape& getHexagon() const { return hexagon; }
     const sf::ConvexShape& getHexagon2() const { return hexagon2; }
     const std::vector<std::array<sf::Vertex, 2>>& getLines() const { return lines; }
     const std::vector<sf::Text>& getCoordText() const { return coordText; }
+    std::vector<sf::ConvexShape>& getMatrice(int index);
     std::vector<sf::ConvexShape>& getMatrice1()  { return matrice1; }
     std::vector<sf::ConvexShape>& getMatrice2()  { return matrice2; }
     std::vector<sf::ConvexShape>& getMatrice3()  { return matrice3; }

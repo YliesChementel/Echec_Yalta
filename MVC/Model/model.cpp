@@ -329,72 +329,104 @@ bool Board::PieceDansLosange(const sf::ConvexShape& shape, const sf::Vector2f& p
 }
 
 
-void Board::PlacementPiece(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& White, std::vector<PieceImage>& Black, std::vector<PieceImage>& Red,int IndexMat,int IndexLos) {
-    sf::Vector2f centre = calculerCentreLosange(losange);
-
-    // Modifier la position en fonction du type de pièce
-    if (selectedPieceIndex < White.size()) {
-        White[selectedPieceIndex].getSprite().setPosition(
-        centre.x - White[selectedPieceIndex].getSprite().getGlobalBounds().width / 2.0f,
-        centre.y - White[selectedPieceIndex].getSprite().getGlobalBounds().height / 2.0f
-        );
-        White[selectedPieceIndex].setTilePositions({IndexLos,IndexMat});
-    } else if (selectedPieceIndex < White.size() + Red.size()) {
-        Red[selectedPieceIndex - White.size()].getSprite().setPosition(
-        centre.x - Red[selectedPieceIndex - White.size()].getSprite().getGlobalBounds().width / 2.0f,
-        centre.y - Red[selectedPieceIndex - White.size()].getSprite().getGlobalBounds().height / 2.0f
-        );
-        Red[selectedPieceIndex - White.size()].setTilePositions({IndexLos,IndexMat});
-    } else {
-        Black[selectedPieceIndex - White.size() - Red.size()].getSprite().setPosition(
-        centre.x - Black[selectedPieceIndex - White.size() - Red.size()].getSprite().getGlobalBounds().width / 2.0f,
-        centre.y - Black[selectedPieceIndex - White.size() - Red.size()].getSprite().getGlobalBounds().height / 2.0f
-        );
-        Black[selectedPieceIndex - White.size() - Red.size()].setTilePositions({IndexLos,IndexMat});
+std::vector<sf::ConvexShape>& Board::getMatrice(int index) {
+    switch(index) {
+        case 1: return matrice1;
+        case 2: return matrice2;
+        case 3: return matrice3;
+        case 4: return matrice4;
+        case 5: return matrice5;
+        case 6: return matrice6;
+        default: throw std::out_of_range("Index de matrice invalide");
     }
 }
 
 
-void Board::ReplacementPiece(int& selectedPieceIndex, int camp, int matriceIndex, std::vector<PieceImage>& pieces, const std::vector<std::vector<sf::ConvexShape>> matrices) {
+
+// Fonction pour placer la pièce à sa position à la nouvelle position si coup valide 
+void Board::PlacementPiece(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& listePieces, int IndexMat,int IndexLos) {
+    sf::Vector2f centre = calculerCentreLosange(losange);
+    // Modifier la position en fonction du type de pièce
+    listePieces[selectedPieceIndex].getSprite().setPosition(
+        centre.x - listePieces[selectedPieceIndex].getSprite().getGlobalBounds().width / 2.0f,
+        centre.y - listePieces[selectedPieceIndex].getSprite().getGlobalBounds().height / 2.0f
+        );
+    listePieces[selectedPieceIndex].setTilePositions({IndexLos,IndexMat});
+}
+
+// Fonction pour replacer la pièce à sa position d'origine si coup invalide
+void Board::ReplacementPiece(int& selectedPieceIndex, int camp, int matriceIndex, std::vector<PieceImage>& pieces) {
+    std::vector<std::vector<sf::ConvexShape>> matrices = {getMatrice1(), getMatrice2(), getMatrice3(), getMatrice4(), getMatrice5(), getMatrice6()};
     int tileIndex = pieces[selectedPieceIndex].getTilePositions()[0];
     const sf::ConvexShape& losange = matrices[matriceIndex - 1][tileIndex];
+    sf::Vector2f centre = calculerCentreLosange(losange);
 
-    if (camp==0) {
-        ReplacementPieceWhite(selectedPieceIndex, losange, pieces);
-    } else if (camp==1) {
-        ReplacementPieceRed(selectedPieceIndex, losange, pieces);
-    } else {
-        ReplacementPieceBlack(selectedPieceIndex, losange, pieces);
+    pieces[selectedPieceIndex].getSprite().setPosition(
+        centre.x - pieces[selectedPieceIndex].getSprite().getGlobalBounds().width / 2.0f,
+        centre.y - pieces[selectedPieceIndex].getSprite().getGlobalBounds().height / 2.0f
+    );
+}
+
+
+int Board::determineSousMatrice(int x, int y) {
+    if (x < 4 && y < 4) return 1; // haut gauche
+    if (x < 4 && y >= 4 && y < 8) return 2; // haut milieu
+    if (y < 4 && x >= 4 && x < 8) return 3; // milieu gauche
+    if (y >= 7 && x >= 4 && x < 8) return 4; // milieu droite
+    if (x >= 7 && y >= 4 && y < 8) return 5; // bas milieu
+    if (x >= 7 && y >= 7) return 6; // bas droite
+    return 0;
+}
+
+int Board::coordonneEnIndexDeLosange(int x, int y, int matrice) {
+    if (matrice == 1) {
+        return 15 - (x + 4 * y); //bon
     }
+    else if (matrice == 2) {
+        return (3 - x) * 4 + y; //bon
+    }
+    else if (matrice == 3) { //bon
+        return 4 * x + (3 - y);
+    }
+    else if (matrice == 4) { //bon
+        return 4 * y + x;
+    }
+    else if (matrice == 5) { //bon
+        return 4 * y + x;
+    }
+    else if (matrice == 6) { //bon
+        return  x * 4 + y;
+    }
+    return -1;
 }
 
-
-void Board::ReplacementPieceWhite(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& White) {
-    sf::Vector2f centre = calculerCentreLosange(losange);
-        White[selectedPieceIndex].getSprite().setPosition(
-        centre.x - White[selectedPieceIndex].getSprite().getGlobalBounds().width / 2.0f,
-        centre.y - White[selectedPieceIndex].getSprite().getGlobalBounds().height / 2.0f
-        );
+std::pair<int, int> Board::indexEnCoordonneDePlateau(int index, int sousMatrice) {
+    int x, y;
+    
+    if(sousMatrice == 1) {
+        y = 3 - (index / 4);  // division entière pour obtenir la ligne
+        x = 3 - (index % 4);  // reste pour obtenir la colonne
+    }
+    else if(sousMatrice == 2) {
+        x = 3 - index / 4;
+        y = (index % 4) + 4;
+    }
+    else if(sousMatrice == 3) {
+        x =  index / 4 + 4 ;
+        y = 3 - index % 4 ;
+    }
+    else if(sousMatrice == 4) {
+        y = index / 4 + 8;
+        x = index % 4 + 4;
+    }
+    else if(sousMatrice == 5) {
+        y = index / 4 + 4;
+        x = index % 4 + 8;
+    }
+    else if(sousMatrice == 6) {
+        x = index / 4 + 8;
+        y = index % 4 + 8;
+    }
+    
+    return {x, y};
 }
-
-void Board::ReplacementPieceRed(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& Red) {
-    sf::Vector2f centre = calculerCentreLosange(losange);
-        Red[selectedPieceIndex].getSprite().setPosition(
-        centre.x - Red[selectedPieceIndex].getSprite().getGlobalBounds().width / 2.0f,
-        centre.y - Red[selectedPieceIndex].getSprite().getGlobalBounds().height / 2.0f
-        );
-}
-
-void Board::ReplacementPieceBlack(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& Black) {
-    sf::Vector2f centre = calculerCentreLosange(losange);
-        Black[selectedPieceIndex].getSprite().setPosition(
-        centre.x - Black[selectedPieceIndex].getSprite().getGlobalBounds().width / 2.0f,
-        centre.y - Black[selectedPieceIndex].getSprite().getGlobalBounds().height / 2.0f
-        );
-}
-
-
-
-
-
-

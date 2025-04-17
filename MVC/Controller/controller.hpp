@@ -22,10 +22,14 @@ private:
     //
     std::vector<std::pair<int, int>> coupsPossibles;
 
+    std::array<std::vector<PieceImage>*, 3> listePieces;
+    void initListePieces();
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Variables pour le drag & drop
     bool isDragging;
     int selectedPieceIndex;
+    int couleurIndex;
     sf::Vector2f offsetImage;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,6 +44,10 @@ private:
     void handleMouseMoved(const sf::Event& event);
     void handleMouseReleased(const sf::Event& event);
 
+
+    bool TrouverPieceSelectioner(std::vector<PieceImage>& liste, int listeIndex, sf::Vector2f mousePos);
+    bool PlacerPieceDansMatrice(const std::vector<sf::ConvexShape>& matrice, int indexMatrice, const sf::Vector2f& mousePos);
+    void RemettreCouleurDefautCases();
 
     std::vector<std::vector<int>> tilesToChangeColor;
     void handleCoup(std::vector<int>& tilePositions);
