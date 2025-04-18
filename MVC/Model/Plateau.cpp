@@ -53,14 +53,26 @@ void Plateau::PlacerPiece(Piece** ListePiece1, Piece** ListePiece2, Piece** List
 
     // Placement des pièces du joueur 3
     for (int j = 4; j < 12; ++j) {
-        ListePiece3[index3]->SetXPosition(10);
-        ListePiece3[index3]->SetYPosition(j);
-        matrice[10][j] = ListePiece3[index3++];
+        if(j<8){
+            ListePiece3[index3]->SetXPosition(10);
+            ListePiece3[index3]->SetYPosition(11-j);
+            matrice[10][11-j] = ListePiece3[index3++];
+        }else{
+            ListePiece3[index3]->SetXPosition(10);
+            ListePiece3[index3]->SetYPosition(j);
+            matrice[10][j] = ListePiece3[index3++];
+        }
     }
     for (int j = 4; j < 12; ++j) {
-        ListePiece3[index3]->SetXPosition(11);
-        ListePiece3[index3]->SetYPosition(j);
-        matrice[11][j] = ListePiece3[index3++];
+        if(j<8){
+            ListePiece3[index3]->SetXPosition(11);
+            ListePiece3[index3]->SetYPosition(11-j);
+            matrice[11][11-j] = ListePiece3[index3++];
+        }else{
+            ListePiece3[index3]->SetXPosition(11);
+            ListePiece3[index3]->SetYPosition(j);
+            matrice[11][j] = ListePiece3[index3++];
+        }
     }
 
     // Les cases restantes sont vides 

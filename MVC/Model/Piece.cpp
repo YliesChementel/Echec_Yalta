@@ -301,18 +301,20 @@ void Piece::CoupPion(int xOrigine, int yOrigine, std::vector<std::pair<int, int>
                 int ycapture = yOrigine + 1;
                 int yCoupTemp = 1;
                 ajustementCoordonnees(xOrigine,yOrigine,xcapture,ycapture,xCoup,yCoupTemp);
-
-                if(matrice[xcapture][ycapture] != nullptr && matrice[xcapture][ycapture]->GetCamp()!=this->GetCamp()){
-                    coupsPossibles.emplace_back(xcapture, ycapture);
+                if (!estHorsPlateau(xdestination, ydestination)) {
+                    if(matrice[xcapture][ycapture] != nullptr && matrice[xcapture][ycapture]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(xcapture, ycapture);
+                    }
                 }
 
                 xcapture = xOrigine + xCoup;
                 ycapture = yOrigine - 1;
                 yCoupTemp = -1;
                 ajustementCoordonnees(xOrigine,yOrigine,xcapture,ycapture,xCoup,yCoupTemp);
-
-                if(matrice[xcapture][ycapture] != nullptr && matrice[xcapture][ycapture]->GetCamp()!=this->GetCamp()){
-                    coupsPossibles.emplace_back(xcapture, ycapture);
+                if (!estHorsPlateau(xdestination, ydestination)) {
+                    if(matrice[xcapture][ycapture] != nullptr && matrice[xcapture][ycapture]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(xcapture, ycapture);
+                    }
                 }
 
                 if(xOrigine==3 && yOrigine==3){

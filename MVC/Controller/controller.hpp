@@ -48,6 +48,7 @@ private:
     bool TrouverPieceSelectioner(std::vector<PieceImage>& liste, int listeIndex, sf::Vector2f mousePos);
     bool PlacerPieceDansMatrice(const std::vector<sf::ConvexShape>& matrice, int indexMatrice, const sf::Vector2f& mousePos);
     void RemettreCouleurDefautCases();
+    void TrouverPieceCapture(std::vector<int> positions);
 
     std::vector<std::vector<int>> tilesToChangeColor;
     void handleCoup(std::vector<int>& tilePositions);

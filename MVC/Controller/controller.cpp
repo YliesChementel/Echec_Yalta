@@ -54,13 +54,29 @@ bool BoardController::TrouverPieceSelectioner(std::vector<PieceImage>& liste, in
     return false;
 }
 
+void BoardController::TrouverPieceCapture(std::vector<int> positions){
+    for (int j = 0; j < listePieces.size(); ++j) {
+        if (j == couleurIndex) continue; // Ignore les pièces de la même couleur
+        std::vector<PieceImage>& piecesAdverses = *listePieces[j];
+        for (int k = 0; k < piecesAdverses.size(); ++k) {
+            std::vector<int> pos = piecesAdverses[k].getTilePositions();
+            if (pos[0] == positions[0] && pos[1] == positions[1]) {
+                piecesAdverses.erase(piecesAdverses.begin() + k); // Supprimer la pièce adverse
+                break;
+            }
+        }
+    }
+}
+
+
 bool BoardController::PlacerPieceDansMatrice(const std::vector<sf::ConvexShape>& matrice, int indexMatrice, const sf::Vector2f& mousePos) {
     if (board.PieceDansMatrice(mousePos, matrice)) {
-        for (size_t i = 0; i < matrice.size(); ++i) {
-            const auto& losange = matrice[i];
+        for (int i = 0; i < matrice.size(); ++i) {
+            const sf::ConvexShape& losange = matrice[i];
             if (board.PieceDansLosange(losange, mousePos)) {
-                std::vector<int> positions = {static_cast<int>(i), indexMatrice};
+                std::vector<int> positions = {i, indexMatrice};
                 if (handleCoupJouer((*listePieces[couleurIndex])[selectedPieceIndex].getTilePositions(), positions)) {
+                    TrouverPieceCapture(positions);
                     board.PlacementPiece(selectedPieceIndex, losange, (*listePieces[couleurIndex]), indexMatrice, i);
                     return true;
                 } else {
@@ -91,9 +107,7 @@ void BoardController::handleMousePressed(const sf::Event& event) {
 
 void BoardController::handleMouseMoved(const sf::Event& event) {
     if (!isDragging) return;
-
     sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-
     (*listePieces[couleurIndex])[selectedPieceIndex].getSprite().setPosition(mousePos - offsetImage); // Déplacement des pièces en fonction de l'index de la pièce et de l'index de la couleur
 }
 
@@ -104,7 +118,7 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
     sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
     bool placed = false;
 
-    // Vérifier si la pièces est dans l'une des 6 matrices
+    // Vérifier si la pièce est dans l'une des 6 matrices
     if (PlacerPieceDansMatrice(board.getMatrice(1),1,mousePos) || PlacerPieceDansMatrice(board.getMatrice(2),2,mousePos) || PlacerPieceDansMatrice(board.getMatrice(3),3,mousePos) ||
         PlacerPieceDansMatrice(board.getMatrice(4),4,mousePos) || PlacerPieceDansMatrice(board.getMatrice(5),5,mousePos) || PlacerPieceDansMatrice(board.getMatrice(6),6,mousePos)) {
         placed = true;
