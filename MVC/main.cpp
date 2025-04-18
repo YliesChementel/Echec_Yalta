@@ -9,7 +9,7 @@ int main() {
     // Création de la fenêtre SFML
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Echec Yalta",sf::Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode(1150, 1000), "Echec Yalta", sf::Style::Default, settings);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Instanciation du modèle (Board)

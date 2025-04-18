@@ -25,6 +25,8 @@ private:
     std::array<std::vector<PieceImage>*, 3> listePieces;
     void initListePieces();
 
+    int tour =0;
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Variables pour le drag & drop
     bool isDragging;

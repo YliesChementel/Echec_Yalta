@@ -5,6 +5,9 @@ BoardController::BoardController(Board& board, BoardView& view, sf::RenderWindow
     : board(board), view(view), window(window),jeu(jeu) , isDragging(false), selectedPieceIndex(-1) {handleSound(); initListePieces();}
 
 void BoardController::run() {
+
+
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -26,7 +29,11 @@ void BoardController::run() {
         view.clear();
         view.drawHexagons(board.getHexagon(), board.getHexagon2());
         view.drawLines(board.getLines());
+
         view.drawText(board.getCoordText());
+        view.drawTextGame(board.getTextGame());
+        view.drawTextGame(board.getTextEchec());
+
         view.drawBoard({board.getMatrice1(),board.getMatrice2(),board.getMatrice3(),board.getMatrice4(),board.getMatrice5(),board.getMatrice6()});
         view.drawPieces(board.getWhitePieces(), board.getRedPieces(), board.getBlackPieces());
         view.display();
@@ -116,12 +123,14 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
         return;
 
     sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-    bool placed = false;
 
     // Vérifier si la pièce est dans l'une des 6 matrices
     if (PlacerPieceDansMatrice(board.getMatrice(1),1,mousePos) || PlacerPieceDansMatrice(board.getMatrice(2),2,mousePos) || PlacerPieceDansMatrice(board.getMatrice(3),3,mousePos) ||
         PlacerPieceDansMatrice(board.getMatrice(4),4,mousePos) || PlacerPieceDansMatrice(board.getMatrice(5),5,mousePos) || PlacerPieceDansMatrice(board.getMatrice(6),6,mousePos)) {
-        placed = true;
+            if (this->sound.getStatus() != sf::Sound::Playing) {
+                this->sound.play();
+            }
+            
     }
     else{ // Replacement d'une pièce à sa position initial si le déplacement est hors du plateau
         int matrice;
@@ -129,15 +138,33 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
         board.ReplacementPiece(selectedPieceIndex, couleurIndex, matrice, (*listePieces[couleurIndex]));
     }
 
-    if (this->sound.getStatus() != sf::Sound::Playing) {
-        this->sound.play();
-    }
-
     isDragging = false;
     couleurIndex = -1;
     selectedPieceIndex = -1;
-
+    
     RemettreCouleurDefautCases();
+
+    std::string echec =" ";
+    if(tour==0){
+        board.setTextGame("Au tour du joueur 1");        
+        tour++;
+    }
+    else if(tour==1){
+        board.setTextGame("Au tour du joueur 2");
+        tour++;
+    }
+    else {
+        board.setTextGame("Au tour du joueur 3");
+        tour=0; 
+    }
+    if(!jeu.GetPlateau().campsEchec.empty()){
+        echec+="Rois en echec : ";
+        for (const auto& camp : jeu.GetPlateau().campsEchec){
+            echec += camp;
+            echec += " ";
+        }
+    }
+    board.setTextEchec(echec);
 }
 
 void BoardController::handleSound() {

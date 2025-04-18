@@ -30,6 +30,15 @@ void BoardView::drawText(const std::vector<sf::Text>& texts) {
     }
 }
 
+void BoardView::drawTextGame(sf::Text& text) {
+    sf::FloatRect bounds = text.getLocalBounds();
+    float x = (window.getSize().x - bounds.width) / 2.f - bounds.left;
+    float y = text.getPosition().y;
+    text.setPosition(x, y);
+    window.draw(text);
+}
+
+
 void BoardView::drawBoard(const std::vector<std::vector<sf::ConvexShape>>& matrices) {
     for (const auto& matrice : matrices) {
         for (const auto& losange : matrice) {

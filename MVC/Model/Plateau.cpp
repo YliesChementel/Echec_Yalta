@@ -192,9 +192,11 @@ void Plateau::Deplacement(int xOrigine, int yOrigine,int xCoup,int yCoup, Joueur
     std::cout << "Pièce déplacée de (" << xOrigine << "," << yOrigine << ") vers (" << xCoup << "," << yCoup << ")" << std::endl;
     std::vector<std::string> camps = VerifierEnEchec(ListeJoueur, matrice);
     if(!camps.empty()) {
+        campsEchec=camps;
         std::cout << "Rois en échec : ";
-        for (const auto& camp : camps)
+        for (const auto& camp : camps){
             std::cout << camp << " ";
+        }
         std::cout << std::endl;
         if (std::count(camps.begin(), camps.end(), "blanc") != 0) {
             if (EstEchecEtMat(0, "blanc", ListeJoueur)) {
@@ -223,6 +225,7 @@ void Plateau::Deplacement(int xOrigine, int yOrigine,int xCoup,int yCoup, Joueur
     }
     else{
         std::cout << "La partie continue" <<std::endl;
+        this->campsEchec.clear();
     }
 }
 
@@ -267,7 +270,7 @@ Piece** copierListePiece(Piece* copie[12][12], int camp, int& taille) {
     for (int i = 0; i < 12; ++i){
         for (int j = 0; j < 12; ++j){
             if (copie[i][j] && copie[i][j]->GetCamp() == camp){
-                liste[index] = copie[i][j];
+                liste[index] = copie[i][j]->clone();;
                 liste[index]->SetXPosition(i);
                 liste[index]->SetYPosition(j);
                 index++;
@@ -377,7 +380,9 @@ std::vector<std::string> Plateau::VerifierEnEchec(Joueur* ListeJoueur, Piece* ma
 
     std::string parNoirs = VerifierEchecParCamp(2, roiBlanc, roiRouge, ListeJoueur, matrice);
     if (parNoirs == "roi1" || parNoirs == "deux"){
-        campsEnEchec.push_back("blanc");
+        if (std::count(campsEnEchec.begin(), campsEnEchec.end(), "blanc") == 0){
+            campsEnEchec.push_back("blanc");
+        }
     }
     if (parNoirs == "roi2" || parNoirs == "deux"){
         if (std::count(campsEnEchec.begin(), campsEnEchec.end(), "rouge") == 0){
@@ -422,6 +427,9 @@ bool Plateau::EstEchecEtMat(int indexJoueur, std::string nomJoueur, Joueur* List
                 return false;
             }
 
+            delete[] listeBlancCopie;
+            delete[] listeRougeCopie;
+            delete[] listeNoirCopie;
             LibererMatrice(copie);
         }
     }

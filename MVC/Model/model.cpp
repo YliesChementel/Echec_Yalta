@@ -12,7 +12,7 @@ Board::Board() {
     std::vector<float> side_lengths = {450, 460, 460, 450, 460, 460};
     std::vector<sf::Vector2f> points;
     float angle = 0;
-    sf::Vector2f origin(350, 100);
+    sf::Vector2f origin(350, 150);
     points.push_back(origin + sf::Vector2f(side_lengths[0], 0));
     
     for (int i = 1; i < 6; i++) {
@@ -165,6 +165,8 @@ Board::Board() {
     this->texturesBlack = loadTextures(texturePathBlack);
     this->BlackPieces = CreerPiece(this->matrice5, this->matrice6, 5, 6,texturesBlack,"Black");
 
+    setTextGame("Bienvenue sur le jeu Yalta !"); 
+    setTextEchec(""); 
 }
 
 

@@ -57,6 +57,9 @@ class Board {
         std::vector<PieceImage> RedPieces;
         std::vector<sf::Texture> texturesRed;
 
+        sf::Text textGame;
+        sf::Text textEchec;
+
 public:
     Board();
     
@@ -107,5 +110,14 @@ public:
     std::vector<PieceImage>& getWhitePieces() { return WhitePieces; }
     std::vector<PieceImage>& getBlackPieces() { return BlackPieces; }
     std::vector<PieceImage>& getRedPieces() { return RedPieces; }
+
+    sf::Text& getTextGame() { return textGame; }
+    void setTextGame(std::string text) {
+        textGame = createText(text, sf::Vector2f(350, 12), 28, sf::Color::Black, font);
+    }
+    sf::Text& getTextEchec() { return textEchec; }
+    void setTextEchec(std::string text) {
+        textEchec = createText(text, sf::Vector2f(350, 50), 28, sf::Color::Black, font);
+    }
 };
 #endif // MODEL_HPP

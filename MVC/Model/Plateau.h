@@ -20,6 +20,9 @@ public:
     void Deplacement(int xOrigine, int yOrigine,int xCoup,int yCoup,Joueur* ListeJoueur, Piece* matrice[12][12]);
     std::vector<std::string> VerifierEnEchec(Joueur* ListeJoueur, Piece* matrice[12][12]);
     bool EstEchecEtMat(int indexJoueur, std::string nomJoueur, Joueur* ListeJoueur);
+
+    std::vector<std::string> campsEchec;
+    std::vector<std::string> campsEchecEtMAt;
 };
 
 
