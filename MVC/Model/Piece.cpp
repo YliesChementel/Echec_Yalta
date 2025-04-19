@@ -1,5 +1,6 @@
 #include "Piece.h"
 #include <iostream>
+#include <algorithm>
 #include "Plateau.h"
 
 
@@ -87,13 +88,13 @@ void Piece::ajustementCoordonnees(int& xOrigine, int& yOrigine, int& xdestinatio
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Intéractions des matrices 4, 5 et 6 qui sont inversées
 
-    else if ((matriceOrigine == 6 && matriceDestination == 5) || (matriceOrigine == 5 && ydestination == 3 && xdestination != 7)) { // Inversion horizontale de la matrice bas-milieu + (cas particulier 7-3)
+    else if ((matriceOrigine == 6 && matriceDestination == 5) || (matriceOrigine == 5 && ydestination == 3)) { // Inversion horizontale de la matrice bas-milieu + (cas particulier 7-3)
         ydestination = 11 - ydestination;
         if ((xCoup == 0 || xCoup == 1 || xCoup == -1) && yCoup == -1) {// Pour toutes les directions où yCoup == -1, donc gauche, bas-gauche et haut-gauche
             yCoup = 1;
         }
     }
-    else if ((matriceOrigine == 6 && matriceDestination == 4) || (matriceOrigine == 4 && xdestination == 3)) { // Inversion verticale de la matrice milieu-droite
+    else if ((matriceOrigine == 6 && matriceDestination == 4) || (matriceOrigine == 4 && xdestination == 3 )) { // Inversion verticale de la matrice milieu-droite
         xdestination = 11 - xdestination;
         if (xCoup == -1 && (yCoup == 0 || yCoup == -1 || yCoup == 1)) { // Pour toutes les directions où xCoup == -1, donc haut, haut-gauche et haut-droite
             xCoup = 1;
@@ -127,38 +128,137 @@ void Piece::CoupRecursif(int xOrigine, int yOrigine, int xCoup, int yCoup,std::v
     int ydestination = yOrigine + yCoup;
     if (!estMurMatrice5(xOrigine, yOrigine, xCoup, yCoup)) {
         if (!estMurMatrice4(xOrigine, yOrigine, xCoup, yCoup)) {
+
             if((xOrigine==3 && yOrigine==3) && (xCoup==1 && yCoup==1)){
-                coupsPossibles.emplace_back(4, 8);
-                coupsPossibles.emplace_back(8, 4);
-                CoupRecursif(4,8, xCoup, yCoup, coupsPossibles,matrice);
-                CoupRecursif(8,4, xCoup, yCoup, coupsPossibles,matrice);
+                if(matrice[4][8] != nullptr){
+                    if(matrice[4][8]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(4, 8);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(4, 8);
+                    CoupRecursif(4,8, xCoup, yCoup, coupsPossibles,matrice);
+                }
+                if(matrice[8][4] != nullptr){
+                    if(matrice[8][4]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(8, 4);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(8, 4);
+                    CoupRecursif(8,4, xCoup, yCoup, coupsPossibles,matrice);
+                }
             }
+
             else if((xOrigine==3 && yOrigine==4) && (xCoup==1 && yCoup==-1)){
-                coupsPossibles.emplace_back(8, 8);
-                CoupRecursif(8,8, 1, 1, coupsPossibles,matrice);
+                if(matrice[8][8] != nullptr){
+                    if(matrice[8][8]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(8, 8);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(8, 8);
+                    CoupRecursif(8,8, 1, 1, coupsPossibles,matrice);
+                }
+                if(matrice[4][3] != nullptr){
+                    if(matrice[4][3]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(4,3);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(4, 3);
+                    CoupRecursif(4,3, 1, -1, coupsPossibles,matrice);
+                }
             }
+
             else if((xOrigine==4 && yOrigine==3) && (xCoup==-1 && yCoup==1)){
-                coupsPossibles.emplace_back(8, 8);
-                CoupRecursif(8,8, 1, 1, coupsPossibles,matrice);
+                if(matrice[8][8] != nullptr){
+                    if(matrice[8][8]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(8, 8);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(8, 8);
+                    CoupRecursif(8,8, 1, 1, coupsPossibles,matrice);
+                }
+                if(matrice[3][4] != nullptr){
+                    if(matrice[3][4]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(3,4);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(3, 4);
+                    CoupRecursif(3,4, -1, 1, coupsPossibles,matrice);
+                }
             }
+
             else if((xOrigine==8 && yOrigine==8) && (xCoup==-1 && yCoup==-1)){
-                coupsPossibles.emplace_back(3, 4);
-                coupsPossibles.emplace_back(4, 3);
-                CoupRecursif(3,4, -1, 1, coupsPossibles,matrice);
-                CoupRecursif(4,3, 1, -1, coupsPossibles,matrice);
+                if(matrice[3][4] != nullptr){
+                    if(matrice[3][4]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(3,4);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(3, 4);
+                    CoupRecursif(3,4, -1, 1, coupsPossibles,matrice);
+                }
+
+                if(matrice[4][3] != nullptr){
+                    if(matrice[4][3]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(4,3);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(4, 3);
+                    CoupRecursif(4,3, 1, -1, coupsPossibles,matrice);
+                }
             }
+
             else if((xOrigine==8 && yOrigine==4) && (xCoup==-1 && yCoup==-1)){
-                coupsPossibles.emplace_back(4, 8);
-                coupsPossibles.emplace_back(3, 3);
-                CoupRecursif(4,8, 1, 1, coupsPossibles,matrice);
-                CoupRecursif(3,3, -1, -1, coupsPossibles,matrice);
+                if(matrice[4][8] != nullptr){
+                    if(matrice[4][8]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(4,8);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(4, 8);
+                    CoupRecursif(4,8, 1, 1, coupsPossibles,matrice);
+                }
+
+                if(matrice[3][3] != nullptr){
+                    if(matrice[3][3]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(3,3);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(3, 3);
+                    CoupRecursif(3,3, -1, -1, coupsPossibles,matrice);
+                }
+
             }
+
             else if((xOrigine==4 && yOrigine==8) && (xCoup==-1 && yCoup==-1)){
-                coupsPossibles.emplace_back(8, 4);
-                coupsPossibles.emplace_back(3, 3);
-                CoupRecursif(8,4, 1, 1, coupsPossibles,matrice);// problème ici et peut être sur les autres rosasse, car je ne vérifie pas si il y a une pièce sur la rossasse, donc il continue après la pièce
-                CoupRecursif(3,3, -1, -1, coupsPossibles,matrice);
+                if(matrice[8][4] != nullptr){
+                    if(matrice[8][4]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(8,4);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(8, 4);
+                    CoupRecursif(8,4, 1, 1, coupsPossibles,matrice);
+                }
+                if(matrice[3][3] != nullptr){
+                    if(matrice[3][3]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(3,3);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(3, 3);
+                    CoupRecursif(3,3, -1, -1, coupsPossibles,matrice);
+                }
+                
             }
+            
             else{
                 ajustementCoordonnees(xOrigine,yOrigine,xdestination,ydestination,xCoup,yCoup);
                 if (!estHorsPlateau(xdestination, ydestination)) {
@@ -234,26 +334,116 @@ void Piece::CoupRoi(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector
     if (!estMurMatrice5(xOrigine, yOrigine, xCoup, yCoup)) {
         if (!estMurMatrice4(xOrigine, yOrigine, xCoup, yCoup)) {
             if((xOrigine==3 && yOrigine==3) && (xCoup==1 && yCoup==1)){
-                coupsPossibles.emplace_back(4, 8);
-                coupsPossibles.emplace_back(8, 4);
+                if(matrice[4][8] != nullptr){
+                    if(matrice[4][8]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(4, 8);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(4, 8);
+                }
+
+                if(matrice[8][4] != nullptr){
+                    if(matrice[8][4]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(8, 4);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(8, 4);
+                }
+                
+                
             }
             else if((xOrigine==3 && yOrigine==4) && (xCoup==1 && yCoup==-1)){
-                coupsPossibles.emplace_back(8, 8);
+                if(matrice[8][8] != nullptr){
+                    if(matrice[8][8]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(8, 8);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(8, 8);
+                }
+                if(matrice[4][3] != nullptr){
+                    if(matrice[4][3]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(4, 3);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(4, 3);
+                }
             }
             else if((xOrigine==4 && yOrigine==3) && (xCoup==-1 && yCoup==1)){
-                coupsPossibles.emplace_back(8, 8);
+                if(matrice[8][8] != nullptr){
+                    if(matrice[8][8]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(8, 8);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(8, 8);
+                }
+                if(matrice[3][4] != nullptr){
+                    if(matrice[3][4]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(3, 4);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(3, 4);
+                }
             }
             else if((xOrigine==8 && yOrigine==8) && (xCoup==-1 && yCoup==-1)){
-                coupsPossibles.emplace_back(3, 4);
-                coupsPossibles.emplace_back(4, 3);
+                if(matrice[3][4] != nullptr){
+                    if(matrice[3][4]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(3, 4);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(3, 4);
+                }
+                if(matrice[4][3] != nullptr){
+                    if(matrice[4][3]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(4, 3);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(4, 3);
+                }
             }
             else if((xOrigine==8 && yOrigine==4) && (xCoup==-1 && yCoup==-1)){
-                coupsPossibles.emplace_back(4, 8);
-                coupsPossibles.emplace_back(3, 3);
+                if(matrice[4][8] != nullptr){
+                    if(matrice[4][8]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(4, 8);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(4, 8);
+                }
+                if(matrice[3][3] != nullptr){
+                    if(matrice[3][3]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(3, 3);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(3, 3);
+                }
             }
             else if((xOrigine==4 && yOrigine==8) && (xCoup==-1 && yCoup==-1)){
-                coupsPossibles.emplace_back(8, 4);
-                coupsPossibles.emplace_back(3, 3);
+                if(matrice[8][4] != nullptr){
+                    if(matrice[8][4]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(8, 4);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(8, 4);
+                }
+
+                if(matrice[3][3] != nullptr){
+                    if(matrice[3][3]->GetCamp()!=this->GetCamp()){
+                        coupsPossibles.emplace_back(3, 3);
+                    }
+                }
+                else{
+                    coupsPossibles.emplace_back(3, 3);
+                }
             }
             else{
                 ajustementCoordonnees(xOrigine,yOrigine,xdestination,ydestination,xCoup,yCoup);
@@ -273,102 +463,78 @@ void Piece::CoupRoi(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector
 }
 
 void Piece::CoupPion(int xOrigine, int yOrigine, std::vector<std::pair<int, int>>& coupsPossibles, int arret, Piece* matrice[12][12]) {
-    if(arret!=2){
-        int xdestination;
-        int ydestination;
-        int xCoup;
-        int yCoup = 0;
+    if (arret == 2) return;
 
-        int matriceOrigine = determineSousMatrice(xOrigine, yOrigine);
+    int xCoup;
+    int matriceOrigine = determineSousMatrice(xOrigine, yOrigine);
 
-        if(this->camp==1){
-            xCoup=1;
+    if (camp == 1 || (camp == 2 && (matriceOrigine == 5 || matriceOrigine == 6)) || (camp == 3 && (matriceOrigine == 3 || matriceOrigine == 4))) {
+        xCoup = 1;
+    } else {
+        xCoup = -1;
+    }
+
+    int yCoup = 0;
+    int xdestination = xOrigine + xCoup;
+    int ydestination = yOrigine + yCoup;
+
+    if (estMurMatrice4(xOrigine, yOrigine, xCoup, yCoup)) return;
+
+    if (arret == 0) {
+        // Capture diagonale à droite
+        capturePion(xOrigine, yOrigine, xCoup, 1, coupsPossibles, matrice);
+
+        // Capture diagonale à gauche
+        capturePion(xOrigine, yOrigine, xCoup, -1, coupsPossibles, matrice);
+
+        // Gérer les cas particuliers de captures de la rosaces
+        CapturesRosaces(xOrigine, yOrigine, coupsPossibles, matrice);
+    }
+
+    // Coup en avant
+    ajustementCoordonnees(xOrigine, yOrigine, xdestination, ydestination, xCoup, yCoup);
+    if (!estHorsPlateau(xdestination, ydestination) && !caseNonExistante(xdestination, ydestination)) {
+        if (matrice[xdestination][ydestination] == nullptr) {
+            coupsPossibles.emplace_back(xdestination, ydestination);
+            CoupPion(xdestination, ydestination, coupsPossibles, arret + 1, matrice);
         }
-        else if(this->camp==2){
-            if(matriceOrigine==6 || matriceOrigine==5){ xCoup=1; }
-            else{ xCoup=-1; }
+    }
+}
+
+void Piece::capturePion(int x, int y, int xCoup, int yCoup, std::vector<std::pair<int, int>>& coups, Piece* matrice[12][12]) {
+    int xCapture = x + xCoup;
+    int yCapture = y + yCoup;
+    ajustementCoordonnees(x, y, xCapture, yCapture, xCoup, yCoup);
+    if (estMurMatrice5(x, y, xCoup, yCoup)) return;
+    if (!estHorsPlateau(xCapture, yCapture)) {
+        Piece* piece = matrice[xCapture][yCapture];
+        if (piece != nullptr && piece->GetCamp() != this->GetCamp()) {
+            coups.emplace_back(xCapture, yCapture);
         }
-        else{
-            if(matriceOrigine==4 || matriceOrigine==3){ xCoup=1; }
-            else{ xCoup=-1; }
-        }
-        xdestination = xOrigine + xCoup;
-        ydestination = yOrigine + yCoup;
-        if (!estMurMatrice4(xOrigine, yOrigine, xCoup, yCoup)) {
-            ajustementCoordonnees(xOrigine,yOrigine,xdestination,ydestination,xCoup,yCoup);
-            if(arret==0){
-                int xcapture = xOrigine + xCoup;
-                int ycapture = yOrigine + 1;
-                int yCoupTemp = 1;
-                ajustementCoordonnees(xOrigine,yOrigine,xcapture,ycapture,xCoup,yCoupTemp);
-                if (!estHorsPlateau(xdestination, ydestination)) {
-                    if(matrice[xcapture][ycapture] != nullptr && matrice[xcapture][ycapture]->GetCamp()!=this->GetCamp()){
-                        coupsPossibles.emplace_back(xcapture, ycapture);
-                    }
-                }
+    }
+}
 
-                xcapture = xOrigine + xCoup;
-                ycapture = yOrigine - 1;
-                yCoupTemp = -1;
-                ajustementCoordonnees(xOrigine,yOrigine,xcapture,ycapture,xCoup,yCoupTemp);
-                if (!estHorsPlateau(xdestination, ydestination)) {
-                    if(matrice[xcapture][ycapture] != nullptr && matrice[xcapture][ycapture]->GetCamp()!=this->GetCamp()){
-                        coupsPossibles.emplace_back(xcapture, ycapture);
-                    }
-                }
+void Piece::CapturesRosaces(int x, int y, std::vector<std::pair<int, int>>& coups, Piece* matrice[12][12]) {
+    std::vector<std::pair<int, int>> coupsRosaces;
 
-                if(xOrigine==3 && yOrigine==3){
-                    if(matrice[4][8] != nullptr && matrice[4][8]->GetCamp()!=this->GetCamp()){
-                        coupsPossibles.emplace_back(4, 8);
-                    }
-                    if(matrice[8][4] != nullptr && matrice[8][4]->GetCamp()!=this->GetCamp()){
-                        coupsPossibles.emplace_back(8, 4);
-                    }
-                }
-                else if(xOrigine==3 && yOrigine==4){
-                    if(matrice[8][8] != nullptr && matrice[8][8]->GetCamp()!=this->GetCamp()){
-                        coupsPossibles.emplace_back(8, 8);
-                    }
-                }
-                else if(xOrigine==4 && yOrigine==3){
-                    if(matrice[8][8] != nullptr && matrice[8][8]->GetCamp()!=this->GetCamp()){
-                        coupsPossibles.emplace_back(8, 8);
-                    }
-                }
-                else if(xOrigine==8 && yOrigine==8){
-                    if(matrice[3][4] != nullptr && matrice[3][4]->GetCamp()!=this->GetCamp()){
-                        coupsPossibles.emplace_back(3, 4);
-                    }
-                    if(matrice[4][3] != nullptr && matrice[4][3]->GetCamp()!=this->GetCamp()){
-                        coupsPossibles.emplace_back(4, 3);
-                    }
-                }
-                else if(xOrigine==8 && yOrigine==4){
-                    if(matrice[4][8] != nullptr && matrice[4][8]->GetCamp()!=this->GetCamp()){
-                        coupsPossibles.emplace_back(4, 8);
-                    }
-                    if(matrice[3][3] != nullptr && matrice[3][3]->GetCamp()!=this->GetCamp()){
-                        coupsPossibles.emplace_back(3, 3);
-                    }
-                }
-                else if(xOrigine==4 && yOrigine==8){
-                    if(matrice[8][4] != nullptr && matrice[8][4]->GetCamp()!=this->GetCamp()){
-                        coupsPossibles.emplace_back(8, 4);
-                    }
-                    if(matrice[3][3] != nullptr && matrice[3][3]->GetCamp()!=this->GetCamp()){
-                        coupsPossibles.emplace_back(3, 3);
-                    }
-                }
-            }
+    if (x == 3 && y == 3) {
+        coupsRosaces = {{4, 8}, {8, 4}};
+    } else if ((x == 3 && y == 4) || (x == 4 && y == 3)) {
+        coupsRosaces = {{8, 8}};
+    } else if (x == 8 && y == 8) {
+        coupsRosaces = {{3, 4}, {4, 3}};
+    } else if (x == 8 && y == 4) {
+        coupsRosaces = {{4, 8}, {3, 3}};
+        coups.erase(std::find(coups.begin(), coups.end(), std::make_pair(7,3))); // cas de bug particulier pour le pion 
+    } else if (x == 4 && y == 8) {
+        coupsRosaces = {{8, 4}, {3, 3}};
+        coups.erase(std::find(coups.begin(), coups.end(), std::make_pair(8,7))); // cas de bug particulier pour le pion 
+    }
 
-            if (!estHorsPlateau(xdestination, ydestination)) {
-                if (!caseNonExistante(xdestination, ydestination)) {
-                    if (matrice[xdestination][ydestination] == nullptr){
-                        coupsPossibles.emplace_back(xdestination, ydestination);
-                        CoupPion(xdestination,ydestination,coupsPossibles,arret+=1,matrice);
-                    }
-                }
-            }
+    for (const auto& coup : coupsRosaces) {
+        Piece* piece = matrice[coup.first][coup.second];
+        if (piece != nullptr && piece->GetCamp() != this->GetCamp()) {
+            coups.emplace_back(coup);
         }
     }
 }

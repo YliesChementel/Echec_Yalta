@@ -41,6 +41,8 @@ protected:
     void CoupCavalier(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector<std::pair<int, int>>& coupsPossibles,int verification,bool methodeDeux,Piece* matrice[12][12]);
     void CoupRoi(int xOrigine, int yOrigine, int xCoup, int yCoup,std::vector<std::pair<int, int>>& coupsPossibles,Piece* matrice[12][12]);
     void CoupPion(int xOrigine, int yOrigine,std::vector<std::pair<int, int>>& coupsPossibles, int arret,Piece* matrice[12][12]);
+    void capturePion(int x, int y, int xCoup, int yCoup, std::vector<std::pair<int, int>>& coups, Piece* matrice[12][12]);
+    void CapturesRosaces(int x, int y, std::vector<std::pair<int, int>>& coups, Piece* matrice[12][12]);
 };
 
 

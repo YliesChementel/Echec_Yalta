@@ -201,6 +201,7 @@ bool BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std
         for (const auto& coup : this->coupsPossibles) {
             if(coupDestination==coup){
                 jeu.GetPlateau().Deplacement(coupOrigine.first,coupOrigine.second,coupDestination.first,coupDestination.second,jeu.GetListeJoueur(),jeu.GetPlateau().matrice);
+                jeu.GetPlateau().AffichageMatrice(jeu.GetPlateau().matrice);
                 coupAutoriser = true;
                 return true;
             }
