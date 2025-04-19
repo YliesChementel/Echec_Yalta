@@ -525,10 +525,16 @@ void Piece::CapturesRosaces(int x, int y, std::vector<std::pair<int, int>>& coup
         coupsRosaces = {{3, 4}, {4, 3}};
     } else if (x == 8 && y == 4) {
         coupsRosaces = {{4, 8}, {3, 3}};
-        coups.erase(std::find(coups.begin(), coups.end(), std::make_pair(7,3))); // cas de bug particulier pour le pion 
+        auto it = std::find(coups.begin(), coups.end(), std::make_pair(7, 8));// cas de bug particulier pour le pion 
+        if (it != coups.end()) {
+            coups.erase(it);
+        } 
     } else if (x == 4 && y == 8) {
         coupsRosaces = {{8, 4}, {3, 3}};
-        coups.erase(std::find(coups.begin(), coups.end(), std::make_pair(8,7))); // cas de bug particulier pour le pion 
+        auto it = std::find(coups.begin(), coups.end(), std::make_pair(8, 7));// cas de bug particulier pour le pion 
+        if (it != coups.end()) {
+            coups.erase(it);
+        } 
     }
 
     for (const auto& coup : coupsRosaces) {
