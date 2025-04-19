@@ -437,3 +437,41 @@ bool Plateau::EstEchecEtMat(int indexJoueur, std::string nomJoueur, Joueur* List
     std::cout << "Les " << nomJoueur << "s sont en ÉCHEC ET MAT !" << std::endl;
     return true;
 }
+
+
+bool Plateau::PionSurExtremite(int xOrigine, int yOrigine,int xCoup, Piece* matrice[12][12]){
+    if(matrice[xOrigine][yOrigine]->GetType()=="P"){
+        if(xCoup==0 || xCoup==7 || xCoup==11){
+            return true;
+        }
+    }
+    return false;
+}
+
+void Plateau::PionPromotion(int xOrigine, int yOrigine, int choixPromotion, Joueur* ListeJoueur,Piece* matrice[12][12]){
+    Piece* piecePromotion;
+    int campPromotion = matrice[xOrigine][yOrigine]->GetCamp();
+    if(choixPromotion==0){
+        piecePromotion = new Reine(campPromotion);
+    }
+    else if(choixPromotion==1){
+        piecePromotion = new Fou(campPromotion);
+    }
+    else if(choixPromotion==2){
+        piecePromotion = new Cavalier(campPromotion);
+    }
+    else if(choixPromotion==3){
+        piecePromotion = new Tour(campPromotion);
+    }
+
+    if(campPromotion==1){
+        ListeJoueur[0].remplacerPiece(matrice[xOrigine][yOrigine],piecePromotion);
+    }
+    else if(campPromotion==2){
+        ListeJoueur[1].remplacerPiece(matrice[xOrigine][yOrigine],piecePromotion);
+    }
+    else{
+        ListeJoueur[2].remplacerPiece(matrice[xOrigine][yOrigine],piecePromotion);
+    }
+    matrice[xOrigine][yOrigine]=piecePromotion;
+}

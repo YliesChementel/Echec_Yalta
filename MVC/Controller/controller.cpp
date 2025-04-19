@@ -15,7 +15,20 @@ void BoardController::run() {
                 window.close();
             }
             else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-                handleMousePressed(event);
+                if(promotion){
+                    sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                    int choix = PromotionChoix(mousePos);
+                    if (choix != -1) {
+                        jeu.GetPlateau().PionPromotion(coupEnAttentePromotion.first,coupEnAttentePromotion.second, choix, jeu.GetListeJoueur(), jeu.GetPlateau().matrice);
+                        
+                        std::vector<PieceImage>& piecesCamp = *listePieces[couleurIndex];
+                        piecesCamp[selectedPieceIndex].getSprite().setTexture(view.getPromotionTexture(choix,couleurIndex), true);
+                        promotion = false; 
+                    }
+                }else{
+                    handleMousePressed(event);
+                }
+                
             }
             else if (event.type == sf::Event::MouseMoved) {
                 handleMouseMoved(event);
@@ -36,6 +49,11 @@ void BoardController::run() {
 
         view.drawBoard({board.getMatrice1(),board.getMatrice2(),board.getMatrice3(),board.getMatrice4(),board.getMatrice5(),board.getMatrice6()});
         view.drawPieces(board.getWhitePieces(), board.getRedPieces(), board.getBlackPieces());
+        
+        if(promotion){
+            view.drawChoice(couleurIndex);
+        }
+        
         view.display();
     }
 }
@@ -107,6 +125,7 @@ void BoardController::handleMousePressed(const sf::Event& event) {
     for (int i = 0; i < listePieces.size(); ++i) {
         if (TrouverPieceSelectioner(*listePieces[i], i, mousePos)) { // j'utilise la déréférences 
             isDragging = true;
+            //indexDernierePiecePrise = i;
             return;
         }
     }
@@ -139,8 +158,8 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
     }
 
     isDragging = false;
-    couleurIndex = -1;
-    selectedPieceIndex = -1;
+    //couleurIndex = -1;
+    //selectedPieceIndex = -1;
     
     RemettreCouleurDefautCases();
 
@@ -200,6 +219,12 @@ bool BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std
     if(coupOrigine!=coupDestination){
         for (const auto& coup : this->coupsPossibles) {
             if(coupDestination==coup){
+
+               if(jeu.GetPlateau().PionSurExtremite(coupOrigine.first,coupOrigine.second,coupDestination.first, jeu.GetPlateau().matrice)){
+                    coupEnAttentePromotion = {coupDestination.first, coupDestination.second};
+                    this->promotion = true;
+                }
+
                 jeu.GetPlateau().Deplacement(coupOrigine.first,coupOrigine.second,coupDestination.first,coupDestination.second,jeu.GetListeJoueur(),jeu.GetPlateau().matrice);
                 jeu.GetPlateau().AffichageMatrice(jeu.GetPlateau().matrice);
                 coupAutoriser = true;
@@ -209,4 +234,13 @@ bool BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std
         std::cout<<"coup non autoriser"<<std::endl;
     }
     return false;
+}
+
+
+int BoardController::PromotionChoix(const sf::Vector2f& mousePos) {
+    for (auto& choix : view.promotionChoix) {
+        if (choix.first.getGlobalBounds().contains(mousePos))
+            return choix.second;
+    }
+    return -1;
 }

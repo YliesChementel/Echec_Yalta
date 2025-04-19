@@ -54,7 +54,7 @@ Board::Board() {
 
     this->hexagon2.setPointCount(6);
     for (size_t i = 0; i < 6; i++) this->hexagon2.setPoint(i, points2[i]);
-    this->hexagon2.setFillColor(sf::Color::Transparent);
+    this->hexagon2.setFillColor(sf::Color::White);
     this->hexagon2.setOutlineColor(sf::Color::Black);
     this->hexagon2.setOutlineThickness(7);
 

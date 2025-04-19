@@ -42,7 +42,15 @@ void Joueur::retirerPiece(Piece* piece) {
             break;
         }
     }
-    listePieceRetirer[16-tailleListePiece]==piece;
+}
+
+void Joueur::remplacerPiece(Piece* anciennePiece,Piece* nouvellePiece) {
+    for (int i = 0; i < tailleListePiece; ++i) {
+        if (listePiece[i] == anciennePiece) {
+            listePiece[i] = nouvellePiece;
+            break;
+        }
+    }
 }
 
 Joueur::~Joueur() {

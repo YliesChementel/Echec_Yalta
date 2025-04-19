@@ -11,13 +11,13 @@ public:
     void setTaille(int tailleListePiece);
     void setListePiece(Piece** listePiece);
     void retirerPiece(Piece* piece);
+    void remplacerPiece(Piece* anciennePiece,Piece* nouvellePiece);
     ~Joueur();
 
 private:
     bool statut;
     int tailleListePiece = 16;
     Piece** listePiece;
-    Piece** listePieceRetirer;
 };
 
 

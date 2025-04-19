@@ -21,6 +21,10 @@ public:
     std::vector<std::string> VerifierEnEchec(Joueur* ListeJoueur, Piece* matrice[12][12]);
     bool EstEchecEtMat(int indexJoueur, std::string nomJoueur, Joueur* ListeJoueur);
 
+    bool PionSurExtremite(int xOrigine, int yOrigine,int xCoup, Piece* matrice[12][12]);
+    void PionPromotion(int xOrigine, int yOrigine, int choixPromotion, Joueur* ListeJoueur,Piece* matrice[12][12]);
+
+
     std::vector<std::string> campsEchec;
     std::vector<std::string> campsEchecEtMAt;
 };

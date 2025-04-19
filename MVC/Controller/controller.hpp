@@ -27,6 +27,12 @@ private:
 
     int tour =0;
 
+
+    int indexDernierePiecePrise;
+    std::pair<int,int> coupEnAttentePromotion;
+    bool promotion = false;
+    int PromotionChoix(const sf::Vector2f& mousePos);
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Variables pour le drag & drop
     bool isDragging;
