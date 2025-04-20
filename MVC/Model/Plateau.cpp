@@ -165,8 +165,20 @@ void Plateau::AfficherCoupsPossibles(std::vector<std::pair<int, int>> coupsPossi
 // Fonction qui retourne les coups possibles à partir de coordonnées données
 std::vector<std::pair<int, int>> Plateau::DeplacerPiece(int xOrigine, int yOrigine) {
     Piece* piece = matrice[xOrigine][yOrigine];
-    return piece->DeplacementCoup(xOrigine,yOrigine,this->matrice);
+    if(piece->GetType()=="r"){
+        int camp = piece->GetCamp();
+        std::string nomJoueur;
+        if(camp==1){nomJoueur="blanc";}
+        else if(camp==2){nomJoueur="rouge";}
+        else{nomJoueur="noir";}
+        return RetirerCoupEnEchecRoi( nomJoueur, piece);
+    }else{
+        return piece->DeplacementCoup(xOrigine,yOrigine,this->matrice);
+    }
 }
+
+
+
 
 // Fonction qui déplace une pièce via les coordonnées données et gère la capture d'une pièce, ainsi que la mise en echec et echec et mat
 void Plateau::Deplacement(int xOrigine, int yOrigine,int xCoup,int yCoup, Joueur* ListeJoueur, Piece* matrice[12][12]){
@@ -200,26 +212,35 @@ void Plateau::Deplacement(int xOrigine, int yOrigine,int xCoup,int yCoup, Joueur
         std::cout << std::endl;
         if (std::count(camps.begin(), camps.end(), "blanc") != 0) {
             if (EstEchecEtMat(0, "blanc", ListeJoueur)) {
-                std::cout << "Fin de la partie pour le joueur Blanc !" << std::endl;
+                if(this->vainqueur.first=="Aucun"){
+                    designerVainqueur(matrice[xCoup][yCoup]->GetCamp(),0);
+                }
             }
             else{
                 std::cout << "Ya encore une chance !" << std::endl;
+                designerVainqueur(-1,-1);
             }
         }
         else if(std::count(camps.begin(), camps.end(), "rouge") != 0){
             if (EstEchecEtMat(1, "rouge", ListeJoueur)) {
-                std::cout << "Fin de la partie pour le joueur Rouge !" << std::endl;
+                if(this->vainqueur.first=="Aucun"){
+                    designerVainqueur(matrice[xCoup][yCoup]->GetCamp(),1);
+                }
             }
             else{
                 std::cout << "Ya encore une chance !" << std::endl;
+                designerVainqueur(-1,-1);
             }
         }
         else{
             if (EstEchecEtMat(2, "noir", ListeJoueur)) {
-                std::cout << "Fin de la partie pour le joueur Noir !" << std::endl;
+                if(this->vainqueur.first=="Aucun"){
+                    designerVainqueur(matrice[xCoup][yCoup]->GetCamp(),2);
+                }
             }
             else{
                 std::cout << "Ya encore une chance !" << std::endl;
+                designerVainqueur(-1,-1);
             }
         }
     }
@@ -270,7 +291,7 @@ Piece** copierListePiece(Piece* copie[12][12], int camp, int& taille) {
     for (int i = 0; i < 12; ++i){
         for (int j = 0; j < 12; ++j){
             if (copie[i][j] && copie[i][j]->GetCamp() == camp){
-                liste[index] = copie[i][j]->clone();;
+                liste[index] = copie[i][j];
                 liste[index]->SetXPosition(i);
                 liste[index]->SetYPosition(j);
                 index++;
@@ -418,8 +439,6 @@ bool Plateau::EstEchecEtMat(int indexJoueur, std::string nomJoueur, Joueur* List
 
             DeplacementPourCopie(piece->GetXPosition(), piece->GetYPosition(), coup.first, coup.second, ListeJoueurCopie, copie);
 
-            //AffichageMatrice(copie);
-
             std::vector<std::string> campsEnEchecVerif = VerifierEnEchec(ListeJoueurCopie, copie);
 
             if (std::count(campsEnEchecVerif.begin(), campsEnEchecVerif.end(), nomJoueur) == 0) {
@@ -427,9 +446,6 @@ bool Plateau::EstEchecEtMat(int indexJoueur, std::string nomJoueur, Joueur* List
                 return false;
             }
 
-            delete[] listeBlancCopie;
-            delete[] listeRougeCopie;
-            delete[] listeNoirCopie;
             LibererMatrice(copie);
         }
     }
@@ -475,3 +491,55 @@ void Plateau::PionPromotion(int xOrigine, int yOrigine, int choixPromotion, Joue
     }
     matrice[xOrigine][yOrigine]=piecePromotion;
 }
+
+
+void Plateau::designerVainqueur(int campGagnant,int campPerdant){
+    if(campGagnant==0){
+        this->vainqueur={"Blanc",campPerdant};
+    }
+    else if(campGagnant==1){
+        this->vainqueur={"Rouge",campPerdant};
+    }
+    else if(campGagnant==2){
+        this->vainqueur={"Noir",campPerdant};
+    }
+    else{
+        this->vainqueur={"Aucun",-1};
+    }
+
+}
+
+
+std::vector<std::pair<int, int>> Plateau::RetirerCoupEnEchecRoi(std::string nomJoueur, Piece* piece) {
+    std::vector<std::pair<int, int>> coupsPossibles = piece->DeplacementCoup(piece->GetXPosition(), piece->GetYPosition(), this->matrice);
+    std::vector<std::pair<int, int>> coupsValides;
+
+    for (const auto& coup : coupsPossibles) {
+        Piece* copie[12][12];
+        CopierMatrice(copie, this->matrice);
+
+        int tailleBlancCopie, tailleRougeCopie ,tailleNoirCopie;
+        Piece** listeBlancCopie = copierListePiece(copie, 1, tailleBlancCopie);
+        Piece** listeRougeCopie = copierListePiece(copie, 2, tailleRougeCopie);
+        Piece** listeNoirCopie  = copierListePiece(copie, 3, tailleNoirCopie);
+
+        Joueur* ListeJoueurCopie = new Joueur[3];
+        ListeJoueurCopie[0].setListePiece(listeBlancCopie); ListeJoueurCopie[0].setTaille(tailleBlancCopie);
+        ListeJoueurCopie[1].setListePiece(listeRougeCopie); ListeJoueurCopie[1].setTaille(tailleRougeCopie);
+        ListeJoueurCopie[2].setListePiece(listeNoirCopie);  ListeJoueurCopie[2].setTaille(tailleNoirCopie);
+
+        DeplacementPourCopie(piece->GetXPosition(), piece->GetYPosition(), coup.first, coup.second, ListeJoueurCopie, copie);
+
+        std::vector<std::string> campsEnEchecVerif = VerifierEnEchec(ListeJoueurCopie, copie);
+
+        if (std::count(campsEnEchecVerif.begin(), campsEnEchecVerif.end(), nomJoueur) == 0) {
+            coupsValides.push_back(coup);
+        }
+
+        LibererMatrice(copie);
+    }
+
+    return coupsValides;
+}
+
+

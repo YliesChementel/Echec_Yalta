@@ -122,13 +122,36 @@ void BoardController::RemettreCouleurDefautCases(){
 
 void BoardController::handleMousePressed(const sf::Event& event) {
     sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-    for (int i = 0; i < listePieces.size(); ++i) {
-        if (TrouverPieceSelectioner(*listePieces[i], i, mousePos)) { // j'utilise la déréférences 
+
+    if (TrouverPieceSelectioner(*listePieces[0], 0, mousePos)) {// j'utilise la déréférences
+        isDragging = true;
+    }
+    if (TrouverPieceSelectioner(*listePieces[1], 1, mousePos)) {
+        isDragging = true;
+    }
+    if (TrouverPieceSelectioner(*listePieces[2], 2, mousePos)) {
+        isDragging = true;
+    }
+    /*
+    if (tour == 0) { // Tour des blancs
+        if (TrouverPieceSelectioner(*listePieces[0], 0, mousePos)) {// j'utilise la déréférences
             isDragging = true;
-            //indexDernierePiecePrise = i;
-            return;
+        }
+    } else if (tour == 1) { // Tour des noirs
+        if (TrouverPieceSelectioner(*listePieces[1], 1, mousePos)) {
+            isDragging = true;
+        }
+    } else if (tour == 2) { // Tour des rouges
+        if (TrouverPieceSelectioner(*listePieces[2], 2, mousePos)) {
+            isDragging = true;
         }
     }
+       
+    //version simplifié
+     if (TrouverPieceSelectioner(*listePieces[tour], tour, mousePos)) {// j'utilise la déréférences
+            isDragging = true;
+        }
+    */
 }
 
 void BoardController::handleMouseMoved(const sf::Event& event) {
@@ -149,6 +172,17 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
             if (this->sound.getStatus() != sf::Sound::Playing) {
                 this->sound.play();
             }
+            std::string echec =" ";
+            if(!jeu.GetPlateau().campsEchec.empty()){
+                echec+="Rois en echec : ";
+                for (const auto& camp : jeu.GetPlateau().campsEchec){
+                    echec += camp;
+                    echec += " ";
+                }
+            }
+            board.setTextEchec(echec);
+
+            finDeTour();
             
     }
     else{ // Replacement d'une pièce à sa position initial si le déplacement est hors du plateau
@@ -158,32 +192,8 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
     }
 
     isDragging = false;
-    //couleurIndex = -1;
-    //selectedPieceIndex = -1;
     
     RemettreCouleurDefautCases();
-
-    std::string echec =" ";
-    if(tour==0){
-        board.setTextGame("Au tour du joueur 1");        
-        tour++;
-    }
-    else if(tour==1){
-        board.setTextGame("Au tour du joueur 2");
-        tour++;
-    }
-    else {
-        board.setTextGame("Au tour du joueur 3");
-        tour=0; 
-    }
-    if(!jeu.GetPlateau().campsEchec.empty()){
-        echec+="Rois en echec : ";
-        for (const auto& camp : jeu.GetPlateau().campsEchec){
-            echec += camp;
-            echec += " ";
-        }
-    }
-    board.setTextEchec(echec);
 }
 
 void BoardController::handleSound() {
@@ -192,6 +202,7 @@ void BoardController::handleSound() {
     }
     this->sound.setBuffer(this->buffer);
 }
+
 
 void BoardController::handleCoup(std::vector<int>& tilePositions) {
     std::pair<int, int> coupOrigine = board.indexEnCoordonneDePlateau(tilePositions[0], tilePositions[1]);
@@ -226,7 +237,6 @@ bool BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std
                 }
 
                 jeu.GetPlateau().Deplacement(coupOrigine.first,coupOrigine.second,coupDestination.first,coupDestination.second,jeu.GetListeJoueur(),jeu.GetPlateau().matrice);
-                jeu.GetPlateau().AffichageMatrice(jeu.GetPlateau().matrice);
                 coupAutoriser = true;
                 return true;
             }
@@ -243,4 +253,39 @@ int BoardController::PromotionChoix(const sf::Vector2f& mousePos) {
             return choix.second;
     }
     return -1;
+}
+
+
+void BoardController::finDeTour() {
+    std::string gagnant = jeu.GetPlateau().vainqueur.first;
+    int joueurPerdant = jeu.GetPlateau().vainqueur.second;
+
+    if (gagnant != "Aucun") {
+        if (joueurPerdant == tour) {
+            board.setTextGame("Félicitations Joueur " + gagnant + " !");
+            board.setTextEchec("Vous avez Gagné !");
+        } else {
+            std::string enEchec;
+            if(joueurPerdant==0){
+                enEchec = "Blanc";
+            }
+            else if(joueurPerdant==1){
+                enEchec = "Rouge";
+            }
+            else{
+                enEchec = "Noir";
+            }
+            board.setTextEchec("Echec et mat du joueur " + enEchec + " au prochain tour !");
+            if(tour==2){
+                tour=0;
+            }
+            else{
+                tour++;
+            }
+        }
+    } else {     
+            if(tour==0){ board.setTextGame("Au tour du joueur Rouge");tour++;}
+            else if(tour==1){ board.setTextGame("Au tour du joueur Noir");tour++;}
+            else{ board.setTextGame("Au tour du joueur Blanc");tour=0;}
+    }
 }

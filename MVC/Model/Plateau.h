@@ -20,12 +20,16 @@ public:
     void Deplacement(int xOrigine, int yOrigine,int xCoup,int yCoup,Joueur* ListeJoueur, Piece* matrice[12][12]);
     std::vector<std::string> VerifierEnEchec(Joueur* ListeJoueur, Piece* matrice[12][12]);
     bool EstEchecEtMat(int indexJoueur, std::string nomJoueur, Joueur* ListeJoueur);
+    void designerVainqueur(int campGagnant,int campPerdant);
+    std::vector<std::pair<int, int>> RetirerCoupEnEchecRoi(std::string nomJoueur, Piece* piece);
+
 
     bool PionSurExtremite(int xOrigine, int yOrigine,int xCoup, Piece* matrice[12][12]);
     void PionPromotion(int xOrigine, int yOrigine, int choixPromotion, Joueur* ListeJoueur,Piece* matrice[12][12]);
 
 
     std::vector<std::string> campsEchec;
+    std::pair<std::string, int> vainqueur={"Aucun",-1};
     std::vector<std::string> campsEchecEtMAt;
 };
 

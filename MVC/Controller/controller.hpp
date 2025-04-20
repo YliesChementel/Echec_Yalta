@@ -52,7 +52,7 @@ private:
     void handleMouseMoved(const sf::Event& event);
     void handleMouseReleased(const sf::Event& event);
 
-
+    void finDeTour();
     bool TrouverPieceSelectioner(std::vector<PieceImage>& liste, int listeIndex, sf::Vector2f mousePos);
     bool PlacerPieceDansMatrice(const std::vector<sf::ConvexShape>& matrice, int indexMatrice, const sf::Vector2f& mousePos);
     void RemettreCouleurDefautCases();
