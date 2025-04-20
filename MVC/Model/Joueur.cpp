@@ -34,15 +34,17 @@ void Joueur::setListePiece(Piece** liste) {
 void Joueur::retirerPiece(Piece* piece) {
     for (int i = 0; i < tailleListePiece; ++i) {
         if (listePiece[i] == piece) {
-            for (int j = i; j < 15; ++j) {// Décale les éléments à gauche pour supprimer l'élément
+            for (int j = i; j + 1 < tailleListePiece; ++j) {
                 listePiece[j] = listePiece[j + 1];
             }
-            listePiece[15] = nullptr; // Réduit la taille logique
-            tailleListePiece--;
+
+            listePiece[tailleListePiece - 1] = nullptr;
+            --tailleListePiece;
             break;
         }
     }
 }
+
 
 void Joueur::remplacerPiece(Piece* anciennePiece,Piece* nouvellePiece) {
     for (int i = 0; i < tailleListePiece; ++i) {

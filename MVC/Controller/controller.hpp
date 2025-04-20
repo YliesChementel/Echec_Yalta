@@ -26,7 +26,7 @@ private:
     void initListePieces();
 
     int tour =0;
-
+    bool finDePartie=false;
 
     int indexDernierePiecePrise;
     std::pair<int,int> coupEnAttentePromotion;

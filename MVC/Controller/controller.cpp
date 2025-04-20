@@ -15,20 +15,21 @@ void BoardController::run() {
                 window.close();
             }
             else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-                if(promotion){
-                    sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-                    int choix = PromotionChoix(mousePos);
-                    if (choix != -1) {
-                        jeu.GetPlateau().PionPromotion(coupEnAttentePromotion.first,coupEnAttentePromotion.second, choix, jeu.GetListeJoueur(), jeu.GetPlateau().matrice);
-                        
-                        std::vector<PieceImage>& piecesCamp = *listePieces[couleurIndex];
-                        piecesCamp[selectedPieceIndex].getSprite().setTexture(view.getPromotionTexture(choix,couleurIndex), true);
-                        promotion = false; 
+                if(!jeu.GetPlateau().finDePartie){
+                    if(promotion){
+                        sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                        int choix = PromotionChoix(mousePos);
+                        if (choix != -1) {
+                            jeu.GetPlateau().PionPromotion(coupEnAttentePromotion.first,coupEnAttentePromotion.second, choix, jeu.GetListeJoueur(), jeu.GetPlateau().matrice);
+                            
+                            std::vector<PieceImage>& piecesCamp = *listePieces[couleurIndex];
+                            piecesCamp[selectedPieceIndex].getSprite().setTexture(view.getPromotionTexture(choix,couleurIndex), true);
+                            promotion = false; 
+                        }
+                    }else{
+                        handleMousePressed(event);
                     }
-                }else{
-                    handleMousePressed(event);
                 }
-                
             }
             else if (event.type == sf::Event::MouseMoved) {
                 handleMouseMoved(event);
@@ -123,7 +124,7 @@ void BoardController::RemettreCouleurDefautCases(){
 void BoardController::handleMousePressed(const sf::Event& event) {
     sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-    if (TrouverPieceSelectioner(*listePieces[0], 0, mousePos)) {// j'utilise la déréférences
+    /*if (TrouverPieceSelectioner(*listePieces[0], 0, mousePos)) {// j'utilise la déréférences
         isDragging = true;
     }
     if (TrouverPieceSelectioner(*listePieces[1], 1, mousePos)) {
@@ -131,27 +132,11 @@ void BoardController::handleMousePressed(const sf::Event& event) {
     }
     if (TrouverPieceSelectioner(*listePieces[2], 2, mousePos)) {
         isDragging = true;
+    }*/
+
+    if (TrouverPieceSelectioner(*listePieces[tour], tour, mousePos)) {// j'utilise la déréférences
+            isDragging = true;
     }
-    /*
-    if (tour == 0) { // Tour des blancs
-        if (TrouverPieceSelectioner(*listePieces[0], 0, mousePos)) {// j'utilise la déréférences
-            isDragging = true;
-        }
-    } else if (tour == 1) { // Tour des noirs
-        if (TrouverPieceSelectioner(*listePieces[1], 1, mousePos)) {
-            isDragging = true;
-        }
-    } else if (tour == 2) { // Tour des rouges
-        if (TrouverPieceSelectioner(*listePieces[2], 2, mousePos)) {
-            isDragging = true;
-        }
-    }
-       
-    //version simplifié
-     if (TrouverPieceSelectioner(*listePieces[tour], tour, mousePos)) {// j'utilise la déréférences
-            isDragging = true;
-        }
-    */
 }
 
 void BoardController::handleMouseMoved(const sf::Event& event) {
@@ -181,8 +166,13 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
                 }
             }
             board.setTextEchec(echec);
-
-            finDeTour();
+            if(jeu.GetPlateau().finDePartie){
+                board.setTextGame("Partie Terminée");
+                board.setTextEchec("Gagnant : "+jeu.GetPlateau().gagnant);
+            }
+            else{
+                finDeTour();
+            }
             
     }
     else{ // Replacement d'une pièce à sa position initial si le déplacement est hors du plateau
@@ -257,35 +247,7 @@ int BoardController::PromotionChoix(const sf::Vector2f& mousePos) {
 
 
 void BoardController::finDeTour() {
-    std::string gagnant = jeu.GetPlateau().vainqueur.first;
-    int joueurPerdant = jeu.GetPlateau().vainqueur.second;
-
-    if (gagnant != "Aucun") {
-        if (joueurPerdant == tour) {
-            board.setTextGame("Félicitations Joueur " + gagnant + " !");
-            board.setTextEchec("Vous avez Gagné !");
-        } else {
-            std::string enEchec;
-            if(joueurPerdant==0){
-                enEchec = "Blanc";
-            }
-            else if(joueurPerdant==1){
-                enEchec = "Rouge";
-            }
-            else{
-                enEchec = "Noir";
-            }
-            board.setTextEchec("Echec et mat du joueur " + enEchec + " au prochain tour !");
-            if(tour==2){
-                tour=0;
-            }
-            else{
-                tour++;
-            }
-        }
-    } else {     
-            if(tour==0){ board.setTextGame("Au tour du joueur Rouge");tour++;}
-            else if(tour==1){ board.setTextGame("Au tour du joueur Noir");tour++;}
-            else{ board.setTextGame("Au tour du joueur Blanc");tour=0;}
-    }
+    if(tour==0){ board.setTextGame("Au tour du joueur Rouge");tour++;}
+    else if(tour==1){ board.setTextGame("Au tour du joueur Noir");tour++;}
+    else{ board.setTextGame("Au tour du joueur Blanc");tour=0;}
 }
