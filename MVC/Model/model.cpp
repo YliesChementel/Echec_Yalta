@@ -370,7 +370,7 @@ void Board::ReplacementPiece(int& selectedPieceIndex, int camp, int matriceIndex
 }
 
 
-int Board::determineSousMatrice(int x, int y) {
+int Board::determineSubMatrix(int x, int y) {
     if (x < 4 && y < 4) return 1; // haut gauche
     if (x < 4 && y >= 4 && y < 8) return 2; // haut milieu
     if (y < 4 && x >= 4 && x < 8) return 3; // milieu gauche

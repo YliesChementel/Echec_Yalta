@@ -4,95 +4,33 @@
 #include <iostream>
 
 Jeu::Jeu(){
-    etatDeParti = false;
-    ListeJoueur = new Joueur[3];
+    playerList = new Joueur[3];
     for(int i=0;i<3;i++){
-        ListeJoueur[i] = Joueur();
-        InitListePiece(ListeJoueur[i], i + 1);
+        playerList[i] = Joueur();
+        InitPieceList(playerList[i], i + 1);
     }
-    plateau.PlacerPiece(ListeJoueur[0].getListePiece(), ListeJoueur[1].getListePiece(), ListeJoueur[2].getListePiece());
-    /*plateau.AffichageMatrice(plateau.matrice);
-
-    int xOrigine, yOrigine, xCoup, yCoup;
-    bool tour;
-    while(etatDeParti==false){
-        tour=false;
-        ChangerTourJoueur();
-        std::cout << "Tour du joueur " << tourJoueur << std::endl;
-        while(tour==false){
-            std::cout << "Entrer les coordonnées de la pièce" << std::endl;
-            std::cin >> xOrigine >> yOrigine;
-            /*std::cout << "Coup Possibles" << std::endl;
-            plateau.AfficherCoupsPossibles(xOrigine,yOrigine);
-            std::cout << "Entrer les coordonnées de son coup" << std::endl;
-            std::cin >> xCoup >> yCoup;
-            tour=plateau.DeplacerPiece(tourJoueur,xOrigine, yOrigine, xCoup, yCoup);*/ /*
-            std::vector<std::pair<int, int>> coups = plateau.DeplacerPiece(xOrigine,yOrigine);
-            for (const auto& coup : coups) {
-                std::cout << "(" << coup.first << ", " << coup.second << ")" << std::endl;
-            }
-            plateau.AfficherCoupsPossibles(coups);
-            std::cout << "Entrer les coordonnées de son coup" << std::endl;
-            std::cin >> xCoup >> yCoup;
-            for (const auto& coup : coups) {
-                if(coup.first == xCoup  && coup.second == yCoup ){
-                    plateau.Deplacement(xOrigine,yOrigine,xCoup,yCoup,ListeJoueur,plateau.matrice);
-                }
-            }
-            plateau.AffichageMatrice(plateau.matrice);
-        }
-        plateau.AffichageMatrice(plateau.matrice);
-        std::cout << std::endl;
-    } */
+    board.PlacePiece(playerList[0].getListPiece(), playerList[1].getListPiece(), playerList[2].getListPiece());
 }
 
-//Interessant pour empecher un coup hors du possible
-/*
- std::cin >> xCoup >> yCoup;
-for (const auto& coup : coups) {
-    if(coup.first == xCoup  && coup.second == yCoup ){
-        plateau.Deplacement(xOrigine,yOrigine,xCoup,yCoup,ListeJoueur,plateau.matrice);
-    }
-}
-
-*/
-
-void Jeu::InitListePiece(Joueur& joueur, int camp) {
-    Piece** liste = new Piece*[16];
+void Jeu::InitPieceList(Joueur& joueur, int side) {
+    Piece** list = new Piece*[16];
     for (int i = 0; i < 8; i++) {
-        liste[i] = new Pion(camp);
+        list[i] = new Pion(side);
     }
-    liste[8] = new Tour(camp);
-    liste[9] = new Cavalier(camp);
-    liste[10] = new Fou(camp);
-    if(camp==2){
-        liste[11] = new Reine(camp);
-        liste[12] = new Roi(camp);
+    list[8] = new Tour(side);
+    list[9] = new Cavalier(side);
+    list[10] = new Fou(side);
+    if(side==2){
+        list[11] = new Reine(side);
+        list[12] = new Roi(side);
         
     }
     else{
-        liste[11] = new Roi(camp);
-        liste[12] = new Reine(camp);
+        list[11] = new Roi(side);
+        list[12] = new Reine(side);
     }
-    liste[13] = new Fou(camp);
-    liste[14] = new Cavalier(camp);
-    liste[15] = new Tour(camp);
-    joueur.setListePiece(liste);
-}
-
-void Jeu::ChangerTourJoueur() {
-   /*if(tourJoueur==1){
-    tourJoueur=2;
-   }
-   else if(tourJoueur==2){
-    tourJoueur=3;
-   }
-   else{
-    tourJoueur=1;
-   }*/
-   tourJoueur=1;
-}
-
-void Jeu::VerifStatutJoueur() {
-    
+    list[13] = new Fou(side);
+    list[14] = new Cavalier(side);
+    list[15] = new Tour(side);
+    joueur.setListPiece(list);
 }

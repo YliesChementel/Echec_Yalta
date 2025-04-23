@@ -20,13 +20,13 @@ private:
 
     /////////////////
     //
-    std::vector<std::pair<int, int>> coupsPossibles;
+    std::vector<std::pair<int, int>> possibleMoves;
 
     std::array<std::vector<PieceImage>*, 3> listePieces;
     void initListePieces();
 
     int tour =0;
-    bool finDePartie=false;
+    bool endOfGame=false;
 
     int indexDernierePiecePrise;
     std::pair<int,int> coupEnAttentePromotion;

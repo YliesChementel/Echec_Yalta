@@ -1,65 +1,59 @@
 #include "Joueur.h"
 #include <iostream>
 
-Joueur::Joueur() : listePiece(nullptr) {}
+Joueur::Joueur() : pieceList(nullptr) {}
 
-
-
-void Joueur::JouerUnCoup(Piece* piece, int coup) {
-    
+Piece** Joueur::getListPiece(){
+    return pieceList;
 }
 
-Piece** Joueur::getListePiece(){
-    return listePiece;
+int Joueur::getSize(){
+    return pieceListSize;
 }
 
-int Joueur::getTaille(){
-    return tailleListePiece;
+void Joueur::setSize(int pieceListSize){
+    this->pieceListSize = pieceListSize;
 }
 
-void Joueur::setTaille(int tailleListePiece){
-    this->tailleListePiece = tailleListePiece;
-}
-
-void Joueur::setListePiece(Piece** liste) {
-    if (listePiece != nullptr) {
+void Joueur::setListPiece(Piece** liste) {
+    if (pieceList != nullptr) {
         for (int i = 0; i < 16; ++i) {
-            delete listePiece[i];
+            delete pieceList[i];
         }
-        delete[] listePiece;
+        delete[] pieceList;
     }
-    listePiece = liste;
+    pieceList = liste;
 }
 
-void Joueur::retirerPiece(Piece* piece) {
-    for (int i = 0; i < tailleListePiece; ++i) {
-        if (listePiece[i] == piece) {
-            for (int j = i; j + 1 < tailleListePiece; ++j) {
-                listePiece[j] = listePiece[j + 1];
+void Joueur::removePiece(Piece* piece) {
+    for (int i = 0; i < pieceListSize; ++i) {
+        if (pieceList[i] == piece) {
+            for (int j = i; j + 1 < pieceListSize; ++j) {
+                pieceList[j] = pieceList[j + 1];
             }
 
-            listePiece[tailleListePiece - 1] = nullptr;
-            --tailleListePiece;
+            pieceList[pieceListSize - 1] = nullptr;
+            --pieceListSize;
             break;
         }
     }
 }
 
 
-void Joueur::remplacerPiece(Piece* anciennePiece,Piece* nouvellePiece) {
-    for (int i = 0; i < tailleListePiece; ++i) {
-        if (listePiece[i] == anciennePiece) {
-            listePiece[i] = nouvellePiece;
+void Joueur::replacePiece(Piece* oldPiece,Piece* newPiece) {
+    for (int i = 0; i < pieceListSize; ++i) {
+        if (pieceList[i] == oldPiece) {
+            pieceList[i] = newPiece;
             break;
         }
     }
 }
 
 Joueur::~Joueur() {
-    if (listePiece != nullptr) {
+    if (pieceList != nullptr) {
         for (int i = 0; i < 16; ++i) {
-            delete listePiece[i];
+            delete pieceList[i];
         }
-        delete[] listePiece;
+        delete[] pieceList;
     }
 }

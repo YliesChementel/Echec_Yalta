@@ -15,12 +15,12 @@ void BoardController::run() {
                 window.close();
             }
             else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-                if(!jeu.GetPlateau().finDePartie){
+                if(!jeu.getBoard().endOfGame){
                     if(promotion){
                         sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                         int choix = PromotionChoix(mousePos);
                         if (choix != -1) {
-                            jeu.GetPlateau().PionPromotion(coupEnAttentePromotion.first,coupEnAttentePromotion.second, choix, jeu.GetListeJoueur(), jeu.GetPlateau().matrice);
+                            jeu.getBoard().PawnPromotion(coupEnAttentePromotion.first,coupEnAttentePromotion.second, choix, jeu.getPlayerList(), jeu.getBoard().matrix);
                             
                             std::vector<PieceImage>& piecesCamp = *listePieces[couleurIndex];
                             piecesCamp[selectedPieceIndex].getSprite().setTexture(view.getPromotionTexture(choix,couleurIndex), true);
@@ -95,10 +95,10 @@ void BoardController::TrouverPieceCapture(std::vector<int> positions){
 }
 
 
-bool BoardController::PlacerPieceDansMatrice(const std::vector<sf::ConvexShape>& matrice, int indexMatrice, const sf::Vector2f& mousePos) {
-    if (board.PieceDansMatrice(mousePos, matrice)) {
-        for (int i = 0; i < matrice.size(); ++i) {
-            const sf::ConvexShape& losange = matrice[i];
+bool BoardController::PlacerPieceDansMatrice(const std::vector<sf::ConvexShape>& matrix, int indexMatrice, const sf::Vector2f& mousePos) {
+    if (board.PieceDansMatrice(mousePos, matrix)) {
+        for (int i = 0; i < matrix.size(); ++i) {
+            const sf::ConvexShape& losange = matrix[i];
             if (board.PieceDansLosange(losange, mousePos)) {
                 std::vector<int> positions = {i, indexMatrice};
                 if (handleCoupJouer((*listePieces[couleurIndex])[selectedPieceIndex].getTilePositions(), positions)) {
@@ -158,17 +158,17 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
                 this->sound.play();
             }
             std::string echec =" ";
-            if(!jeu.GetPlateau().campsEchec.empty()){
+            if(!jeu.getBoard().sidesInCheck.empty()){
                 echec+="Rois en echec : ";
-                for (const auto& camp : jeu.GetPlateau().campsEchec){
-                    echec += camp;
+                for (const auto& side : jeu.getBoard().sidesInCheck){
+                    echec += side;
                     echec += " ";
                 }
             }
             board.setTextEchec(echec);
-            if(jeu.GetPlateau().finDePartie){
+            if(jeu.getBoard().endOfGame){
                 board.setTextGame("Partie Terminée");
-                board.setTextEchec("Gagnant : "+jeu.GetPlateau().gagnant);
+                board.setTextEchec("Gagnant : "+jeu.getBoard().winner);
             }
             else{
                 finDeTour();
@@ -176,9 +176,9 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
             
     }
     else{ // Replacement d'une pièce à sa position initial si le déplacement est hors du plateau
-        int matrice;
-        matrice = (*listePieces[couleurIndex])[selectedPieceIndex].getTilePositions()[1];
-        board.ReplacementPiece(selectedPieceIndex, couleurIndex, matrice, (*listePieces[couleurIndex]));
+        int matrix;
+        matrix = (*listePieces[couleurIndex])[selectedPieceIndex].getTilePositions()[1];
+        board.ReplacementPiece(selectedPieceIndex, couleurIndex, matrix, (*listePieces[couleurIndex]));
     }
 
     isDragging = false;
@@ -196,20 +196,20 @@ void BoardController::handleSound() {
 
 void BoardController::handleCoup(std::vector<int>& tilePositions) {
     std::pair<int, int> coupOrigine = board.indexEnCoordonneDePlateau(tilePositions[0], tilePositions[1]);
-    this->coupsPossibles = jeu.GetPlateau().DeplacerPiece(coupOrigine.first,coupOrigine.second);
+    this->possibleMoves = jeu.getBoard().MovePiece(coupOrigine.first,coupOrigine.second);
 
-    for (const auto& coup : this->coupsPossibles) {
-        int matrice = board.determineSousMatrice(coup.first,coup.second);
+    for (const auto& coup : this->possibleMoves) {
+        int matrix = board.determineSubMatrix(coup.first,coup.second);
         int x = coup.first;
         int y = coup.second;
-        if (matrice == 2) { y = coup.second - 4; }
-        else if (matrice == 3) { x = coup.first - 4; }
-        else if (matrice == 4) { x = coup.first - 4; y = coup.second - 8; }
-        else if (matrice == 5) { x = coup.first - 8; y = coup.second - 4; }
-        else if (matrice == 6) { x = coup.first - 8; y = coup.second - 8; }
-        int index = board.coordonneEnIndexDeLosange(x, y, matrice);
-        view.changeColorTileDark(board.getMatrice(matrice)[index]);
-        tilesToChangeColor.push_back({index, matrice});
+        if (matrix == 2) { y = coup.second - 4; }
+        else if (matrix == 3) { x = coup.first - 4; }
+        else if (matrix == 4) { x = coup.first - 4; y = coup.second - 8; }
+        else if (matrix == 5) { x = coup.first - 8; y = coup.second - 4; }
+        else if (matrix == 6) { x = coup.first - 8; y = coup.second - 8; }
+        int index = board.coordonneEnIndexDeLosange(x, y, matrix);
+        view.changeColorTileDark(board.getMatrice(matrix)[index]);
+        tilesToChangeColor.push_back({index, matrix});
     }
 }
 
@@ -218,15 +218,15 @@ bool BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std
     std::pair<int, int> coupDestination = board.indexEnCoordonneDePlateau(tilePositionsDestination[0], tilePositionsDestination[1]);
     bool coupAutoriser = false;
     if(coupOrigine!=coupDestination){
-        for (const auto& coup : this->coupsPossibles) {
+        for (const auto& coup : this->possibleMoves) {
             if(coupDestination==coup){
 
-               if(jeu.GetPlateau().PionSurExtremite(coupOrigine.first,coupOrigine.second,coupDestination.first, jeu.GetPlateau().matrice)){
+               if(jeu.getBoard().PawnOnEdge(coupOrigine.first,coupOrigine.second,coupDestination.first, jeu.getBoard().matrix)){
                     coupEnAttentePromotion = {coupDestination.first, coupDestination.second};
                     this->promotion = true;
                 }
 
-                jeu.GetPlateau().Deplacement(coupOrigine.first,coupOrigine.second,coupDestination.first,coupDestination.second,jeu.GetListeJoueur(),jeu.GetPlateau().matrice);
+                jeu.getBoard().Move(coupOrigine.first,coupOrigine.second,coupDestination.first,coupDestination.second,jeu.getPlayerList(),jeu.getBoard().matrix);
                 coupAutoriser = true;
                 return true;
             }

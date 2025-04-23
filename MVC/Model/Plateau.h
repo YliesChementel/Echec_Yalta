@@ -9,29 +9,27 @@ class Piece;
 class Plateau {
 public:
     Plateau();
-    void InitMatrice();
-    void PlacerPiece(Piece** ListePiece1, Piece** ListePiece2, Piece** ListePiece3);
-    void AffichageMatrice(Piece* matrice[12][12]);
-    std::vector<std::pair<int, int>> DeplacerPiece(int xOrigine, int yOrigine);
-    std::vector<std::pair<int, int>> ObtenirCoupsPossibles(Piece* piece, int xOrigine, int yOrigine);
-    void AfficherCoupsPossibles(std::vector<std::pair<int, int>> coupsPossibles);
-    Piece* matrice[12][12];
+    void InitMatrix();
+    void PlacePiece(Piece** whitePieces, Piece** redPieces, Piece** blackPieces);
+    void AffichageMatrice(Piece* matrix[12][12]);
+    std::vector<std::pair<int, int>> MovePiece(int xStart, int yStart);
+    void AfficherCoupsPossibles(std::vector<std::pair<int, int>> possibleMoves);
+    Piece* matrix[12][12];
     
-    void Deplacement(int xOrigine, int yOrigine,int xCoup,int yCoup,Joueur* ListeJoueur, Piece* matrice[12][12]);
-    std::vector<std::string> VerifierEnEchec(Joueur* ListeJoueur, Piece* matrice[12][12]);
-    bool EstEchecEtMat(int indexJoueur, std::string nomJoueur, Joueur* ListeJoueur);
-    std::vector<std::pair<int, int>> RetirerCoupEnEchecRoi(std::string nomJoueur, Piece* piece);
-    bool Stalemate(int indexJoueur, const std::string& nomJoueur, Joueur* ListeJoueur);
+    void Move(int xStart, int yStart,int xMove,int yMove,Joueur* playerList, Piece* matrix[12][12]);
+    std::vector<std::string> IsInCheck(Joueur* playerList, Piece* matrix[12][12]);
+    bool IsCheckmate(int indexPlayer, std::string playerName, Joueur* playerList);
+    std::vector<std::pair<int, int>> RemoveKingInCheckMoves(std::string playerName, Piece* piece);
+    bool Stalemate(int indexPlayer, const std::string& playerName, Joueur* playerList);
 
 
-    bool PionSurExtremite(int xOrigine, int yOrigine,int xCoup, Piece* matrice[12][12]);
-    void PionPromotion(int xOrigine, int yOrigine, int choixPromotion, Joueur* ListeJoueur,Piece* matrice[12][12]);
+    bool PawnOnEdge(int xStart, int yStart,int xMove, Piece* matrix[12][12]);
+    void PawnPromotion(int xStart, int yStart, int promotionChoice, Joueur* playerList,Piece* matrix[12][12]);
 
 
-    std::vector<std::string> campsEchec;
-    std::vector<std::string> campsEchecEtMAt;
-    std::string gagnant;
-    bool finDePartie=false;
+    std::vector<std::string> sidesInCheck;
+    std::string winner;
+    bool endOfGame=false;
 };
 
 

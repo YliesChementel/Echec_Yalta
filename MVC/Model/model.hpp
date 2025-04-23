@@ -91,7 +91,7 @@ public:
 
     void ReplacementPiece(int& selectedPieceIndex, int camp, int matriceIndex, std::vector<PieceImage>& pieces);
 
-    int determineSousMatrice(int x, int y);
+    int determineSubMatrix(int x, int y);
     int coordonneEnIndexDeLosange(int x, int y, int matrice);
     std::pair<int, int> indexEnCoordonneDePlateau(int index, int sousMatrice);
 

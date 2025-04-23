@@ -5,19 +5,17 @@
 class Joueur {
 public:
     Joueur();
-    void JouerUnCoup(Piece* piece, int coup);
-    Piece** getListePiece();
-    int getTaille();
-    void setTaille(int tailleListePiece);
-    void setListePiece(Piece** listePiece);
-    void retirerPiece(Piece* piece);
-    void remplacerPiece(Piece* anciennePiece,Piece* nouvellePiece);
+    Piece** getListPiece();
+    int getSize();
+    void setSize(int pieceListSize);
+    void setListPiece(Piece** pieceList);
+    void removePiece(Piece* piece);
+    void replacePiece(Piece* oldPiece,Piece* newPiece);
     ~Joueur();
 
 private:
-    bool statut;
-    int tailleListePiece = 16;
-    Piece** listePiece;
+    int pieceListSize = 16;
+    Piece** pieceList;
 };
 
 

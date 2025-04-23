@@ -6,17 +6,13 @@
 class Jeu {
 public:
     Jeu();
-    void ChangerTourJoueur();
-    void VerifStatutJoueur();
-    void InitListePiece(Joueur& joueur, int camp);
-    Plateau& GetPlateau() { return plateau; }
-    Joueur* GetListeJoueur() { return ListeJoueur; }
+    void InitPieceList(Joueur& joueur, int side);
+    Plateau& getBoard() { return board; }
+    Joueur* getPlayerList() { return playerList; }
 
 private:
-    Joueur* ListeJoueur;
-    bool etatDeParti;
-    int tourJoueur;
-    Plateau plateau;
+    Joueur* playerList;
+    Plateau board;
 };
 
 
