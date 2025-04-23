@@ -216,6 +216,10 @@ void Plateau::Move(int xStart, int yStart,int xMove,int yMove, Joueur* playerLis
     matrix[xMove][yMove]->setXPosition(xMove);
     matrix[xMove][yMove]->setYPosition(yMove);
 
+    if(!matrix[xMove][yMove]->getHasAlreadyMoved()){
+        matrix[xMove][yMove]->setHasAlreadyMoved(true);
+    }
+    
     std::cout << "Pièce déplacée de (" << xStart << "," << yStart << ") vers (" << xMove << "," << yMove << ")" << std::endl;
     std::vector<std::string> sides = IsInCheck(playerList, matrix);
     if(!sides.empty()) {

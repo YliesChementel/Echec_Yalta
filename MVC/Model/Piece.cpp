@@ -501,6 +501,42 @@ void Piece::pawnMove(int xStart, int yStart, std::vector<std::pair<int, int>>& p
     }
 }
 
+void Piece::pawnMove2(int xStart, int yStart, std::vector<std::pair<int, int>>& possibleMoves, Piece* matrix[12][12]) {
+
+    int xMove;
+    int matrixStart = determineSubMatrix(xStart, yStart);
+
+    if (side == 1 || (side == 2 && (matrixStart == 5 || matrixStart == 6)) || (side == 3 && (matrixStart == 3 || matrixStart == 4))) {
+        xMove = 1;
+    } else {
+        xMove = -1;
+    }
+
+    int yMove = 0;
+    int xDestination = xStart + xMove;
+    int yDestination = yStart + yMove;
+
+    if (isWallInMatrix4(xStart, yStart, xMove, yMove)) return;
+
+    // Capture diagonale à droite
+    captureByPawn(xStart, yStart, xMove, 1, possibleMoves, matrix);
+
+    // Capture diagonale à gauche
+    captureByPawn(xStart, yStart, xMove, -1, possibleMoves, matrix);
+
+    // Gérer les cas particuliers de captures de la rosaces
+    captureOnBoardCenter(xStart, yStart, possibleMoves, matrix);
+
+    // Coup en avant
+    adjustCoordinates(xStart, yStart, xDestination, yDestination, xMove, yMove);
+    if (!isOutOfBoard(xDestination, yDestination) && !isSquareExist(xDestination, yDestination)) {
+        if (matrix[xDestination][yDestination] == nullptr) {
+            possibleMoves.emplace_back(xDestination, yDestination);
+        }
+    }
+}
+
+
 void Piece::captureByPawn(int x, int y, int xMove, int yMove, std::vector<std::pair<int, int>>& moves, Piece* matrix[12][12]) {
     int xCapture = x + xMove;
     int yCapture = y + yMove;

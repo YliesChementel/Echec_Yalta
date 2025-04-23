@@ -15,6 +15,8 @@ Piece(int side) : side(side) {}
     int getYPosition(){ return yPosition;};
     void setXPosition(int xPosition){this->xPosition=xPosition;};
     void setYPosition(int yPosition){this->yPosition=yPosition;};
+    bool getHasAlreadyMoved(){ return hasAlreadyMoved;};
+    void setHasAlreadyMoved(bool hasAlreadyMoved){this->hasAlreadyMoved=hasAlreadyMoved;}
     virtual std::string getType() const = 0;
 
     // Méthode pour cloner une pièce
@@ -26,6 +28,7 @@ private:
     int side;
     int xPosition;
     int yPosition;
+    bool hasAlreadyMoved=false;
 
 protected:
     std::vector<std::pair<int, int>> directions = {{-1,-1},{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1}};
@@ -41,6 +44,7 @@ protected:
     void knightMove(int xStart, int yStart, int xMove, int yMove,std::vector<std::pair<int, int>>& possibleMoves, int verification,bool methodTwo,Piece* matrix[12][12]);
     void kingMove(int xStart, int yStart, int xMove, int yMove,std::vector<std::pair<int, int>>& possibleMoves,Piece* matrix[12][12]);
     void pawnMove(int xStart, int yStart,std::vector<std::pair<int, int>>& possibleMoves, int stop,Piece* matrix[12][12]);
+    void pawnMove2(int xStart, int yStart, std::vector<std::pair<int, int>>& possibleMoves, Piece* matrix[12][12]);
     void captureByPawn(int x, int y, int xMove, int yMove, std::vector<std::pair<int, int>>& moves, Piece* matrix[12][12]);
     void captureOnBoardCenter(int x, int y, std::vector<std::pair<int, int>>& moves, Piece* matrix[12][12]);
 };
@@ -204,7 +208,11 @@ class Pion : public Piece {
 
         std::vector<std::pair<int, int>> possibleMove(int xStart, int yStart,Piece* matrix[12][12]){
             std::vector<std::pair<int, int>> possibleMoves;
-            pawnMove(xStart,yStart,possibleMoves,0,matrix);
+            if(this->getHasAlreadyMoved()){
+                pawnMove2(xStart,yStart,possibleMoves,matrix);
+            }else{
+                pawnMove(xStart,yStart,possibleMoves,0,matrix);
+            } 
             return possibleMoves;
         }
 };
