@@ -24,6 +24,8 @@ Piece(int side) : side(side) {}
     // Destructeur pour éviter les fuites de mémoire 
     virtual ~Piece() {}
 
+    bool inCheck = false;
+
 private:
     int side;
     int xPosition;
@@ -43,6 +45,7 @@ protected:
     void recursiveMove(int xStart, int yStart, int xMove, int yMove,std::vector<std::pair<int, int>>& possibleMoves,Piece* matrix[12][12]);
     void knightMove(int xStart, int yStart, int xMove, int yMove,std::vector<std::pair<int, int>>& possibleMoves, int verification,bool methodTwo,Piece* matrix[12][12]);
     void kingMove(int xStart, int yStart, int xMove, int yMove,std::vector<std::pair<int, int>>& possibleMoves,Piece* matrix[12][12]);
+    void castling(int xStart, int yStart, std::vector<std::pair<int, int>>& possibleMoves, Piece* matrix[12][12]);
     void pawnMove(int xStart, int yStart,std::vector<std::pair<int, int>>& possibleMoves, int stop,Piece* matrix[12][12]);
     void pawnMove2(int xStart, int yStart, std::vector<std::pair<int, int>>& possibleMoves, Piece* matrix[12][12]);
     void captureByPawn(int x, int y, int xMove, int yMove, std::vector<std::pair<int, int>>& moves, Piece* matrix[12][12]);
@@ -191,6 +194,9 @@ class Roi : public Piece {
             kingMove(xStart,yStart,directions[5].first,directions[5].second,possibleMoves,matrix);
             kingMove(xStart,yStart,directions[6].first,directions[6].second,possibleMoves,matrix);
             kingMove(xStart,yStart,directions[7].first,directions[7].second,possibleMoves,matrix);
+            if(!this->getHasAlreadyMoved() && !inCheck){
+                castling(xStart, yStart, possibleMoves, matrix);
+            }
             return possibleMoves;
         }
 };

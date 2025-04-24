@@ -178,9 +178,61 @@ std::vector<std::pair<int, int>> Plateau::MovePiece(int xStart, int yStart) {
         if(side==1){playerName="blanc";}
         else if(side==2){playerName="rouge";}
         else{playerName="noir";}
-        return RemoveKingInCheckMoves( playerName, piece);
+        return RemoveKingInCheckMoves(playerName, piece);
     }else{
         return piece->possibleMove(xStart,yStart,this->matrix);
+    }
+}
+
+
+void Plateau::IsCastling(int xStart, int yStart,int xMove,int yMove, Piece* matrix[12][12]){
+    if(matrix[xStart][yStart]->getSide()==1){
+        if(xMove==0 && yMove==2){
+            matrix[0][3] = matrix[0][0];
+            matrix[0][0] = nullptr;
+            matrix[0][3]->setXPosition(0);
+            matrix[0][3]->setYPosition(3);
+            castling=true;
+        }
+        else if(xMove==0 && yMove==6){
+            matrix[0][5] = matrix[0][7];
+            matrix[0][7] = nullptr;
+            matrix[0][5]->setXPosition(0);
+            matrix[0][5]->setYPosition(5);
+            castling=true;
+        }
+    }
+    else if(matrix[xStart][yStart]->getSide()==2){
+        if(xMove==7 && yMove==1){
+            matrix[7][2] = matrix[7][0];
+            matrix[7][0] = nullptr;
+            matrix[7][2]->setXPosition(7);
+            matrix[7][2]->setYPosition(2);
+            castling=true;
+        }
+        else if(xMove==7 && yMove==9){
+            matrix[7][8] = matrix[7][11];
+            matrix[7][11] = nullptr;
+            matrix[7][8]->setXPosition(7);
+            matrix[7][8]->setYPosition(8);
+            castling=true;
+        }
+    }
+    else{
+        if(xMove==11 && yMove==10){
+            matrix[11][9] = matrix[11][11];
+            matrix[11][11] = nullptr;
+            matrix[11][9]->setXPosition(11);
+            matrix[11][9]->setYPosition(9);
+            castling=true;
+        }
+        else if(xMove==11 && yMove==5){
+            matrix[11][4] = matrix[11][7];
+            matrix[11][7] = nullptr;
+            matrix[11][4]->setXPosition(11);
+            matrix[11][4]->setYPosition(4);
+            castling=true;
+        }
     }
 }
 
@@ -209,6 +261,10 @@ void Plateau::Move(int xStart, int yStart,int xMove,int yMove, Joueur* playerLis
                 playerList[2].removePiece(matrix[xMove][yMove]);
             }
     }
+    
+    if(matrix[xStart][yStart]->getType()=="r" && !matrix[xStart][yStart]->getHasAlreadyMoved()){
+        IsCastling( xStart, yStart, xMove, yMove, matrix);
+    }
 
     matrix[xMove][yMove] = matrix[xStart][yStart];
     matrix[xStart][yStart] = nullptr;
@@ -219,7 +275,8 @@ void Plateau::Move(int xStart, int yStart,int xMove,int yMove, Joueur* playerLis
     if(!matrix[xMove][yMove]->getHasAlreadyMoved()){
         matrix[xMove][yMove]->setHasAlreadyMoved(true);
     }
-    
+    AffichageMatrice(matrix);
+
     std::cout << "Pièce déplacée de (" << xStart << "," << yStart << ") vers (" << xMove << "," << yMove << ")" << std::endl;
     std::vector<std::string> sides = IsInCheck(playerList, matrix);
     if(!sides.empty()) {
@@ -435,6 +492,29 @@ std::vector<std::string> Plateau::IsInCheck(Joueur* playerList, Piece* matrix[12
             sidesCheck.push_back("rouge");
         }
     }
+
+
+    if(std::count(sidesCheck.begin(), sidesCheck.end(), "blanc")== 0){
+        matrix[whiteKing.first][whiteKing.second]->inCheck=false;
+    }
+    else{
+        matrix[whiteKing.first][whiteKing.second]->inCheck=true;
+    }
+
+    if(std::count(sidesCheck.begin(), sidesCheck.end(), "rouge")== 0){
+        matrix[redKing.first][redKing.second]->inCheck=false;
+    }
+    else{
+        matrix[redKing.first][redKing.second]->inCheck=true;
+    }
+
+    if(std::count(sidesCheck.begin(), sidesCheck.end(), "noir")== 0){
+        matrix[blackKing.first][blackKing.second]->inCheck=false;
+    }
+    else{
+        matrix[blackKing.first][blackKing.second]->inCheck=true;
+    }
+
 
     return sidesCheck;
 }

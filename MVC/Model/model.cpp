@@ -139,8 +139,8 @@ Board::Board() {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Création des pièces du jeu
     std::vector<std::string> texturePathWhite = {
-        "WhiteRook.png", "WhiteKnight.png", "WhiteBishop.png", "WhiteKing.png",
-        "WhiteQueen.png", "WhiteBishop.png", "WhiteKnight.png", "WhiteRook.png",
+        "WhiteRook.png", "WhiteKnight.png", "WhiteBishop.png", "WhiteQueen.png",
+        "WhiteKing.png", "WhiteBishop.png", "WhiteKnight.png", "WhiteRook.png",
         "WhitePawn.png", "WhitePawn.png", "WhitePawn.png", "WhitePawn.png",
         "WhitePawn.png", "WhitePawn.png", "WhitePawn.png", "WhitePawn.png"
     };
@@ -148,8 +148,8 @@ Board::Board() {
     this->WhitePieces = CreerPiece(this->matrice1, this->matrice2, 1, 2, texturesWhite, "White");
 
     std::vector<std::string> texturePathRed = {
-        "RedRook.png", "RedKnight.png", "RedBishop.png", "RedKing.png",
-        "RedQueen.png", "RedBishop.png", "RedKnight.png", "RedRook.png",
+        "RedRook.png", "RedKnight.png", "RedBishop.png", "RedQueen.png",
+        "RedKing.png", "RedBishop.png", "RedKnight.png", "RedRook.png",
         "RedPawn.png", "RedPawn.png", "RedPawn.png", "RedPawn.png",
         "RedPawn.png", "RedPawn.png", "RedPawn.png", "RedPawn.png"
     };
@@ -157,8 +157,8 @@ Board::Board() {
     this->RedPieces = CreerPiece(this->matrice4, this->matrice3, 4, 3, texturesRed,"Red");
 
     std::vector<std::string> texturePathBlack = {
-        "BlackRook.png", "BlackKnight.png", "BlackBishop.png", "BlackKing.png",
-        "BlackQueen.png", "BlackBishop.png", "BlackKnight.png", "BlackRook.png",
+        "BlackRook.png", "BlackKnight.png", "BlackBishop.png", "BlackQueen.png",
+        "BlackKing.png", "BlackBishop.png", "BlackKnight.png", "BlackRook.png",
         "BlackPawn.png", "BlackPawn.png", "BlackPawn.png", "BlackPawn.png",
         "BlackPawn.png", "BlackPawn.png", "BlackPawn.png", "BlackPawn.png"
     };
@@ -432,3 +432,6 @@ std::pair<int, int> Board::indexEnCoordonneDePlateau(int index, int sousMatrice)
     
     return {x, y};
 }
+
+
+

@@ -462,6 +462,46 @@ void Piece::kingMove(int xStart, int yStart, int xMove, int yMove,std::vector<st
     }
 }
 
+void Piece::castling(int xStart, int yStart, std::vector<std::pair<int, int>>& possibleMoves, Piece* matrix[12][12]){
+    Piece* piece = matrix[xStart][yStart];
+    if(piece->side==1){
+        if(matrix[0][0]!=nullptr && !matrix[0][0]->getHasAlreadyMoved()){
+            if(matrix[0][1]==nullptr && matrix[0][2]==nullptr && matrix[0][3]==nullptr){
+                possibleMoves.emplace_back(0, 2);
+            }
+        }
+        if(matrix[0][7]!=nullptr && !matrix[0][7]->getHasAlreadyMoved()){
+            if(matrix[0][5]==nullptr && matrix[0][6]==nullptr){
+                possibleMoves.emplace_back(0, 6);
+            }
+        }
+    }
+    else if(piece->side==2){
+        if(matrix[7][0]!=nullptr && !matrix[7][0]->getHasAlreadyMoved()){
+            if(matrix[7][1]==nullptr && matrix[7][2]==nullptr){
+                possibleMoves.emplace_back(7, 1);
+            }
+        }
+        if(matrix[7][11]!=nullptr && !matrix[7][11]->getHasAlreadyMoved()){
+            if(matrix[7][8]==nullptr && matrix[7][9]==nullptr && matrix[7][10]==nullptr){
+                possibleMoves.emplace_back(7, 9);
+            }
+        }
+    }
+    else{
+        if(matrix[11][11]!=nullptr && !matrix[11][11]->getHasAlreadyMoved()){
+            if(matrix[11][10]==nullptr && matrix[11][9]==nullptr){
+                possibleMoves.emplace_back(11, 10);
+            }
+        }
+        if(matrix[11][7]!=nullptr && !matrix[11][7]->getHasAlreadyMoved()){
+            if(matrix[11][6]==nullptr && matrix[11][5]==nullptr && matrix[11][4]==nullptr){
+                possibleMoves.emplace_back(11, 5);
+            }
+        }
+    }
+}
+
 void Piece::pawnMove(int xStart, int yStart, std::vector<std::pair<int, int>>& possibleMoves, int stop, Piece* matrix[12][12]) {
     if (stop == 2) return;
 
@@ -502,7 +542,6 @@ void Piece::pawnMove(int xStart, int yStart, std::vector<std::pair<int, int>>& p
 }
 
 void Piece::pawnMove2(int xStart, int yStart, std::vector<std::pair<int, int>>& possibleMoves, Piece* matrix[12][12]) {
-
     int xMove;
     int matrixStart = determineSubMatrix(xStart, yStart);
 

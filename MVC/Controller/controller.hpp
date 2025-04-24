@@ -33,6 +33,9 @@ private:
     bool promotion = false;
     int PromotionChoix(const sf::Vector2f& mousePos);
 
+    void caslingChanges(int matrix,std::vector<PieceImage>& listePieces);
+
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Variables pour le drag & drop
     bool isDragging;

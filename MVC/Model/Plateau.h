@@ -30,6 +30,11 @@ public:
     std::vector<std::string> sidesInCheck;
     std::string winner;
     bool endOfGame=false;
+
+    void IsCastling(int xStart, int yStart,int xMove,int yMove, Piece* matrix[12][12]);
+    bool castling=false;
+
+    void RemoveCastlingMoves(std::string playerName, Piece* piece,std::vector<std::pair<int, int>>& possibleMoves);
 };
 
 

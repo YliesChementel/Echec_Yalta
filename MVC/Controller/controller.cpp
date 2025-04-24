@@ -124,7 +124,7 @@ void BoardController::RemettreCouleurDefautCases(){
 void BoardController::handleMousePressed(const sf::Event& event) {
     sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-    /*if (TrouverPieceSelectioner(*listePieces[0], 0, mousePos)) {// j'utilise la déréférences
+    if (TrouverPieceSelectioner(*listePieces[0], 0, mousePos)) {// j'utilise la déréférences
         isDragging = true;
     }
     if (TrouverPieceSelectioner(*listePieces[1], 1, mousePos)) {
@@ -132,11 +132,11 @@ void BoardController::handleMousePressed(const sf::Event& event) {
     }
     if (TrouverPieceSelectioner(*listePieces[2], 2, mousePos)) {
         isDragging = true;
-    }*/
-
+    }
+/*
     if (TrouverPieceSelectioner(*listePieces[tour], tour, mousePos)) {// j'utilise la déréférences
             isDragging = true;
-    }
+    }*/
 }
 
 void BoardController::handleMouseMoved(const sf::Event& event) {
@@ -154,9 +154,17 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
     // Vérifier si la pièce est dans l'une des 6 matrices
     if (PlacerPieceDansMatrice(board.getMatrice(1),1,mousePos) || PlacerPieceDansMatrice(board.getMatrice(2),2,mousePos) || PlacerPieceDansMatrice(board.getMatrice(3),3,mousePos) ||
         PlacerPieceDansMatrice(board.getMatrice(4),4,mousePos) || PlacerPieceDansMatrice(board.getMatrice(5),5,mousePos) || PlacerPieceDansMatrice(board.getMatrice(6),6,mousePos)) {
+
+            if(jeu.getBoard().castling){
+                std::vector<PieceImage>& piecesCamp = *listePieces[couleurIndex];
+                caslingChanges(piecesCamp[selectedPieceIndex].getTilePositions()[1],piecesCamp);
+                jeu.getBoard().castling=false;
+            }
+
             if (this->sound.getStatus() != sf::Sound::Playing) {
                 this->sound.play();
             }
+            
             std::string echec =" ";
             if(!jeu.getBoard().sidesInCheck.empty()){
                 echec+="Rois en echec : ";
@@ -250,4 +258,32 @@ void BoardController::finDeTour() {
     if(tour==0){ board.setTextGame("Au tour du joueur Rouge");tour++;}
     else if(tour==1){ board.setTextGame("Au tour du joueur Noir");tour++;}
     else{ board.setTextGame("Au tour du joueur Blanc");tour=0;}
+}
+
+
+void BoardController::caslingChanges(int matrix,std::vector<PieceImage>& listePieces){
+    if(matrix==1){
+        int tour = 0;
+        board.PlacementPiece(tour, board.getMatrice(1)[3], listePieces, 1,3);
+    }
+    else if(matrix==2){
+        int tour = 7;
+        board.PlacementPiece(tour, board.getMatrice(2)[13], listePieces, 2,13);
+    }
+    else if(matrix==3){
+        int tour = 7;
+        board.PlacementPiece(tour, board.getMatrice(3)[13], listePieces, 3,13);
+    }
+    else if(matrix==4){
+        int tour = 0;
+        board.PlacementPiece(tour, board.getMatrice(4)[3], listePieces, 4,3);
+    }
+    else if(matrix==5){
+        int tour = 0;
+        board.PlacementPiece(tour, board.getMatrice(5)[3], listePieces, 5,3);
+    }
+    else{
+        int tour = 7;
+        board.PlacementPiece(tour, board.getMatrice(6)[13], listePieces, 6,13);
+    }
 }
