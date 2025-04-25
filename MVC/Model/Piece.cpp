@@ -503,7 +503,7 @@ void Piece::castling(int xStart, int yStart, std::vector<std::pair<int, int>>& p
 }
 
 void Piece::pawnMove(int xStart, int yStart, std::vector<std::pair<int, int>>& possibleMoves, int stop, Piece* matrix[12][12]) {
-    if (stop == 2) return;
+    if (stop == 2) return; 
 
     int xMove;
     int matrixStart = determineSubMatrix(xStart, yStart);
@@ -566,6 +566,9 @@ void Piece::pawnMove2(int xStart, int yStart, std::vector<std::pair<int, int>>& 
     // Gérer les cas particuliers de captures de la rosaces
     captureOnBoardCenter(xStart, yStart, possibleMoves, matrix);
 
+    captureEnPassant(xStart, yStart, xMove, -1, possibleMoves, matrix);
+    captureEnPassant(xStart, yStart, xMove, 1, possibleMoves, matrix);
+
     // Coup en avant
     adjustCoordinates(xStart, yStart, xDestination, yDestination, xMove, yMove);
     if (!isOutOfBoard(xDestination, yDestination) && !isSquareExist(xDestination, yDestination)) {
@@ -575,6 +578,21 @@ void Piece::pawnMove2(int xStart, int yStart, std::vector<std::pair<int, int>>& 
     }
 }
 
+
+void Piece::captureEnPassant(int x, int y, int xMove, int yMove, std::vector<std::pair<int, int>>& moves, Piece* matrix[12][12]){
+    int xCapture = x + xMove;
+    int yCapture = y + yMove;
+    adjustCoordinates(x, y, xCapture, yCapture, xMove, yMove);
+    if (isWallInMatrix5(x, y, xMove, yMove)) return;
+    if (!isOutOfBoard(xCapture, yCapture)) {
+        Piece* piece;
+        if(xMove==1) {piece = matrix[xCapture-1][yCapture];}
+        else{piece = matrix[xCapture+1][yCapture];}
+        if (piece != nullptr && piece->getSide() != this->getSide() && piece->enPassant) {
+            moves.emplace_back(xCapture, yCapture);
+        }
+    }
+}
 
 void Piece::captureByPawn(int x, int y, int xMove, int yMove, std::vector<std::pair<int, int>>& moves, Piece* matrix[12][12]) {
     int xCapture = x + xMove;

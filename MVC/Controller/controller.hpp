@@ -34,6 +34,7 @@ private:
     int PromotionChoix(const sf::Vector2f& mousePos);
 
     void caslingChanges(int matrix,std::vector<PieceImage>& listePieces);
+    void enPassantChanges();
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////

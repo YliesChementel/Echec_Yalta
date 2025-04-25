@@ -160,6 +160,11 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
                 caslingChanges(piecesCamp[selectedPieceIndex].getTilePositions()[1],piecesCamp);
                 jeu.getBoard().castling=false;
             }
+            
+            if(jeu.getBoard().isEnPassant){
+                enPassantChanges();
+                jeu.getBoard().isEnPassant=false;
+            }
 
             if (this->sound.getStatus() != sf::Sound::Playing) {
                 this->sound.play();
@@ -285,5 +290,30 @@ void BoardController::caslingChanges(int matrix,std::vector<PieceImage>& listePi
     else{
         int tour = 7;
         board.PlacementPiece(tour, board.getMatrice(6)[13], listePieces, 6,13);
+    }
+}
+
+void BoardController::enPassantChanges(){
+    std::vector<PieceImage>& piecesCamp = *listePieces[couleurIndex];
+    int matrix = piecesCamp[selectedPieceIndex].getTilePositions()[1];
+    int losange = piecesCamp[selectedPieceIndex].getTilePositions()[0];
+
+    if(matrix==1){ losange -= 1; }
+    else if(matrix==2){ losange -=4; }
+    else if(matrix==3){ losange -=4; }
+    else if(matrix==4){ losange -=1; }
+    else if(matrix==5){ losange -=1; }
+    else{ losange -=4; }
+
+    for (int j = 0; j < listePieces.size(); ++j) {
+        if (j == couleurIndex) continue; // Ignore les pièces de la même couleur
+        std::vector<PieceImage>& ennemyPieces = *listePieces[j];
+        for (int k = 0; k < ennemyPieces.size(); ++k) {
+            std::vector<int> pos = ennemyPieces[k].getTilePositions();
+            if (pos[0] == losange && pos[1] == matrix) {
+                ennemyPieces.erase(ennemyPieces.begin() + k); // Supprimer le pion arrière
+                break;
+            }
+        }
     }
 }

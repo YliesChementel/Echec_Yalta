@@ -25,6 +25,7 @@ Piece(int side) : side(side) {}
     virtual ~Piece() {}
 
     bool inCheck = false;
+    bool enPassant = false;
 
 private:
     int side;
@@ -50,6 +51,7 @@ protected:
     void pawnMove2(int xStart, int yStart, std::vector<std::pair<int, int>>& possibleMoves, Piece* matrix[12][12]);
     void captureByPawn(int x, int y, int xMove, int yMove, std::vector<std::pair<int, int>>& moves, Piece* matrix[12][12]);
     void captureOnBoardCenter(int x, int y, std::vector<std::pair<int, int>>& moves, Piece* matrix[12][12]);
+    void captureEnPassant(int x, int y, int xMove, int yMove, std::vector<std::pair<int, int>>& moves, Piece* matrix[12][12]);
 };
 
 
