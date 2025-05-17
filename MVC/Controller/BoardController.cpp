@@ -88,6 +88,9 @@ void BoardController::TrouverPieceCapture(std::vector<int> positions){
             std::vector<int> pos = piecesAdverses[k].getTilePositions();
             if (pos[0] == positions[0] && pos[1] == positions[1]) {
                 piecesAdverses.erase(piecesAdverses.begin() + k); // Supprimer la pièce adverse
+                if(k<rookRight){
+                    rookRight--;
+                }
                 break;
             }
         }
@@ -272,12 +275,10 @@ void BoardController::caslingChanges(int matrix,std::vector<PieceImage>& listePi
         makeBoard.PlacementPiece(tour, makeBoard.getMatrice(1)[3], listePieces, 1,3);
     }
     else if(matrix==2){
-        int tour = 7;
-        makeBoard.PlacementPiece(tour, makeBoard.getMatrice(2)[13], listePieces, 2,13);
+        makeBoard.PlacementPiece(rookRight, makeBoard.getMatrice(2)[13], listePieces, 2,13);
     }
     else if(matrix==3){
-        int tour = 7;
-        makeBoard.PlacementPiece(tour, makeBoard.getMatrice(3)[13], listePieces, 3,13);
+        makeBoard.PlacementPiece(rookRight, makeBoard.getMatrice(3)[13], listePieces, 3,13);
     }
     else if(matrix==4){
         int tour = 0;
@@ -288,8 +289,7 @@ void BoardController::caslingChanges(int matrix,std::vector<PieceImage>& listePi
         makeBoard.PlacementPiece(tour, makeBoard.getMatrice(5)[3], listePieces, 5,3);
     }
     else{
-        int tour = 7;
-        makeBoard.PlacementPiece(tour, makeBoard.getMatrice(6)[13], listePieces, 6,13);
+        makeBoard.PlacementPiece(rookRight, makeBoard.getMatrice(6)[13], listePieces, 6,13);
     }
 }
 

@@ -28,6 +28,9 @@ private:
     int tour =0;
     bool endOfGame=false;
 
+    int rookRight=7;
+
+
     int indexDernierePiecePrise;
     std::pair<int,int> coupEnAttentePromotion;
     bool promotion = false;
