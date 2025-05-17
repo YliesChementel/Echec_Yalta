@@ -2,12 +2,12 @@
 #define VIEW_HPP
 
 #include <SFML/Graphics.hpp>
-#include "model.hpp"
+#include "Makeboard.h"
 
 
-class BoardView {
+class DrawBoard {
     public:
-        BoardView(sf::RenderWindow& window);
+        DrawBoard(sf::RenderWindow& window);
         void drawHexagons(const sf::ConvexShape& hex1, const sf::ConvexShape& hex2);
         void drawBoard(const std::vector<std::vector<sf::ConvexShape>>& matrices);
         void drawPieces(const std::vector<PieceImage>& white, const std::vector<PieceImage>& red, const std::vector<PieceImage>& black);

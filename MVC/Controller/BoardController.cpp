@@ -1,8 +1,8 @@
-#include "Controller.hpp"
+#include "BoardController.h"
 #include <iostream>
 
-BoardController::BoardController(Board& board, BoardView& view, sf::RenderWindow& window,Jeu& jeu)
-    : board(board), view(view), window(window),jeu(jeu) , isDragging(false), selectedPieceIndex(-1) {handleSound(); initListePieces();}
+BoardController::BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf::RenderWindow& window,Jeu& jeu)
+    : makeBoard(makeBoard), drawBoard(drawBoard), window(window),jeu(jeu) , isDragging(false), selectedPieceIndex(-1) {handleSound(); initListePieces();}
 
 void BoardController::run() {
 
@@ -23,7 +23,7 @@ void BoardController::run() {
                             jeu.getBoard().PawnPromotion(coupEnAttentePromotion.first,coupEnAttentePromotion.second, choix, jeu.getPlayerList(), jeu.getBoard().matrix);
                             
                             std::vector<PieceImage>& piecesCamp = *listePieces[couleurIndex];
-                            piecesCamp[selectedPieceIndex].getSprite().setTexture(view.getPromotionTexture(choix,couleurIndex), true);
+                            piecesCamp[selectedPieceIndex].getSprite().setTexture(drawBoard.getPromotionTexture(choix,couleurIndex), true);
                             promotion = false; 
                         }
                     }else{
@@ -40,30 +40,30 @@ void BoardController::run() {
         }
         
         // Rendu de la scène via la vue
-        view.clear();
-        view.drawHexagons(board.getHexagon(), board.getHexagon2());
-        view.drawLines(board.getLines());
+        drawBoard.clear();
+        drawBoard.drawHexagons(makeBoard.getHexagon(), makeBoard.getHexagon2());
+        drawBoard.drawLines(makeBoard.getLines());
 
-        view.drawText(board.getCoordText());
-        view.drawTextGame(board.getTextGame());
-        view.drawTextGame(board.getTextEchec());
+        drawBoard.drawText(makeBoard.getCoordText());
+        drawBoard.drawTextGame(makeBoard.getTextGame());
+        drawBoard.drawTextGame(makeBoard.getTextEchec());
 
-        view.drawBoard({board.getMatrice1(),board.getMatrice2(),board.getMatrice3(),board.getMatrice4(),board.getMatrice5(),board.getMatrice6()});
-        view.drawPieces(board.getWhitePieces(), board.getRedPieces(), board.getBlackPieces());
+        drawBoard.drawBoard({makeBoard.getMatrice1(),makeBoard.getMatrice2(),makeBoard.getMatrice3(),makeBoard.getMatrice4(),makeBoard.getMatrice5(),makeBoard.getMatrice6()});
+        drawBoard.drawPieces(makeBoard.getWhitePieces(), makeBoard.getRedPieces(), makeBoard.getBlackPieces());
         
         if(promotion){
-            view.drawChoice(couleurIndex);
+            drawBoard.drawChoice(couleurIndex);
         }
         
-        view.display();
+        drawBoard.display();
     }
 }
 
 void BoardController::initListePieces() {
     listePieces = {
-        &board.getWhitePieces(),
-        &board.getRedPieces(),
-        &board.getBlackPieces()
+        &makeBoard.getWhitePieces(),
+        &makeBoard.getRedPieces(),
+        &makeBoard.getBlackPieces()
     };
 }
 
@@ -96,14 +96,14 @@ void BoardController::TrouverPieceCapture(std::vector<int> positions){
 
 
 bool BoardController::PlacerPieceDansMatrice(const std::vector<sf::ConvexShape>& matrix, int indexMatrice, const sf::Vector2f& mousePos) {
-    if (board.PieceDansMatrice(mousePos, matrix)) {
+    if (makeBoard.PieceDansMatrice(mousePos, matrix)) {
         for (int i = 0; i < matrix.size(); ++i) {
             const sf::ConvexShape& losange = matrix[i];
-            if (board.PieceDansLosange(losange, mousePos)) {
+            if (makeBoard.PieceDansLosange(losange, mousePos)) {
                 std::vector<int> positions = {i, indexMatrice};
                 if (handleCoupJouer((*listePieces[couleurIndex])[selectedPieceIndex].getTilePositions(), positions)) {
                     TrouverPieceCapture(positions);
-                    board.PlacementPiece(selectedPieceIndex, losange, (*listePieces[couleurIndex]), indexMatrice, i);
+                    makeBoard.PlacementPiece(selectedPieceIndex, losange, (*listePieces[couleurIndex]), indexMatrice, i);
                     return true;
                 } else {
                     return false;
@@ -116,7 +116,7 @@ bool BoardController::PlacerPieceDansMatrice(const std::vector<sf::ConvexShape>&
 
 void BoardController::RemettreCouleurDefautCases(){
     for(const auto& tile : tilesToChangeColor) {
-        view.changeColorTileBright(board.getMatrice(tile[1])[tile[0]]);
+        drawBoard.changeColorTileBright(makeBoard.getMatrice(tile[1])[tile[0]]);
     }
     tilesToChangeColor.clear();
 }
@@ -152,8 +152,8 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
     sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
     // Vérifier si la pièce est dans l'une des 6 matrices
-    if (PlacerPieceDansMatrice(board.getMatrice(1),1,mousePos) || PlacerPieceDansMatrice(board.getMatrice(2),2,mousePos) || PlacerPieceDansMatrice(board.getMatrice(3),3,mousePos) ||
-        PlacerPieceDansMatrice(board.getMatrice(4),4,mousePos) || PlacerPieceDansMatrice(board.getMatrice(5),5,mousePos) || PlacerPieceDansMatrice(board.getMatrice(6),6,mousePos)) {
+    if (PlacerPieceDansMatrice(makeBoard.getMatrice(1),1,mousePos) || PlacerPieceDansMatrice(makeBoard.getMatrice(2),2,mousePos) || PlacerPieceDansMatrice(makeBoard.getMatrice(3),3,mousePos) ||
+        PlacerPieceDansMatrice(makeBoard.getMatrice(4),4,mousePos) || PlacerPieceDansMatrice(makeBoard.getMatrice(5),5,mousePos) || PlacerPieceDansMatrice(makeBoard.getMatrice(6),6,mousePos)) {
 
             if(jeu.getBoard().castling){
                 std::vector<PieceImage>& piecesCamp = *listePieces[couleurIndex];
@@ -178,10 +178,10 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
                     echec += " ";
                 }
             }
-            board.setTextEchec(echec);
+            makeBoard.setTextEchec(echec);
             if(jeu.getBoard().endOfGame){
-                board.setTextGame("Partie Terminée");
-                board.setTextEchec("Gagnant : "+jeu.getBoard().winner);
+                makeBoard.setTextGame("Partie Terminee");
+                makeBoard.setTextEchec("Gagnant : "+jeu.getBoard().winner);
             }
             else{
                 finDeTour();
@@ -191,7 +191,7 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
     else{ // Replacement d'une pièce à sa position initial si le déplacement est hors du plateau
         int matrix;
         matrix = (*listePieces[couleurIndex])[selectedPieceIndex].getTilePositions()[1];
-        board.ReplacementPiece(selectedPieceIndex, couleurIndex, matrix, (*listePieces[couleurIndex]));
+        makeBoard.ReplacementPiece(selectedPieceIndex, couleurIndex, matrix, (*listePieces[couleurIndex]));
     }
 
     isDragging = false;
@@ -208,11 +208,11 @@ void BoardController::handleSound() {
 
 
 void BoardController::handleCoup(std::vector<int>& tilePositions) {
-    std::pair<int, int> coupOrigine = board.indexEnCoordonneDePlateau(tilePositions[0], tilePositions[1]);
+    std::pair<int, int> coupOrigine = makeBoard.indexEnCoordonneDePlateau(tilePositions[0], tilePositions[1]);
     this->possibleMoves = jeu.getBoard().MovePiece(coupOrigine.first,coupOrigine.second);
 
     for (const auto& coup : this->possibleMoves) {
-        int matrix = board.determineSubMatrix(coup.first,coup.second);
+        int matrix = makeBoard.determineSubMatrix(coup.first,coup.second);
         int x = coup.first;
         int y = coup.second;
         if (matrix == 2) { y = coup.second - 4; }
@@ -220,15 +220,15 @@ void BoardController::handleCoup(std::vector<int>& tilePositions) {
         else if (matrix == 4) { x = coup.first - 4; y = coup.second - 8; }
         else if (matrix == 5) { x = coup.first - 8; y = coup.second - 4; }
         else if (matrix == 6) { x = coup.first - 8; y = coup.second - 8; }
-        int index = board.coordonneEnIndexDeLosange(x, y, matrix);
-        view.changeColorTileDark(board.getMatrice(matrix)[index]);
+        int index = makeBoard.coordonneEnIndexDeLosange(x, y, matrix);
+        drawBoard.changeColorTileDark(makeBoard.getMatrice(matrix)[index]);
         tilesToChangeColor.push_back({index, matrix});
     }
 }
 
 bool BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std::vector<int>& tilePositionsDestination){
-    std::pair<int, int> coupOrigine = board.indexEnCoordonneDePlateau(tilePositionsOrigine[0], tilePositionsOrigine[1]);
-    std::pair<int, int> coupDestination = board.indexEnCoordonneDePlateau(tilePositionsDestination[0], tilePositionsDestination[1]);
+    std::pair<int, int> coupOrigine = makeBoard.indexEnCoordonneDePlateau(tilePositionsOrigine[0], tilePositionsOrigine[1]);
+    std::pair<int, int> coupDestination = makeBoard.indexEnCoordonneDePlateau(tilePositionsDestination[0], tilePositionsDestination[1]);
     bool coupAutoriser = false;
     if(coupOrigine!=coupDestination){
         for (const auto& coup : this->possibleMoves) {
@@ -251,7 +251,7 @@ bool BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std
 
 
 int BoardController::PromotionChoix(const sf::Vector2f& mousePos) {
-    for (auto& choix : view.promotionChoix) {
+    for (auto& choix : drawBoard.promotionChoix) {
         if (choix.first.getGlobalBounds().contains(mousePos))
             return choix.second;
     }
@@ -260,36 +260,36 @@ int BoardController::PromotionChoix(const sf::Vector2f& mousePos) {
 
 
 void BoardController::finDeTour() {
-    if(tour==0){ board.setTextGame("Au tour du joueur Rouge");tour++;}
-    else if(tour==1){ board.setTextGame("Au tour du joueur Noir");tour++;}
-    else{ board.setTextGame("Au tour du joueur Blanc");tour=0;}
+    if(tour==0){ makeBoard.setTextGame("Au tour du joueur Rouge");tour++;}
+    else if(tour==1){ makeBoard.setTextGame("Au tour du joueur Noir");tour++;}
+    else{ makeBoard.setTextGame("Au tour du joueur Blanc");tour=0;}
 }
 
 
 void BoardController::caslingChanges(int matrix,std::vector<PieceImage>& listePieces){
     if(matrix==1){
         int tour = 0;
-        board.PlacementPiece(tour, board.getMatrice(1)[3], listePieces, 1,3);
+        makeBoard.PlacementPiece(tour, makeBoard.getMatrice(1)[3], listePieces, 1,3);
     }
     else if(matrix==2){
         int tour = 7;
-        board.PlacementPiece(tour, board.getMatrice(2)[13], listePieces, 2,13);
+        makeBoard.PlacementPiece(tour, makeBoard.getMatrice(2)[13], listePieces, 2,13);
     }
     else if(matrix==3){
         int tour = 7;
-        board.PlacementPiece(tour, board.getMatrice(3)[13], listePieces, 3,13);
+        makeBoard.PlacementPiece(tour, makeBoard.getMatrice(3)[13], listePieces, 3,13);
     }
     else if(matrix==4){
         int tour = 0;
-        board.PlacementPiece(tour, board.getMatrice(4)[3], listePieces, 4,3);
+        makeBoard.PlacementPiece(tour, makeBoard.getMatrice(4)[3], listePieces, 4,3);
     }
     else if(matrix==5){
         int tour = 0;
-        board.PlacementPiece(tour, board.getMatrice(5)[3], listePieces, 5,3);
+        makeBoard.PlacementPiece(tour, makeBoard.getMatrice(5)[3], listePieces, 5,3);
     }
     else{
         int tour = 7;
-        board.PlacementPiece(tour, board.getMatrice(6)[13], listePieces, 6,13);
+        makeBoard.PlacementPiece(tour, makeBoard.getMatrice(6)[13], listePieces, 6,13);
     }
 }
 

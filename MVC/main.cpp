@@ -1,7 +1,7 @@
 #include <SFML/Graphics.hpp>
-#include "model.hpp"
-#include "view.hpp"
-#include "controller.hpp"
+#include "MakeBoard.h"
+#include "DrawBoard.h"
+#include "BoardController.h"
 #include "Jeu.h"
 
 int main() {
@@ -13,11 +13,11 @@ int main() {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Instanciation du modèle (Board)
-    Board board;
+    MakeBoard makeBoard;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Instanciation de la vue en lui passant la fenêtre
-    BoardView view(window);
+    DrawBoard drawBoard(window);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Instanciation du jeu (Jeu) qui gère la logique du jeu
@@ -25,7 +25,7 @@ int main() {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Création du contrôleur en liant modèle, vue et fenêtre
-    BoardController controller(board, view, window, jeu);
+    BoardController controller(makeBoard, drawBoard, window, jeu);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Lancement de la boucle principale de l'application via le contrôleur

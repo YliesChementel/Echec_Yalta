@@ -7,9 +7,9 @@ CXXFLAGS = -std=c++17 -IModel -IView -IController
 
 # Fichiers source
 SRC = main.cpp \
-      Model/model.cpp \
-      View/view.cpp \
-      Controller/controller.cpp \
+      View/MakeBoard.cpp \
+      View/DrawBoard.cpp \
+      Controller/BoardController.cpp \
 	  Model/Jeu.cpp \
 	  Model/Plateau.cpp \
       Model/Joueur.cpp \

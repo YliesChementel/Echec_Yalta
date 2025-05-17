@@ -683,7 +683,6 @@ std::vector<std::pair<int, int>> Plateau::RemoveKingInCheckMoves(std::string pla
     return validMoves;
 }
 
-
 bool Plateau::Stalemate(int indexPlayer, const std::string& playerName, Joueur* playerList) {
     // vérif de si le roi est en echec
     std::vector<std::string> inCheck = IsInCheck(playerList, this->matrix);

@@ -1,36 +1,36 @@
-#include "View.hpp"
+#include "DrawBoard.h"
 #include <iterator>
 #include <vector>
 #include <iostream>
 
-BoardView::BoardView(sf::RenderWindow& win) : window(win) { loadPromotionTextures(); }
+DrawBoard::DrawBoard(sf::RenderWindow& win) : window(win) { loadPromotionTextures(); }
 
-void BoardView::clear() {
+void DrawBoard::clear() {
     this->window.clear(sf::Color(48, 46, 43));
 }
 
-void BoardView::display() {
+void DrawBoard::display() {
     window.display();
 }
 
-void BoardView::drawHexagons(const sf::ConvexShape& hex1, const sf::ConvexShape& hex2) {
+void DrawBoard::drawHexagons(const sf::ConvexShape& hex1, const sf::ConvexShape& hex2) {
     window.draw(hex1);
     window.draw(hex2);
 }
 
-void BoardView::drawLines(const std::vector<std::array<sf::Vertex, 2>>& lines) {
+void DrawBoard::drawLines(const std::vector<std::array<sf::Vertex, 2>>& lines) {
     for (const auto& line : lines) {
         window.draw(line.data(), 2, sf::Lines);
     }
 }
 
-void BoardView::drawText(const std::vector<sf::Text>& texts) {
+void DrawBoard::drawText(const std::vector<sf::Text>& texts) {
     for (const auto& text : texts) {
         window.draw(text);
     }
 }
 
-void BoardView::drawTextGame(sf::Text& text) {
+void DrawBoard::drawTextGame(sf::Text& text) {
     sf::FloatRect bounds = text.getLocalBounds();
     float x = (window.getSize().x - bounds.width) / 2.f - bounds.left;
     float y = text.getPosition().y;
@@ -40,7 +40,7 @@ void BoardView::drawTextGame(sf::Text& text) {
 }
 
 
-void BoardView::drawBoard(const std::vector<std::vector<sf::ConvexShape>>& matrices) {
+void DrawBoard::drawBoard(const std::vector<std::vector<sf::ConvexShape>>& matrices) {
     for (const auto& matrice : matrices) {
         for (const auto& losange : matrice) {
             window.draw(losange);
@@ -48,7 +48,7 @@ void BoardView::drawBoard(const std::vector<std::vector<sf::ConvexShape>>& matri
     }
 }
 
-void BoardView::drawPieces(const std::vector<PieceImage>& whites, const std::vector<PieceImage>& blacks, const std::vector<PieceImage>& reds) {
+void DrawBoard::drawPieces(const std::vector<PieceImage>& whites, const std::vector<PieceImage>& blacks, const std::vector<PieceImage>& reds) {
     for (const auto& piece : whites) {
         window.draw(piece.getSprite());
     }
@@ -60,7 +60,7 @@ void BoardView::drawPieces(const std::vector<PieceImage>& whites, const std::vec
     }
 }
 
-void BoardView::changeColorTileDark(sf::ConvexShape& losange) {
+void DrawBoard::changeColorTileDark(sf::ConvexShape& losange) {
     sf::Color actuel = losange.getFillColor();
 
     sf::Color darkerColor(
@@ -70,7 +70,7 @@ void BoardView::changeColorTileDark(sf::ConvexShape& losange) {
     losange.setFillColor(darkerColor);
 }
 
-void BoardView::changeColorTileBright(sf::ConvexShape& losange) {
+void DrawBoard::changeColorTileBright(sf::ConvexShape& losange) {
     sf::Color actuel = losange.getFillColor();
 
     sf::Color brighterColor(
@@ -97,7 +97,7 @@ std::pair<sf::RectangleShape, sf::Sprite> createImageSquare(sf::Texture& texture
     return {square, sprite};
 }
 
-void BoardView::drawChoice(int camp) {
+void DrawBoard::drawChoice(int camp) {
     std::vector<sf::Texture> texturesPromotion;
     promotionChoix.clear();
     if(camp==0){
@@ -125,7 +125,7 @@ void BoardView::drawChoice(int camp) {
     window.draw(squareRook);   window.draw(spriteRook);
 }
 
-void BoardView::loadPromotionTextures() {
+void DrawBoard::loadPromotionTextures() {
     std::vector<std::string> nomsFicherWhite = {
         "WhiteQueen.png",
         "WhiteBishop.png",

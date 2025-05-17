@@ -1,20 +1,20 @@
-#ifndef BOARD_CONTROLLER_HPP
-#define BOARD_CONTROLLER_HPP
+#ifndef BOARD_CONTROLLER_H
+#define BOARD_CONTROLLER_H
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include "model.hpp"
-#include "view.hpp"
+#include "Makeboard.h"
+#include "DrawBoard.h"
 #include "Jeu.h"
 
 class BoardController {
 public:
-    BoardController(Board& board, BoardView& view, sf::RenderWindow& window,Jeu& jeu);
+    BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf::RenderWindow& window,Jeu& jeu);
     void run();// Démarre la boucle principale de l'application
 
 private:
-    Board& board;
-    BoardView& view;
+    MakeBoard& makeBoard;
+    DrawBoard& drawBoard;
     sf::RenderWindow& window;
     Jeu& jeu;
 
@@ -68,4 +68,4 @@ private:
 
 };
 
-#endif // BOARD_CONTROLLER_HPP
+#endif // BOARD_CONTROLLER_H

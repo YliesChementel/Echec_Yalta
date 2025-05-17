@@ -1,6 +1,5 @@
-// Model.hpp
-#ifndef MODEL_HPP
-#define MODEL_HPP
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <SFML/Graphics.hpp>
 #include <string>
@@ -37,7 +36,7 @@ class PieceImage {
         std::string camp;
 };
 
-class Board {
+class MakeBoard {
     private:
         sf::ConvexShape hexagon;
         sf::ConvexShape hexagon2;
@@ -61,7 +60,7 @@ class Board {
         sf::Text textEchec;
 
 public:
-    Board();
+    MakeBoard();
     
     sf::Vector2f milieu(const sf::Vector2f& p1, const sf::Vector2f& p2);
 
@@ -120,4 +119,4 @@ public:
         textEchec = createText(text, sf::Vector2f(350, 50), 28, sf::Color::Black, font);
     }
 };
-#endif // MODEL_HPP
+#endif
