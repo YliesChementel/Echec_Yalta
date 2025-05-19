@@ -56,6 +56,12 @@ void BoardController::run() {
         }
         
         drawBoard.display();
+
+        if(!jeu.getBoard().endOfGame){
+            aiMove();
+        }
+        
+        
     }
 }
 
@@ -317,3 +323,51 @@ void BoardController::enPassantChanges(){
         }
     }
 }
+
+
+void BoardController::aiMove(){
+    jeu.getBoard().minmax(jeu.getBoard(), tour, tour, 3, -1000000, 1000000, jeu.getPlayerList());
+        
+        std::cout<<"moveStart "<< jeu.getBoard().bestMoveStart.first << " " << jeu.getBoard().bestMoveStart.second<<std::endl;
+        std::cout<<"moveEnd "<< jeu.getBoard().bestMoveEnd.first << " " << jeu.getBoard().bestMoveEnd.second<<std::endl;
+        int IndexMatrixStart = makeBoard.determineSubMatrix(jeu.getBoard().bestMoveStart.first, jeu.getBoard().bestMoveStart.second);
+        int IndexMatrixEnd = makeBoard.determineSubMatrix(jeu.getBoard().bestMoveEnd.first, jeu.getBoard().bestMoveEnd.second);
+        int xStart = jeu.getBoard().bestMoveStart.first;
+        int yStart = jeu.getBoard().bestMoveStart.second;
+        if (IndexMatrixStart == 2) { yStart = jeu.getBoard().bestMoveStart.second - 4; }
+        else if (IndexMatrixStart == 3) { xStart = jeu.getBoard().bestMoveStart.first - 4; }
+        else if (IndexMatrixStart == 4) { xStart = jeu.getBoard().bestMoveStart.first - 4; yStart = jeu.getBoard().bestMoveStart.second - 8; }
+        else if (IndexMatrixStart == 5) { xStart = jeu.getBoard().bestMoveStart.first - 8; yStart = jeu.getBoard().bestMoveStart.second - 4; }
+        else if (IndexMatrixStart == 6) { xStart = jeu.getBoard().bestMoveStart.first - 8; yStart = jeu.getBoard().bestMoveStart.second - 8; }
+        int IndexLosStart = makeBoard.coordonneEnIndexDeLosange(xStart, yStart, IndexMatrixStart);
+
+        int xEnd = jeu.getBoard().bestMoveEnd.first;
+        int yEnd = jeu.getBoard().bestMoveEnd.second;
+        if (IndexMatrixEnd == 2) { yEnd = jeu.getBoard().bestMoveEnd.second - 4; }
+        else if (IndexMatrixEnd == 3) { xEnd = jeu.getBoard().bestMoveEnd.first - 4; }
+        else if (IndexMatrixEnd == 4) { xEnd = jeu.getBoard().bestMoveEnd.first - 4; yEnd = jeu.getBoard().bestMoveEnd.second - 8; }
+        else if (IndexMatrixEnd == 5) { xEnd = jeu.getBoard().bestMoveEnd.first - 8; yEnd = jeu.getBoard().bestMoveEnd.second - 4; }
+        else if (IndexMatrixEnd == 6) { xEnd = jeu.getBoard().bestMoveEnd.first - 8; yEnd = jeu.getBoard().bestMoveEnd.second - 8; }
+        int IndexLosEnd = makeBoard.coordonneEnIndexDeLosange(xEnd, yEnd, IndexMatrixEnd);
+
+        std::cout << "AI move: " << IndexMatrixStart << " " << IndexLosStart << std::endl;
+        std::cout << "AI move: " << IndexMatrixEnd << " " << IndexLosEnd << std::endl;
+        if(tour==0){
+            TrouverPieceCapture({IndexLosEnd, IndexMatrixEnd});
+            makeBoard.PlacementPieceAI(makeBoard.getWhitePieces(), IndexMatrixStart, IndexLosStart, IndexMatrixEnd, IndexLosEnd);
+        }
+        else if(tour==1){
+            TrouverPieceCapture({IndexLosEnd, IndexMatrixEnd});
+            makeBoard.PlacementPieceAI(makeBoard.getRedPieces(), IndexMatrixStart, IndexLosStart, IndexMatrixEnd, IndexLosEnd);
+        }
+        else{
+            TrouverPieceCapture({IndexLosEnd, IndexMatrixEnd});
+            makeBoard.PlacementPieceAI(makeBoard.getBlackPieces(), IndexMatrixStart, IndexLosStart, IndexMatrixEnd, IndexLosEnd);
+        }
+        finDeTour();
+        jeu.getBoard().Move(jeu.getBoard().bestMoveStart.first, jeu.getBoard().bestMoveStart.second, jeu.getBoard().bestMoveEnd.first, jeu.getBoard().bestMoveEnd.second, jeu.getPlayerList(), jeu.getBoard().matrix);
+        if(jeu.getBoard().endOfGame){
+            makeBoard.setTextGame("Partie Terminee");
+            makeBoard.setTextEchec("Gagnant : "+jeu.getBoard().winner);
+        }
+    }

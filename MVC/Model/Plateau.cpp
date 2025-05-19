@@ -1,6 +1,7 @@
 #include "Plateau.h"
 #include <iostream>
 #include <vector>
+#include <climits>
 
 Plateau::Plateau(){
     InitMatrix();
@@ -238,7 +239,6 @@ void Plateau::IsCastling(int xStart, int yStart,int xMove,int yMove, Piece* matr
 
 
 void RemoveEnPassantMove(Piece** pieceList,int listSize){
-    std::cout << "remove" <<std::endl;
     for (int i = 0; i < listSize; i++) {
         if (pieceList[i]->enPassant){
             pieceList[i]->enPassant=false;
@@ -332,6 +332,11 @@ void Plateau::Move(int xStart, int yStart,int xMove,int yMove, Joueur* playerLis
         matrix[xMove][yMove]->setHasAlreadyMoved(true);
     }
     AffichageMatrice(matrix);
+    
+    ///std::cout << "évaluation blanc : " << evaluation(playerList,0,playerList) << std::endl;
+    //std::cout << "évaluation rouge : " << evaluation(playerList,1,playerList) << std::endl;
+    //std::cout << "évaluation noir : " << evaluation(playerList,2,playerList) << std::endl;
+
     std::cout << "Pièce déplacée de (" << xStart << "," << yStart << ") vers (" << xMove << "," << yMove << ")" << std::endl;
     if(!endOfGame){
         std::vector<std::string> sides = IsInCheck(playerList, matrix);
@@ -498,7 +503,7 @@ std::string returnSidesInCheck(int indexAttacker, std::pair<int,int> king1, std:
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction pour trouver la position du roi d’un player
+// Fonction pour trouver la position du roi d'un player
 std::pair<int, int> findKingPosition(Joueur& player) {
     Piece** pieces = player.getListPiece();
     for (int i = 0; i < player.getSize(); ++i) {
@@ -707,4 +712,194 @@ bool Plateau::Stalemate(int indexPlayer, const std::string& playerName, Joueur* 
         }
     }
     return true;
+}
+
+
+int Plateau::evaluation(Joueur* players, int sideAi, Joueur* playerList) {
+  int evalValue = 0;
+  int valuePiece = 0;
+  for(int side=0; side<3; ++side){
+    int signe = (side == sideAi ? +1 : -1);
+    Piece** listPiece = players[side].getListPiece();
+    for(int i = 0; i < players[side].getSize(); ++i){
+        Piece* piece = listPiece[i];
+        int x = piece->getXPosition();
+        int y = piece->getYPosition();
+        
+        if(piece->getType() == "P"){
+            valuePiece = 10;
+            if(piece->getSide() == 0) {
+                valuePiece += x*10; 
+            }
+            else if(piece->getSide() == 1) {
+                valuePiece += x*10; 
+            }
+            else if(piece->getSide() == 2) {
+                valuePiece += 11-x*10; 
+            }
+        }
+        else if(piece->getType() == "C"){
+            valuePiece = 30;
+        }
+        else if(piece->getType() == "T"){
+            if(piece->getHasAlreadyMoved()){
+                valuePiece += -25;
+            }
+            else{
+                valuePiece += 25;
+            }
+            valuePiece += 50;
+        }
+        else if(piece->getType() == "F"){
+            valuePiece = 30;
+        }
+        else if(piece->getType() == "R"){
+            valuePiece = 90;
+        }
+        else if(piece->getType() == "r"){
+            /*std::vector<std::string> sides = IsInCheck(playerList, matrix);
+            if(!sides.empty()) {
+                for (const auto& side : sides){
+                    if(side == "blanc" && piece->getSide() == 0){
+                        valuePiece = -10000;
+                    }
+                    else if(side == "rouge" && piece->getSide() == 1){
+                        valuePiece = -10000;
+                    }
+                    else if(side == "noir" && piece->getSide() == 2){
+                        valuePiece = -10000;
+                    }
+                }
+            }*/
+            valuePiece = 10000;
+        }
+        evalValue += signe * valuePiece;
+    }
+  }
+  return evalValue;
+}
+
+Plateau* Plateau::clone() {
+    Plateau* newPlateau = new Plateau();
+    cloneMatrix(newPlateau->matrix, this->matrix);
+
+    newPlateau->sidesInCheck = sidesInCheck;
+    newPlateau->winner = winner;
+    newPlateau->endOfGame = endOfGame;
+    newPlateau->castling = castling;
+    newPlateau->isEnPassant = isEnPassant;
+    newPlateau->whiteEnPassant = whiteEnPassant;
+    newPlateau->redEnPassant = redEnPassant;
+    newPlateau->blackEnPassant = blackEnPassant;
+    
+    return newPlateau;
+}
+
+
+
+int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int alpha, int beta, Joueur* players){
+    if(depth==0 || plateau.endOfGame){
+        return evaluation(players, sideMove,players);
+    }
+
+    if(sideMove==sideAi){
+        int maxEval = INT_MIN;
+        if(players[sideMove].getSize() > 0){
+            for(int j = 0; j < players[sideMove].getSize(); ++j){
+                Piece* piece = players[sideMove].getListPiece()[j];
+                std::vector<std::pair<int,int>> moves = piece->possibleMove(piece->getXPosition(), piece->getYPosition(), plateau.matrix);
+                for(const auto& move : moves){
+                    Plateau* newPlateau = plateau.clone();
+                    //newPlateau->Move(piece->getXPosition(), piece->getYPosition(), move.first, move.second, players, newPlateau->matrix);
+                    moveForClone(piece->getXPosition(), piece->getYPosition(), move.first, move.second, players, newPlateau->matrix);
+                    int nextSide;
+                    if(sideMove==0){
+                        nextSide = 1;
+                    }
+                    else if(sideMove==1){
+                        nextSide = 2;
+                    }
+                    else{
+                        nextSide = 0;
+                    }
+                    int whiteCopySize, redCopySize, blackCopySize;
+                    Piece** whiteListCopy = clonePieceListe(newPlateau->matrix, 1, whiteCopySize);
+                    Piece** redListCopy = clonePieceListe(newPlateau->matrix, 2, redCopySize);
+                    Piece** blackListCopy = clonePieceListe(newPlateau->matrix, 3, blackCopySize);
+
+                    Joueur* playerListCopy = new Joueur[3];
+                    playerListCopy[0].setListPiece(whiteListCopy); playerListCopy[0].setSize(whiteCopySize);
+                    playerListCopy[1].setListPiece(redListCopy); playerListCopy[1].setSize(redCopySize);
+                    playerListCopy[2].setListPiece(blackListCopy); playerListCopy[2].setSize(blackCopySize);
+
+                    int eval = minmax(*newPlateau, nextSide, sideAi, depth-1, alpha, beta, playerListCopy);
+                    maxEval = std::max(maxEval, eval);
+                    if(maxEval == eval){
+                        bestMoveStart = {piece->getXPosition(), piece->getYPosition()};
+                        bestMoveEnd = move;
+                    }
+                    alpha = std::max(alpha, eval);
+                    
+                    // Free memory
+                    freeMatrix(newPlateau->matrix);
+                    delete newPlateau;
+                    
+                    if(beta <= alpha){
+                        break;
+                    }
+                }
+            }
+        }
+        return maxEval;
+    }
+    else{
+        int minEval = INT_MAX;
+        for(int i = 0; i < 3; ++i){
+            if(players[i].getSize() > 0 && i != sideAi){
+                for(int j = 0; j < players[i].getSize(); ++j){
+                    Piece* piece = players[i].getListPiece()[j];
+                    std::vector<std::pair<int,int>> moves = piece->possibleMove(piece->getXPosition(), piece->getYPosition(), plateau.matrix);
+                    for(const auto& move : moves){
+                        Plateau* newPlateau = plateau.clone();
+                        //newPlateau->Move(piece->getXPosition(), piece->getYPosition(), move.first, move.second, players, newPlateau->matrix);
+                        moveForClone(piece->getXPosition(), piece->getYPosition(), move.first, move.second, players, newPlateau->matrix);
+
+                        int nextSide;
+                        if(sideMove==0){
+                            nextSide = 1;
+                        }
+                        else if(sideMove==1){
+                            nextSide = 2;
+                        }
+                        else{
+                            nextSide = 0;
+                        }
+                        int whiteCopySize, redCopySize, blackCopySize;
+                        Piece** whiteListCopy = clonePieceListe(newPlateau->matrix, 1, whiteCopySize);
+                        Piece** redListCopy = clonePieceListe(newPlateau->matrix, 2, redCopySize);
+                        Piece** blackListCopy = clonePieceListe(newPlateau->matrix, 3, blackCopySize);
+
+                        Joueur* playerListCopy = new Joueur[3];
+                        playerListCopy[0].setListPiece(whiteListCopy); playerListCopy[0].setSize(whiteCopySize);
+                        playerListCopy[1].setListPiece(redListCopy); playerListCopy[1].setSize(redCopySize);
+                        playerListCopy[2].setListPiece(blackListCopy); playerListCopy[2].setSize(blackCopySize);
+
+                        int eval = minmax(*newPlateau, nextSide, sideAi, depth-1, alpha, beta, playerListCopy);
+                        minEval = std::min(minEval, eval);
+                        beta = std::min(beta, eval);
+                        
+                        // Free memory
+                        freeMatrix(newPlateau->matrix);
+                        delete newPlateau;
+
+                        
+                        if(beta <= alpha){
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return minEval;
+    }   
 }

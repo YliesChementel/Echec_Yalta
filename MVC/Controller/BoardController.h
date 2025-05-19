@@ -25,7 +25,7 @@ private:
     std::array<std::vector<PieceImage>*, 3> listePieces;
     void initListePieces();
 
-    int tour =0;
+    int tour = 0;
     bool endOfGame=false;
 
     int rookRight=7;
@@ -69,6 +69,7 @@ private:
     void handleCoup(std::vector<int>& tilePositions);
     bool handleCoupJouer(std::vector<int>& tilePositionsOrigine,std::vector<int>& tilePositionsDestination);
 
+    void aiMove();
 };
 
 #endif // BOARD_CONTROLLER_H

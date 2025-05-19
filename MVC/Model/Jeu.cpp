@@ -11,6 +11,21 @@ Jeu::Jeu(){
     }
     board.PlacePiece(playerList[0].getListPiece(), playerList[1].getListPiece(), playerList[2].getListPiece());
     board.AffichageMatrice(board.matrix);
+    /*std::cout << "AI move: " << board.minmax(board, 0, 0, 3, -1000000, 1000000, playerList) << std::endl;
+    std::cout << "AI move start: " << board.bestMoveStart.first << " " << board.bestMoveStart.second << std::endl;
+    std::cout << "AI move end: " << board.bestMoveEnd.first << " " << board.bestMoveEnd.second << std::endl;
+    while(!board.endOfGame){
+        for(int i=0;i<3;i++){
+            std::cout<<"avant"<<std::endl;
+            board.minmax(board, i, i, 3, -1000000, 1000000, playerList);
+            std::cout<<"apres"<<std::endl;
+            std::cout<<"bestMoveStart: "<<board.bestMoveStart.first<<" "<<board.bestMoveStart.second<<std::endl;
+            std::cout<<"bestMoveEnd: "<<board.bestMoveEnd.first<<" "<<board.bestMoveEnd.second<<std::endl;
+            board.Move(board.bestMoveStart.first, board.bestMoveStart.second, board.bestMoveEnd.first, board.bestMoveEnd.second, playerList, board.matrix);
+            if(board.endOfGame) break;
+        }
+    }
+   board.AffichageMatrice(board.matrix);*/
 }
 
 void Jeu::InitPieceList(Joueur& joueur, int side) {

@@ -433,3 +433,22 @@ std::pair<int, int> MakeBoard::indexEnCoordonneDePlateau(int index, int sousMatr
 
 
 
+void MakeBoard::PlacementPieceAI(std::vector<PieceImage>& listePieces, int IndexMatStart,int IndexLosStart,int IndexMatEnd,int IndexLosEnd) {
+    int aiPieceIndex = -1;
+    for(int i = 0; i < listePieces.size(); i++) {
+        if (listePieces[i].getTilePositions()[0] == IndexLosStart && listePieces[i].getTilePositions()[1] == IndexMatStart) {
+            aiPieceIndex = i;
+            break;
+        }
+    }
+
+    sf::ConvexShape losange = getMatrice(IndexMatEnd)[IndexLosEnd];
+
+    sf::Vector2f centre = calculerCentreLosange(losange);
+
+    listePieces[aiPieceIndex].getSprite().setPosition(
+        centre.x - listePieces[aiPieceIndex].getSprite().getGlobalBounds().width / 2.0f,
+        centre.y - listePieces[aiPieceIndex].getSprite().getGlobalBounds().height / 2.0f
+        );
+    listePieces[aiPieceIndex].setTilePositions({IndexLosEnd,IndexMatEnd});
+}

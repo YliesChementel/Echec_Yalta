@@ -29,6 +29,8 @@ public:
 
     std::vector<std::string> sidesInCheck;
     std::string winner;
+
+
     bool endOfGame=false;
 
     void IsCastling(int xStart, int yStart,int xMove,int yMove, Piece* matrix[12][12]);
@@ -39,6 +41,17 @@ public:
     bool whiteEnPassant=false;
     bool redEnPassant=false;
     bool blackEnPassant=false;
+
+
+    int evaluation(Joueur* players, int sideAi, Joueur* playerList);
+    int minmax(Plateau plateau, int sideMove, int sideAi, int depth, int alpha, int beta, Joueur* players);
+
+    std::pair<int, int> bestMoveStart;
+    std::pair<int, int> bestMoveEnd;
+
+    
+    Plateau* clone();
+
 };
 
 

@@ -118,5 +118,7 @@ public:
     void setTextEchec(std::string text) {
         textEchec = createText(text, sf::Vector2f(350, 50), 28, sf::Color::Black, font);
     }
+
+    void PlacementPieceAI(std::vector<PieceImage>& listePieces, int IndexMatStart,int IndexLosStart,int IndexMatEnd,int IndexLosEnd);
 };
 #endif
