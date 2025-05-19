@@ -1,39 +1,11 @@
 #include <SFML/Graphics.hpp>
-#include "MakeBoard.h"
-#include "DrawBoard.h"
-#include "BoardController.h"
-#include "Jeu.h"
+
+#include "MainController.h"
 
 int main() {
 
-    // Jeu jeu;
-
-    
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Création de la fenêtre SFML
-    sf::ContextSettings settings;
-    settings.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode(1150, 1000), "Echec Yalta", sf::Style::Default, settings);
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Instanciation du modèle (Board)
-    MakeBoard makeBoard;
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Instanciation de la vue en lui passant la fenêtre
-    DrawBoard drawBoard(window);
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Instanciation du jeu (Jeu) qui gère la logique du jeu
-    Jeu jeu;
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Création du contrôleur en liant modèle, vue et fenêtre
-    BoardController controller(makeBoard, drawBoard, window, jeu);
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Lancement de la boucle principale de l'application via le contrôleur
-    controller.run();
+    MainController mainController;
+    mainController.run();
 
     return 0;
 }

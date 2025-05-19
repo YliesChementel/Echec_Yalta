@@ -9,7 +9,9 @@ CXXFLAGS = -std=c++17 -IModel -IView -IController
 SRC = main.cpp \
       View/MakeBoard.cpp \
       View/DrawBoard.cpp \
+	  View/Menu.cpp \
       Controller/BoardController.cpp \
+	  Controller/MainController.cpp \
 	  Model/Jeu.cpp \
 	  Model/Plateau.cpp \
       Model/Joueur.cpp \
