@@ -18,12 +18,12 @@ void BoardController::run() {
                 window.close();
             }
             else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-                if(!jeu.getBoard().endOfGame){
+                if(!jeu.getBoard().isEndOfGame()){
                     if(promotion){
                         sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                         int choix = PromotionChoix(mousePos);
                         if (choix != -1) {
-                            jeu.getBoard().PawnPromotion(coupEnAttentePromotion.first,coupEnAttentePromotion.second, choix, jeu.getPlayerList(), jeu.getBoard().matrix);
+                            jeu.getBoard().PawnPromotion(coupEnAttentePromotion.first,coupEnAttentePromotion.second, choix, jeu.getPlayerList(), jeu.getBoard().getMatrix());
                             
                             std::vector<PieceImage>& piecesCamp = *listePieces[couleurIndex];
                             piecesCamp[selectedPieceIndex].getSprite().setTexture(drawBoard.getPromotionTexture(choix,couleurIndex), true);
@@ -63,7 +63,7 @@ void BoardController::run() {
         
         drawBoard.drawBackButton(makeBoard.getBackButton(), makeBoard.getBackButtonText());
         
-        if(jeu.getBoard().endOfGame){
+        if(jeu.getBoard().isEndOfGame()){
             float deltaTime = clock.restart().asSeconds();
             update(deltaTime);
             for (auto& confetto : fallingConfetto) {
@@ -73,7 +73,7 @@ void BoardController::run() {
 
         drawBoard.display();
 
-        if(!jeu.getBoard().endOfGame && ia[tour]){
+        if(!jeu.getBoard().isEndOfGame() && ia[tour] && !promotion){
             aiMove();
         }
         
@@ -110,6 +110,8 @@ void BoardController::TrouverPieceCapture(std::vector<int> positions){
         std::vector<PieceImage>& piecesAdverses = *listePieces[j];
         for (int k = 0; k < piecesAdverses.size(); ++k) {
             std::vector<int> pos = piecesAdverses[k].getTilePositions();
+            std::cout << "Position de la pièce adverse : " << pos[0] << " " << pos[1] << std::endl;
+            std::cout << "Position de la pièce sélectionnée : " << positions[0] << " " << positions[1] << std::endl;
             if (pos[0] == positions[0] && pos[1] == positions[1]) {
                 piecesAdverses.erase(piecesAdverses.begin() + k); // Supprimer la pièce adverse
                 if(k<rookRight){
@@ -190,15 +192,15 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
     if (PlacerPieceDansMatrice(makeBoard.getMatrice(1),1,mousePos) || PlacerPieceDansMatrice(makeBoard.getMatrice(2),2,mousePos) || PlacerPieceDansMatrice(makeBoard.getMatrice(3),3,mousePos) ||
         PlacerPieceDansMatrice(makeBoard.getMatrice(4),4,mousePos) || PlacerPieceDansMatrice(makeBoard.getMatrice(5),5,mousePos) || PlacerPieceDansMatrice(makeBoard.getMatrice(6),6,mousePos)) {
 
-            if(jeu.getBoard().castling){
+            if(jeu.getBoard().isCastling()){
                 std::vector<PieceImage>& piecesCamp = *listePieces[couleurIndex];
                 caslingChanges(piecesCamp[selectedPieceIndex].getTilePositions()[1],piecesCamp);
-                jeu.getBoard().castling=false;
+                jeu.getBoard().setCastling(false);
             }
             
-            if(jeu.getBoard().isEnPassant){
+            if(jeu.getBoard().isEnPassantMove()){
                 enPassantChanges();
-                jeu.getBoard().isEnPassant=false;
+                jeu.getBoard().setEnPassant(false);
             }
 
             if (this->sound.getStatus() != sf::Sound::Playing) {
@@ -206,17 +208,17 @@ void BoardController::handleMouseReleased(const sf::Event& event) {
             }
             
             std::string echec =" ";
-            if(!jeu.getBoard().sidesInCheck.empty()){
+            if(!jeu.getBoard().getSidesInCheck().empty()){
                 echec+="Rois en echec : ";
-                for (const auto& side : jeu.getBoard().sidesInCheck){
+                for (const auto& side : jeu.getBoard().getSidesInCheck()){
                     echec += side;
                     echec += " ";
                 }
             }
             makeBoard.setTextEchec(echec);
-            if(jeu.getBoard().endOfGame){
+            if(jeu.getBoard().isEndOfGame()){
                 makeBoard.setTextGame("Partie Terminee");
-                makeBoard.setTextEchec("Gagnant : "+jeu.getBoard().winner);
+                makeBoard.setTextEchec("Gagnant : "+jeu.getBoard().getWinner());
             }
             else{
                 finDeTour();
@@ -269,12 +271,12 @@ bool BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std
         for (const auto& coup : this->possibleMoves) {
             if(coupDestination==coup){
 
-               if(jeu.getBoard().PawnOnEdge(coupOrigine.first,coupOrigine.second,coupDestination.first, jeu.getBoard().matrix)){
+               if(jeu.getBoard().PawnOnEdge(coupOrigine.first,coupOrigine.second,coupDestination.first, jeu.getBoard().getMatrix())){
                     coupEnAttentePromotion = {coupDestination.first, coupDestination.second};
                     this->promotion = true;
                 }
 
-                jeu.getBoard().Move(coupOrigine.first,coupOrigine.second,coupDestination.first,coupDestination.second,jeu.getPlayerList(),jeu.getBoard().matrix);
+                jeu.getBoard().Move(coupOrigine.first,coupOrigine.second,coupDestination.first,coupDestination.second,jeu.getPlayerList(),jeu.getBoard().getMatrix());
                 coupAutoriser = true;
                 return true;
             }
@@ -353,50 +355,47 @@ void BoardController::enPassantChanges(){
 
 void BoardController::aiMove(){
     jeu.getBoard().minmax(jeu.getBoard(), tour, tour, 3, -1000000, 1000000, jeu.getPlayerList());
-        
-        std::cout<<"moveStart "<< jeu.getBoard().bestMoveStart.first << " " << jeu.getBoard().bestMoveStart.second<<std::endl;
-        std::cout<<"moveEnd "<< jeu.getBoard().bestMoveEnd.first << " " << jeu.getBoard().bestMoveEnd.second<<std::endl;
-        int IndexMatrixStart = makeBoard.determineSubMatrix(jeu.getBoard().bestMoveStart.first, jeu.getBoard().bestMoveStart.second);
-        int IndexMatrixEnd = makeBoard.determineSubMatrix(jeu.getBoard().bestMoveEnd.first, jeu.getBoard().bestMoveEnd.second);
-        int xStart = jeu.getBoard().bestMoveStart.first;
-        int yStart = jeu.getBoard().bestMoveStart.second;
-        if (IndexMatrixStart == 2) { yStart = jeu.getBoard().bestMoveStart.second - 4; }
-        else if (IndexMatrixStart == 3) { xStart = jeu.getBoard().bestMoveStart.first - 4; }
-        else if (IndexMatrixStart == 4) { xStart = jeu.getBoard().bestMoveStart.first - 4; yStart = jeu.getBoard().bestMoveStart.second - 8; }
-        else if (IndexMatrixStart == 5) { xStart = jeu.getBoard().bestMoveStart.first - 8; yStart = jeu.getBoard().bestMoveStart.second - 4; }
-        else if (IndexMatrixStart == 6) { xStart = jeu.getBoard().bestMoveStart.first - 8; yStart = jeu.getBoard().bestMoveStart.second - 8; }
-        int IndexLosStart = makeBoard.coordonneEnIndexDeLosange(xStart, yStart, IndexMatrixStart);
+    
+    std::cout<<"moveStart "<< jeu.getBoard().getBestMoveStart().first << " " << jeu.getBoard().getBestMoveStart().second<<std::endl;
+    std::cout<<"moveEnd "<< jeu.getBoard().getBestMoveEnd().first << " " << jeu.getBoard().getBestMoveEnd().second<<std::endl;
+    int IndexMatrixStart = makeBoard.determineSubMatrix(jeu.getBoard().getBestMoveStart().first, jeu.getBoard().getBestMoveStart().second);
+    int IndexMatrixEnd = makeBoard.determineSubMatrix(jeu.getBoard().getBestMoveEnd().first, jeu.getBoard().getBestMoveEnd().second);
+    int xStart = jeu.getBoard().getBestMoveStart().first;
+    int yStart = jeu.getBoard().getBestMoveStart().second;
+    if (IndexMatrixStart == 2) { yStart = jeu.getBoard().getBestMoveStart().second - 4; }
+    else if (IndexMatrixStart == 3) { xStart = jeu.getBoard().getBestMoveStart().first - 4; }
+    else if (IndexMatrixStart == 4) { xStart = jeu.getBoard().getBestMoveStart().first - 4; yStart = jeu.getBoard().getBestMoveStart().second - 8; }
+    else if (IndexMatrixStart == 5) { xStart = jeu.getBoard().getBestMoveStart().first - 8; yStart = jeu.getBoard().getBestMoveStart().second - 4; }
+    else if (IndexMatrixStart == 6) { xStart = jeu.getBoard().getBestMoveStart().first - 8; yStart = jeu.getBoard().getBestMoveStart().second - 8; }
+    int IndexLosStart = makeBoard.coordonneEnIndexDeLosange(xStart, yStart, IndexMatrixStart);
 
-        int xEnd = jeu.getBoard().bestMoveEnd.first;
-        int yEnd = jeu.getBoard().bestMoveEnd.second;
-        if (IndexMatrixEnd == 2) { yEnd = jeu.getBoard().bestMoveEnd.second - 4; }
-        else if (IndexMatrixEnd == 3) { xEnd = jeu.getBoard().bestMoveEnd.first - 4; }
-        else if (IndexMatrixEnd == 4) { xEnd = jeu.getBoard().bestMoveEnd.first - 4; yEnd = jeu.getBoard().bestMoveEnd.second - 8; }
-        else if (IndexMatrixEnd == 5) { xEnd = jeu.getBoard().bestMoveEnd.first - 8; yEnd = jeu.getBoard().bestMoveEnd.second - 4; }
-        else if (IndexMatrixEnd == 6) { xEnd = jeu.getBoard().bestMoveEnd.first - 8; yEnd = jeu.getBoard().bestMoveEnd.second - 8; }
-        int IndexLosEnd = makeBoard.coordonneEnIndexDeLosange(xEnd, yEnd, IndexMatrixEnd);
+    int xEnd = jeu.getBoard().getBestMoveEnd().first;
+    int yEnd = jeu.getBoard().getBestMoveEnd().second;
+    if (IndexMatrixEnd == 2) { yEnd = jeu.getBoard().getBestMoveEnd().second - 4; }
+    else if (IndexMatrixEnd == 3) { xEnd = jeu.getBoard().getBestMoveEnd().first - 4; }
+    else if (IndexMatrixEnd == 4) { xEnd = jeu.getBoard().getBestMoveEnd().first - 4; yEnd = jeu.getBoard().getBestMoveEnd().second - 8; }
+    else if (IndexMatrixEnd == 5) { xEnd = jeu.getBoard().getBestMoveEnd().first - 8; yEnd = jeu.getBoard().getBestMoveEnd().second - 4; }
+    else if (IndexMatrixEnd == 6) { xEnd = jeu.getBoard().getBestMoveEnd().first - 8; yEnd = jeu.getBoard().getBestMoveEnd().second - 8; }
+    int IndexLosEnd = makeBoard.coordonneEnIndexDeLosange(xEnd, yEnd, IndexMatrixEnd);
 
-        std::cout << "AI move: " << IndexMatrixStart << " " << IndexLosStart << std::endl;
-        std::cout << "AI move: " << IndexMatrixEnd << " " << IndexLosEnd << std::endl;
-        if(tour==0){
-            TrouverPieceCapture({IndexLosEnd, IndexMatrixEnd});
-            makeBoard.PlacementPieceAI(makeBoard.getWhitePieces(), IndexMatrixStart, IndexLosStart, IndexMatrixEnd, IndexLosEnd);
-        }
-        else if(tour==1){
-            TrouverPieceCapture({IndexLosEnd, IndexMatrixEnd});
-            makeBoard.PlacementPieceAI(makeBoard.getRedPieces(), IndexMatrixStart, IndexLosStart, IndexMatrixEnd, IndexLosEnd);
-        }
-        else{
-            TrouverPieceCapture({IndexLosEnd, IndexMatrixEnd});
-            makeBoard.PlacementPieceAI(makeBoard.getBlackPieces(), IndexMatrixStart, IndexLosStart, IndexMatrixEnd, IndexLosEnd);
-        }
-        finDeTour();
-        jeu.getBoard().Move(jeu.getBoard().bestMoveStart.first, jeu.getBoard().bestMoveStart.second, jeu.getBoard().bestMoveEnd.first, jeu.getBoard().bestMoveEnd.second, jeu.getPlayerList(), jeu.getBoard().matrix);
-        /*if (this->sound.getStatus() != sf::Sound::Playing) {
-                this->sound.play();
-        }*/
-        if(jeu.getBoard().endOfGame){
-            makeBoard.setTextGame("Partie Terminee");
-            makeBoard.setTextEchec("Gagnant : "+jeu.getBoard().winner);
-        }
+    couleurIndex = tour;
+    if(tour==0){
+        makeBoard.PlacementPieceAI(makeBoard.getWhitePieces(), IndexMatrixStart, IndexLosStart, IndexMatrixEnd, IndexLosEnd);
     }
+    else if(tour==1){
+        makeBoard.PlacementPieceAI(makeBoard.getRedPieces(), IndexMatrixStart, IndexLosStart, IndexMatrixEnd, IndexLosEnd);
+    }
+    else{
+        makeBoard.PlacementPieceAI(makeBoard.getBlackPieces(), IndexMatrixStart, IndexLosStart, IndexMatrixEnd, IndexLosEnd);
+    }
+    finDeTour();
+    jeu.getBoard().Move(jeu.getBoard().getBestMoveStart().first, jeu.getBoard().getBestMoveStart().second, jeu.getBoard().getBestMoveEnd().first, jeu.getBoard().getBestMoveEnd().second, jeu.getPlayerList(), jeu.getBoard().getMatrix());
+    TrouverPieceCapture({IndexLosEnd, IndexMatrixEnd});
+    if (this->sound.getStatus() != sf::Sound::Playing) {
+            this->sound.play();
+    }
+    if(jeu.getBoard().isEndOfGame()){
+        makeBoard.setTextGame("Partie Terminee");
+        makeBoard.setTextEchec("Gagnant : "+jeu.getBoard().getWinner());
+    }
+}
