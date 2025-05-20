@@ -18,7 +18,10 @@ class MainController {
             window.create(sf::VideoMode(1150, 1000), "Echec Yalta", sf::Style::Default, settings);
         }
         void run();
-
+        void setGameState(GameState state) { currentState = state; }
+        GameState getGameState() const { return currentState; }
+        void runGame();
+        
     private:
         GameState currentState;
         sf::ContextSettings settings;

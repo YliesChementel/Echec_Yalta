@@ -58,9 +58,12 @@ class MakeBoard {
 
         sf::Text textGame;
         sf::Text textEchec;
+        
+        sf::RectangleShape backButton;
+        sf::Text backButtonText;
 
-public:
-    MakeBoard();
+    public:
+        MakeBoard();
     
     sf::Vector2f milieu(const sf::Vector2f& p1, const sf::Vector2f& p2);
 
@@ -119,6 +122,10 @@ public:
         textEchec = createText(text, sf::Vector2f(350, 50), 28, sf::Color::Black, font);
     }
 
-    void PlacementPieceAI(std::vector<PieceImage>& listePieces, int IndexMatStart,int IndexLosStart,int IndexMatEnd,int IndexLosEnd);
+        const sf::RectangleShape& getBackButton() const { return backButton; }
+        const sf::Text& getBackButtonText() const { return backButtonText; }
+        bool isMouseOverBackButton(const sf::Vector2f& mousePos) const;
+
+        void PlacementPieceAI(std::vector<PieceImage>& listePieces, int IndexMatStart,int IndexLosStart,int IndexMatEnd,int IndexLosEnd);
 };
 #endif

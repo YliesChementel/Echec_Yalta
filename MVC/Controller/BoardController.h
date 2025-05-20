@@ -6,11 +6,13 @@
 #include "Makeboard.h"
 #include "DrawBoard.h"
 #include "Jeu.h"
+#include "FallingPiece.h"
+
 
 class BoardController {
 public:
     BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf::RenderWindow& window,Jeu& jeu, std::array<bool, 3> ia);
-    void run();// Démarre la boucle principale de l'application
+    void run();
 
 private:
     MakeBoard& makeBoard;
@@ -30,7 +32,6 @@ private:
 
     int rookRight=7;
 
-
     int indexDernierePiecePrise;
     std::pair<int,int> coupEnAttentePromotion;
     bool promotion = false;
@@ -38,7 +39,6 @@ private:
 
     void caslingChanges(int matrix,std::vector<PieceImage>& listePieces);
     void enPassantChanges();
-
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Variables pour le drag & drop
@@ -71,6 +71,45 @@ private:
 
     void aiMove();
     std::array<bool, 3> ia;
+
+    bool home;
+    void handleBackButtonClick(const sf::Vector2f& mousePos);
+
+    std::vector<sf::Texture> confettoTextures;
+    std::vector<FallingPiece> fallingConfetto;
+    std::vector<std::string> confettoPaths = {
+        "resources/images/confetti/Confetto_blanc.png",
+        "resources/images/confetti/Confetto_bleu.png",
+        "resources/images/confetti/Confetto_jaune.png",
+        "resources/images/confetti/Confetto_orange.png",
+        "resources/images/confetti/Confetto_rose.png",
+        "resources/images/confetti/Confetto_rouge.png",
+        "resources/images/confetti/Confetto_vert.png",
+        "resources/images/confetti/Confetto_violet.png"
+    };
+
+    void update(float deltaTime) {
+        for (auto& confetto : fallingConfetto) {
+            confetto.update(deltaTime);
+        }
+    }
+
+    void makeConfetto() {
+        for (const auto& path : confettoPaths) {
+            sf::Texture texture;
+            if (texture.loadFromFile(path)) {
+                confettoTextures.push_back(texture);
+            } else {
+                std::cout << "Erreur chargement texture : " << path << "\n";
+            }
+        }
+        for (int j = 0; j < 8; ++j){
+            for (int i = 0; i < 8; ++i) {
+                float x = static_cast<float>(rand() % 1200);
+                fallingConfetto.emplace_back(confettoTextures[i], x, 200.f); 
+            }
+        }
+    };
 };
 
 #endif // BOARD_CONTROLLER_H

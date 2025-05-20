@@ -12,6 +12,13 @@
 #include "Jeu.h"
 #include "Menu.h"
 
+void MainController::runGame() {
+    MakeBoard makeBoard;
+    DrawBoard drawBoard(window);
+    Jeu jeu;
+    BoardController controller(makeBoard, drawBoard, window, jeu, {menu.isWhiteAI(),menu.isRedAI(),menu.isBlackAI()});
+    controller.run();
+}
 
 void MainController::run(){
     sf::Clock clock;
@@ -22,18 +29,13 @@ void MainController::run(){
                 window.close();
             }
             else if(currentState == GameState::GAME){
-                MakeBoard makeBoard;
-
-                DrawBoard drawBoard(window);
-
-                Jeu jeu;
-
-                BoardController controller(makeBoard, drawBoard, window, jeu, {menu.isWhiteAI(),menu.isRedAI(),menu.isBlackAI()});
-                controller.run();
+                runGame();
+                setGameState(GameState::MENU);
             }
             else if (currentState == GameState::MENU) {
-                if (menu.isPlayButtonClicked(event, window)) {
-                    currentState = GameState::GAME;
+                if (menu.isPlayButtonClicked()) {
+                    setGameState(GameState::GAME);
+                    menu.setPlayButtonClicked(false);
                 }
                 menu.handleEvent(event, window);
             }

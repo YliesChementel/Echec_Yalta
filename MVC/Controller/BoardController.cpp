@@ -2,13 +2,15 @@
 #include <iostream>
 
 BoardController::BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf::RenderWindow& window,Jeu& jeu, std::array<bool, 3> ia)
-    : makeBoard(makeBoard), drawBoard(drawBoard), window(window),jeu(jeu) , isDragging(false), selectedPieceIndex(-1) {
+    : makeBoard(makeBoard), drawBoard(drawBoard), window(window),jeu(jeu) , isDragging(false), selectedPieceIndex(-1),home(false) {
         handleSound(); 
         initListePieces();
+        makeConfetto();
         this->ia = ia;
     }
 
 void BoardController::run() {
+    sf::Clock clock;
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -30,6 +32,9 @@ void BoardController::run() {
                     }else{
                         handleMousePressed(event);
                     }
+                }
+                else{
+                    handleBackButtonClick(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
                 }
             }
             else if (event.type == sf::Event::MouseMoved) {
@@ -56,13 +61,25 @@ void BoardController::run() {
             drawBoard.drawChoice(couleurIndex);
         }
         
+        drawBoard.drawBackButton(makeBoard.getBackButton(), makeBoard.getBackButtonText());
+        
+        if(jeu.getBoard().endOfGame){
+            float deltaTime = clock.restart().asSeconds();
+            update(deltaTime);
+            for (auto& confetto : fallingConfetto) {
+                confetto.draw(window);
+            }
+        }
+
         drawBoard.display();
 
         if(!jeu.getBoard().endOfGame && ia[tour]){
             aiMove();
         }
         
-        
+        if(home){
+            return;
+        }
     }
 }
 
@@ -131,8 +148,16 @@ void BoardController::RemettreCouleurDefautCases(){
     tilesToChangeColor.clear();
 }
 
+void BoardController::handleBackButtonClick(const sf::Vector2f& mousePos) {
+    if (makeBoard.isMouseOverBackButton(mousePos)) {
+        home = true;
+    }
+}
+
 void BoardController::handleMousePressed(const sf::Event& event) {
-    sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+    sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
+    
+    handleBackButtonClick(mousePos);
 
     if (TrouverPieceSelectioner(*listePieces[0], 0, mousePos)) {// j'utilise la déréférences
         isDragging = true;
@@ -143,8 +168,8 @@ void BoardController::handleMousePressed(const sf::Event& event) {
     if (TrouverPieceSelectioner(*listePieces[2], 2, mousePos)) {
         isDragging = true;
     }
-/*
-    if (TrouverPieceSelectioner(*listePieces[tour], tour, mousePos)) {// j'utilise la déréférences
+
+    /*if (TrouverPieceSelectioner(*listePieces[tour], tour, mousePos)) {// j'utilise la déréférences
             isDragging = true;
     }*/
 }
@@ -367,6 +392,9 @@ void BoardController::aiMove(){
         }
         finDeTour();
         jeu.getBoard().Move(jeu.getBoard().bestMoveStart.first, jeu.getBoard().bestMoveStart.second, jeu.getBoard().bestMoveEnd.first, jeu.getBoard().bestMoveEnd.second, jeu.getPlayerList(), jeu.getBoard().matrix);
+        /*if (this->sound.getStatus() != sf::Sound::Playing) {
+                this->sound.play();
+        }*/
         if(jeu.getBoard().endOfGame){
             makeBoard.setTextGame("Partie Terminee");
             makeBoard.setTextEchec("Gagnant : "+jeu.getBoard().winner);

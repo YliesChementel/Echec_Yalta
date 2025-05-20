@@ -170,3 +170,8 @@ void DrawBoard::loadPromotionTextures() {
     }
 }
 
+void DrawBoard::drawBackButton(const sf::RectangleShape& button, const sf::Text& text) {
+    window.draw(button);
+    window.draw(text);
+}
+

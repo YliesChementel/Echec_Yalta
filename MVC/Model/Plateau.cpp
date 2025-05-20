@@ -728,6 +728,7 @@ int Plateau::evaluation(Joueur* players, int sideAi, Joueur* playerList) {
         
         if(piece->getType() == "P"){
             valuePiece = 10;
+
             if(piece->getSide() == 1) {
                 valuePiece += x*10; 
             }
@@ -742,13 +743,12 @@ int Plateau::evaluation(Joueur* players, int sideAi, Joueur* playerList) {
             valuePiece = 30;
         }
         else if(piece->getType() == "T"){
-            if(piece->getHasAlreadyMoved()){
-                valuePiece += -25;
+            valuePiece = 40;
+
+            if(!piece->getHasAlreadyMoved()){
+                valuePiece += 50;
             }
-            else{
-                valuePiece += 25;
-            }
-            valuePiece += 50;
+            
         }
         else if(piece->getType() == "F"){
             valuePiece = 30;
@@ -760,13 +760,13 @@ int Plateau::evaluation(Joueur* players, int sideAi, Joueur* playerList) {
             /*std::vector<std::string> sides = IsInCheck(playerList, matrix);
             if(!sides.empty()) {
                 for (const auto& side : sides){
-                    if(side == "blanc" && piece->getSide() == 0){
+                    if(side == "blanc" && piece->getSide() == 1){
                         valuePiece = -10000;
                     }
-                    else if(side == "rouge" && piece->getSide() == 1){
+                    else if(side == "rouge" && piece->getSide() == 2){
                         valuePiece = -10000;
                     }
-                    else if(side == "noir" && piece->getSide() == 2){
+                    else if(side == "noir" && piece->getSide() == 3){
                         valuePiece = -10000;
                     }
                 }
@@ -774,6 +774,7 @@ int Plateau::evaluation(Joueur* players, int sideAi, Joueur* playerList) {
             valuePiece = 10000;
         }
         evalValue += signe * valuePiece;
+        valuePiece = 0;
     }
   }
   return evalValue;

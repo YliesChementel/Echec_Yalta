@@ -14,6 +14,7 @@ class DrawBoard {
         void drawLines(const std::vector<std::array<sf::Vertex, 2>>& lines);
         void drawText(const std::vector<sf::Text>& texts);
         void drawTextGame(sf::Text& text);
+        void drawBackButton(const sf::RectangleShape& button, const sf::Text& text);
         void changeColorTileDark(sf::ConvexShape& losange);
         void changeColorTileBright(sf::ConvexShape& losange);
         void loadPromotionTextures();

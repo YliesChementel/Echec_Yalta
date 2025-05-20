@@ -165,6 +165,13 @@ MakeBoard::MakeBoard() {
 
     setTextGame("Bienvenue sur le jeu Yalta !"); 
     setTextEchec(""); 
+
+    backButton.setSize(sf::Vector2f(100, 40));
+    backButton.setPosition(sf::Vector2f(1045, 5));
+    backButton.setFillColor(beige);
+    backButton.setOutlineColor(sf::Color::Black);
+    backButton.setOutlineThickness(2);
+    backButtonText = createText("Acceuil", sf::Vector2f(1063, 12), 20, sf::Color::Black, font);
 }
 
 
@@ -451,4 +458,8 @@ void MakeBoard::PlacementPieceAI(std::vector<PieceImage>& listePieces, int Index
         centre.y - listePieces[aiPieceIndex].getSprite().getGlobalBounds().height / 2.0f
         );
     listePieces[aiPieceIndex].setTilePositions({IndexLosEnd,IndexMatEnd});
+}
+
+bool MakeBoard::isMouseOverBackButton(const sf::Vector2f& mousePos) const {
+    return backButton.getGlobalBounds().contains(mousePos);
 }

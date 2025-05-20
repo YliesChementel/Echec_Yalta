@@ -95,11 +95,9 @@ void Menu::render(sf::RenderWindow& window) {
     window.display();
 }
 
-bool Menu::isPlayButtonClicked(const sf::Event& event, sf::RenderWindow& window) {
+bool Menu::isPlayButtonClicked() {
     return playButtonClicked;
 }
-
-
 
 void Menu::makePieces() {
     for (const auto& path : piecePaths) {
@@ -113,6 +111,6 @@ void Menu::makePieces() {
 
     for (int i = 0; i < 27; ++i) {
         float x = static_cast<float>(rand() % 1200);
-        fallingPieces.emplace_back(pieceTextures[i], x); 
+        fallingPieces.emplace_back(pieceTextures[i], x, 100.f);  
     }
 }

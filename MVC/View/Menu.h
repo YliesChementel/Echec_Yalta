@@ -108,7 +108,9 @@ class Menu {
         void handleEvent(const sf::Event& event, sf::RenderWindow& window);
         void update(float deltaTime);
         void render(sf::RenderWindow& window);
-        bool isPlayButtonClicked(const sf::Event& event, sf::RenderWindow& window);
+        bool isPlayButtonClicked();
+        void setPlayButtonClicked(bool clicked) { playButtonClicked = clicked; }
+
         void makePieces();
         bool isWhiteAI() const { return whiteAICheckbox.getState(); }
         bool isRedAI() const { return redAICheckbox.getState(); }
