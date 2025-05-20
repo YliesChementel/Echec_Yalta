@@ -728,13 +728,13 @@ int Plateau::evaluation(Joueur* players, int sideAi, Joueur* playerList) {
         
         if(piece->getType() == "P"){
             valuePiece = 10;
-            if(piece->getSide() == 0) {
-                valuePiece += x*10; 
-            }
-            else if(piece->getSide() == 1) {
+            if(piece->getSide() == 1) {
                 valuePiece += x*10; 
             }
             else if(piece->getSide() == 2) {
+                valuePiece += 11-x*10; 
+            }
+            else if(piece->getSide() == 3) {
                 valuePiece += 11-x*10; 
             }
         }

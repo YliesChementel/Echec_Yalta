@@ -2,6 +2,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/Network.hpp>
+#include <SFML/System/Clock.hpp>
 #include <iostream>
 #include "Menu.h"
 #include "MakeBoard.h"
@@ -10,19 +11,14 @@
 
 
 Menu::Menu()
-    : playButton(0, 0, "Jouer"),       
-      playAIButton(0, 0, "AI"),         
-      quitButton(0, 0, "Quitter")        
+    : playButton(0, 0, "Jouer",24),       
+      quitButton(0, 0, "Quitter",24), 
+      frameCheckbox(0, 0, "Choix IA", 20),  
+      title(0, 0, "Jeu d'echec Yalta",50),
+      whiteAICheckbox(0, 0, "resources/images/WhiteKing.png", 20),
+      redAICheckbox(0, 0, "resources/images/RedKing.png", 20),
+      blackAICheckbox(0, 0, "resources/images/BlackKing.png", 20)     
 {
-    if (!font.loadFromFile("resources/font/arial.ttf")) {
-        std::cout << "Erreur de chargement de la police\n"; 
-    }
-
-    title.setFont(font);
-    title.setString("Jeu d'echec Yalta");
-    title.setCharacterSize(50);
-    title.setFillColor(sf::Color::White);
-    title.setPosition((1150 - title.getLocalBounds().width) / 2, 100);  
 
     float windowWidth = 1150;
     float windowHeight = 1000;
@@ -34,10 +30,31 @@ Menu::Menu()
 
     float startY = (windowHeight - totalButtonsHeight) / 2;
 
-    playButton.setPosition((1150 - buttonWidth) / 2, startY);
-    playAIButton.setPosition((1150 - buttonWidth) / 2, startY + buttonHeight + verticalSpacing);
+    title.setPosition((1150 - 410) / 2, 100);
+    title.setSize(410,80);
+    playButton.setPosition((1150 - buttonWidth) / 2, startY - verticalSpacing);
+    
+    float checkboxX = (1150 - buttonWidth) / 2 +15;
+    float checkboxY = startY + buttonHeight + verticalSpacing;
+    
+    whiteAICheckbox.setPosition(checkboxX, checkboxY);
+    redAICheckbox.setPosition(checkboxX + 75, checkboxY);
+    blackAICheckbox.setPosition(checkboxX + 75*2, checkboxY);
+
+    frameCheckbox.setPosition(checkboxX - 15, checkboxY - 40);
+    frameCheckbox.setSize(200,100);
+
     quitButton.setPosition((1150 - buttonWidth) / 2, startY + 2 * (buttonHeight + verticalSpacing));
+
+    makePieces();
 }
+
+void Menu::update(float deltaTime) {
+    for (auto& piece : fallingPieces) {
+        piece.update(deltaTime);
+    }
+}
+
 
 void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
@@ -50,15 +67,31 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
         if (quitButton.isClicked(mousePos)) {
             window.close();
         }
+
+        if (whiteAICheckbox.isClicked(mousePos)) {
+            whiteAICheckbox.toggle();
+        }
+        if (redAICheckbox.isClicked(mousePos)) {
+            redAICheckbox.toggle();
+        }
+        if (blackAICheckbox.isClicked(mousePos)) {
+            blackAICheckbox.toggle();
+        }
     }
 }
 
 void Menu::render(sf::RenderWindow& window) {
     window.clear(sf::Color(48, 46, 43));
-    window.draw(title);
+    for (auto& piece : fallingPieces) {
+        piece.draw(window);
+    }
+    title.draw(window);
     playButton.draw(window);
-    playAIButton.draw(window);
     quitButton.draw(window);
+    frameCheckbox.draw(window);
+    whiteAICheckbox.draw(window);
+    redAICheckbox.draw(window);
+    blackAICheckbox.draw(window);
     window.display();
 }
 
@@ -68,3 +101,18 @@ bool Menu::isPlayButtonClicked(const sf::Event& event, sf::RenderWindow& window)
 
 
 
+void Menu::makePieces() {
+    for (const auto& path : piecePaths) {
+        sf::Texture texture;
+        if (texture.loadFromFile(path)) {
+            pieceTextures.push_back(texture);
+        } else {
+            std::cout << "Erreur chargement texture : " << path << "\n";
+        }
+    }
+
+    for (int i = 0; i < 27; ++i) {
+        float x = static_cast<float>(rand() % 1200);
+        fallingPieces.emplace_back(pieceTextures[i], x); 
+    }
+}

@@ -1,13 +1,14 @@
 #include "BoardController.h"
 #include <iostream>
 
-BoardController::BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf::RenderWindow& window,Jeu& jeu)
-    : makeBoard(makeBoard), drawBoard(drawBoard), window(window),jeu(jeu) , isDragging(false), selectedPieceIndex(-1) {handleSound(); initListePieces();}
+BoardController::BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf::RenderWindow& window,Jeu& jeu, std::array<bool, 3> ia)
+    : makeBoard(makeBoard), drawBoard(drawBoard), window(window),jeu(jeu) , isDragging(false), selectedPieceIndex(-1) {
+        handleSound(); 
+        initListePieces();
+        this->ia = ia;
+    }
 
 void BoardController::run() {
-
-
-
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -57,7 +58,7 @@ void BoardController::run() {
         
         drawBoard.display();
 
-        if(!jeu.getBoard().endOfGame){
+        if(!jeu.getBoard().endOfGame && ia[tour]){
             aiMove();
         }
         

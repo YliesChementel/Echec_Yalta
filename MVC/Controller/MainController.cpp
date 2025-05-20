@@ -2,6 +2,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/Network.hpp>
+#include <SFML/System/Clock.hpp>
 #include <iostream>
 #include "MainController.h"
 #include "BoardController.h"
@@ -13,7 +14,7 @@
 
 
 void MainController::run(){
-    
+    sf::Clock clock;
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -27,7 +28,7 @@ void MainController::run(){
 
                 Jeu jeu;
 
-                BoardController controller(makeBoard, drawBoard, window, jeu);
+                BoardController controller(makeBoard, drawBoard, window, jeu, {menu.isWhiteAI(),menu.isRedAI(),menu.isBlackAI()});
                 controller.run();
             }
             else if (currentState == GameState::MENU) {
@@ -38,6 +39,8 @@ void MainController::run(){
             }
         }
         if (currentState == GameState::MENU) {
+            float deltaTime = clock.restart().asSeconds();
+            menu.update(deltaTime);
             menu.render(window);
         }
     }

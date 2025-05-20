@@ -9,7 +9,7 @@
 
 class BoardController {
 public:
-    BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf::RenderWindow& window,Jeu& jeu);
+    BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf::RenderWindow& window,Jeu& jeu, std::array<bool, 3> ia);
     void run();// Démarre la boucle principale de l'application
 
 private:
@@ -70,6 +70,7 @@ private:
     bool handleCoupJouer(std::vector<int>& tilePositionsOrigine,std::vector<int>& tilePositionsDestination);
 
     void aiMove();
+    std::array<bool, 3> ia;
 };
 
 #endif // BOARD_CONTROLLER_H
