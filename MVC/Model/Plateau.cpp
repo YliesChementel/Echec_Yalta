@@ -271,12 +271,13 @@ void Plateau::resetEnPassant(int side, Joueur* playerList) {
 
 void Plateau::Capture(int xMove, int yMove, int playerSide, Joueur* playerList, Piece* matrix[12][12]) {
     if (matrix[xMove][yMove] != nullptr) {
+        
         if(matrix[xMove][yMove]->getType()=="r"){
-            setEndOfGame(true);
-            if(playerSide==1){setWinner("Blanc");}
-            else if(playerSide==2){setWinner("Rouge");}
-            else{setWinner("Noir");}
-            std::cout << "Roi capturer, fin de partie" << std::endl;
+            this->setEndOfGame(true);
+            if(playerSide==1){this->setWinner("Blanc");}
+            else if(playerSide==2){this->setWinner("Rouge");}
+            else{this->setWinner("Noir");}
+            //std::cout << "Roi capturer, fin de partie" << std::endl;
         }
 
         if(matrix[xMove][yMove]->getSide()==1){
@@ -312,9 +313,6 @@ void Plateau::SpecialMoves(int xStart, int yStart, int xMove, int yMove, int pla
         }
         else if(yMove!=yStart && matrix[xStart][yMove] != nullptr && matrix[xStart][yMove]->enPassant && xMove!=0 && yMove!=0 ){ // xstart pour la même ligne que le pion déplacé et ymove pour la colone d'à côté
             std::cout << "Capture" << std::endl;
-            std::cout << "xStart : " << xStart << " yStart : " << yStart << std::endl;
-            std::cout << "xMove : " << xMove << " yMove : " << yMove << std::endl;
-            std::cout <<"Piece capturée en passant : "<< matrix[xStart][yMove]->getSide() << std::endl;
             if(matrix[xStart][yMove]->getSide()==1){
                 playerList[0].removePiece(matrix[xStart][yMove]);
             }
@@ -397,9 +395,9 @@ void Plateau::Move(int xStart, int yStart,int xMove,int yMove, Joueur* playerLis
 // Fonction similaire à Move mais sera utiliser par L'IA
 void Plateau::moveForAi(int xStart, int yStart,int xMove,int yMove, Joueur* playerList, Piece* matrix[12][12]){
     int playerSide = matrix[xStart][yStart]->getSide();
-    resetEnPassant(playerSide, playerList);
+    //this->resetEnPassant(playerSide, playerList);
 
-    Capture(xMove, yMove, playerSide, playerList, matrix);
+    this->Capture(xMove, yMove, playerSide, playerList, matrix);
 
     //SpecialMoves(xStart, yStart, xMove, yMove, playerSide, playerList, matrix);
 
@@ -408,9 +406,9 @@ void Plateau::moveForAi(int xStart, int yStart,int xMove,int yMove, Joueur* play
 
     matrix[xMove][yMove]->setXPosition(xMove);
     matrix[xMove][yMove]->setYPosition(yMove);
-    //if(!matrix[xMove][yMove]->getHasAlreadyMoved()){
-      //  matrix[xMove][yMove]->setHasAlreadyMoved(true);
-    //}
+    if(!matrix[xMove][yMove]->getHasAlreadyMoved()){
+        matrix[xMove][yMove]->setHasAlreadyMoved(true);
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -736,7 +734,7 @@ bool Plateau::Stalemate(int indexPlayer, const std::string& playerName, Joueur* 
     return true;
 }
 
-int Plateau::evaluation(Joueur* players, int sideAi, Joueur* playerList) {
+int Plateau::evaluation(Joueur* players, int sideAi) {
   int evalValue = 0;
   int valuePiece = 0;
   for(int side=0; side<3; ++side){
@@ -769,14 +767,21 @@ int Plateau::evaluation(Joueur* players, int sideAi, Joueur* playerList) {
                    valuePiece += 11-x*10; 
                 } 
             }
+
+            if(piece->getHasAlreadyMoved()){
+                valuePiece += 10;
+            }
         }
         else if(piece->getType() == "C"){
             valuePiece = 30;
+            if(piece->getHasAlreadyMoved()){
+                valuePiece += 20;
+            }
         }
         else if(piece->getType() == "T"){
             valuePiece = 40;
             if(!piece->getHasAlreadyMoved()){
-                valuePiece += 20;
+                valuePiece += 30;
             }
             
         }
@@ -814,10 +819,7 @@ Plateau* Plateau::clone() {
 
 int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int alpha, int beta, Joueur* players){
     if(depth==0 || plateau.endOfGame){
-        if(plateau.endOfGame){
-            std::cout << "Fin de partie" << std::endl;
-        }
-        return evaluation(players, sideMove,players);
+        return evaluation(players, sideAi);
     }
 
     if(sideMove==sideAi){
@@ -828,7 +830,7 @@ int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int al
                 std::vector<std::pair<int,int>> moves = piece->possibleMove(piece->getXPosition(), piece->getYPosition(), plateau.matrix);
                 for(const auto& move : moves){
                     Plateau* newPlateau = plateau.clone();
-                    moveForAi(piece->getXPosition(), piece->getYPosition(), move.first, move.second, players, newPlateau->matrix);
+                    newPlateau->moveForAi(piece->getXPosition(), piece->getYPosition(), move.first, move.second, players, newPlateau->matrix);
                     int nextSide;
                     if(sideMove==0){
                         nextSide = 1;
@@ -877,7 +879,7 @@ int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int al
                     std::vector<std::pair<int,int>> moves = piece->possibleMove(piece->getXPosition(), piece->getYPosition(), plateau.matrix);
                     for(const auto& move : moves){
                         Plateau* newPlateau = plateau.clone();
-                        moveForClone(piece->getXPosition(), piece->getYPosition(), move.first, move.second, players, newPlateau->matrix);
+                        newPlateau->moveForAi(piece->getXPosition(), piece->getYPosition(), move.first, move.second, players, newPlateau->matrix);
 
                         int nextSide;
                         if(sideMove==0){

@@ -26,7 +26,7 @@ class Plateau {
         void PawnPromotion(int xStart, int yStart, int promotionChoice, Joueur* playerList,Piece* matrix[12][12]);
         void IsCastling(int xStart, int yStart,int xMove,int yMove, Piece* matrix[12][12]);
         void moveForAi(int xStart, int yStart,int xMove,int yMove, Joueur* playerList, Piece* matrix[12][12]);
-        int evaluation(Joueur* players, int sideAi, Joueur* playerList);
+        int evaluation(Joueur* players, int sideAi);
         int minmax(Plateau plateau, int sideMove, int sideAi, int depth, int alpha, int beta, Joueur* players);
         Plateau* clone();
 
