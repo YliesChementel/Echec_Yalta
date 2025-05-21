@@ -143,7 +143,7 @@ MakeBoard::MakeBoard() {
         "WhitePawn.png", "WhitePawn.png", "WhitePawn.png", "WhitePawn.png"
     };
     this->texturesWhite = loadTextures(texturePathWhite);
-    this->WhitePieces = CreerPiece(this->matrice1, this->matrice2, 1, 2, texturesWhite, "White");
+    this->WhitePieces = CreerPiece(this->matrice1, this->matrice2, 1, 2, texturesWhite, "White"); 
 
     std::vector<std::string> texturePathRed = {
         "RedRook.png", "RedKnight.png", "RedBishop.png", "RedQueen.png",

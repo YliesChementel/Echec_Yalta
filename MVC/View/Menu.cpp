@@ -17,7 +17,8 @@ Menu::Menu()
       title(0, 0, "Jeu d'echec Yalta",50),
       whiteAICheckbox(0, 0, "resources/images/WhiteKing.png", 20),
       redAICheckbox(0, 0, "resources/images/RedKing.png", 20),
-      blackAICheckbox(0, 0, "resources/images/BlackKing.png", 20)     
+      blackAICheckbox(0, 0, "resources/images/BlackKing.png", 20),
+      debugModeButton(1010, 940, "Debug Mode", 20)
 {
 
     float windowWidth = 1150;
@@ -45,6 +46,7 @@ Menu::Menu()
     frameCheckbox.setSize(200,100);
 
     quitButton.setPosition((1150 - buttonWidth) / 2, startY + 2 * (buttonHeight + verticalSpacing));
+    debugModeButton.setSize(135, 50);
 
     makePieces();
 }
@@ -77,6 +79,9 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
         if (blackAICheckbox.isClicked(mousePos)) {
             blackAICheckbox.toggle();
         }
+        if(debugModeButton.isClicked(mousePos)){
+            debugModeButtonClicked = true;
+        }
     }
 }
 
@@ -92,11 +97,16 @@ void Menu::render(sf::RenderWindow& window) {
     whiteAICheckbox.draw(window);
     redAICheckbox.draw(window);
     blackAICheckbox.draw(window);
+    debugModeButton.draw(window); 
     window.display();
 }
 
 bool Menu::isPlayButtonClicked() {
     return playButtonClicked;
+}
+
+bool Menu::isDebugModeButtonClicked() {
+    return debugModeButtonClicked;
 }
 
 void Menu::makePieces() {

@@ -12,11 +12,11 @@
 #include "Jeu.h"
 #include "Menu.h"
 
-void MainController::runGame() {
+void MainController::runGame(bool debugMode) {
     MakeBoard makeBoard;
     DrawBoard drawBoard(window);
     Jeu jeu;
-    BoardController controller(makeBoard, drawBoard, window, jeu, {menu.isWhiteAI(),menu.isRedAI(),menu.isBlackAI()});
+    BoardController controller(makeBoard, drawBoard, window, jeu, {menu.isWhiteAI(),menu.isRedAI(),menu.isBlackAI()}, debugMode);
     controller.run();
 }
 
@@ -29,13 +29,17 @@ void MainController::run(){
                 window.close();
             }
             else if(currentState == GameState::GAME){
-                runGame();
+                runGame(menu.isDebugModeButtonClicked());
+                menu.setDebugModeButtonClicked(false);
                 setGameState(GameState::MENU);
             }
             else if (currentState == GameState::MENU) {
                 if (menu.isPlayButtonClicked()) {
                     setGameState(GameState::GAME);
                     menu.setPlayButtonClicked(false);
+                }
+                if(menu.isDebugModeButtonClicked()){
+                    setGameState(GameState::GAME);
                 }
                 menu.handleEvent(event, window);
             }

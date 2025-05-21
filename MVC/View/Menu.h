@@ -16,6 +16,8 @@ public:
         button.setPosition(x, y);
         sf::Color beige(0xEE, 0xCF, 0xA1);
         button.setFillColor(beige);
+        button.setOutlineThickness(3);
+        button.setOutlineColor(sf::Color::Black);
 
         font.loadFromFile("resources/font/arial.ttf"); 
         text.setFont(font);
@@ -88,7 +90,8 @@ public:
 
     void toggle() {
         isChecked = !isChecked;
-        box.setFillColor(isChecked ? sf::Color(0xEE, 0xCF, 0xA1) : sf::Color::White);
+        box.setFillColor(isChecked ? sf::Color::Black : sf::Color::White);
+        box.setOutlineColor(isChecked ? sf::Color::White : sf::Color::Black);
     }
 
     bool getState() const {
@@ -109,7 +112,9 @@ class Menu {
         void update(float deltaTime);
         void render(sf::RenderWindow& window);
         bool isPlayButtonClicked();
+        bool isDebugModeButtonClicked();
         void setPlayButtonClicked(bool clicked) { playButtonClicked = clicked; }
+        void setDebugModeButtonClicked(bool clicked) { debugModeButtonClicked = clicked; }
 
         void makePieces();
         bool isWhiteAI() const { return whiteAICheckbox.getState(); }
@@ -122,10 +127,12 @@ class Menu {
         Button playButton;
         Button quitButton;
         Button frameCheckbox;
+        Button debugModeButton;
         Checkbox whiteAICheckbox;
         Checkbox redAICheckbox;
         Checkbox blackAICheckbox;
         bool playButtonClicked = false;
+        bool debugModeButtonClicked = false;
 
         std::vector<sf::Texture> pieceTextures;
         std::vector<FallingPiece> fallingPieces;

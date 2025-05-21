@@ -20,7 +20,7 @@ class MainController {
         void run();
         void setGameState(GameState state) { currentState = state; }
         GameState getGameState() const { return currentState; }
-        void runGame();
+        void runGame(bool debugMode);
         
     private:
         GameState currentState;
