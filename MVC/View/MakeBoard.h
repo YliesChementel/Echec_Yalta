@@ -57,7 +57,7 @@ class MakeBoard {
         int determineSubMatrix(int x, int y);
         int coordonneEnIndexDeLosange(int x, int y, int matrice);
         std::pair<int, int> indexEnCoordonneDePlateau(int index, int sousMatrice);
-        void PlacementPieceAI(std::vector<PieceImage>& listePieces, int IndexMatStart,int IndexLosStart,int IndexMatEnd,int IndexLosEnd);
+        void PlacementPieceAI(std::vector<PieceImage>& listePieces, int IndexMatStart,int IndexLosStart,int IndexMatEnd,int IndexLosEnd, int& selectedPieceIndex);
 
         const sf::ConvexShape& getHexagon() const { return hexagon; }
         const sf::ConvexShape& getHexagon2() const { return hexagon2; }

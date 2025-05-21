@@ -440,7 +440,7 @@ std::pair<int, int> MakeBoard::indexEnCoordonneDePlateau(int index, int sousMatr
 
 
 
-void MakeBoard::PlacementPieceAI(std::vector<PieceImage>& listePieces, int IndexMatStart,int IndexLosStart,int IndexMatEnd,int IndexLosEnd) {
+void MakeBoard::PlacementPieceAI(std::vector<PieceImage>& listePieces, int IndexMatStart,int IndexLosStart,int IndexMatEnd,int IndexLosEnd,int& selectedPieceIndex) {
     int aiPieceIndex = -1;
     for(int i = 0; i < listePieces.size(); i++) {
         if (listePieces[i].getTilePositions()[0] == IndexLosStart && listePieces[i].getTilePositions()[1] == IndexMatStart) {
@@ -458,6 +458,7 @@ void MakeBoard::PlacementPieceAI(std::vector<PieceImage>& listePieces, int Index
         centre.y - listePieces[aiPieceIndex].getSprite().getGlobalBounds().height / 2.0f
         );
     listePieces[aiPieceIndex].setTilePositions({IndexLosEnd,IndexMatEnd});
+    //selectedPieceIndex = aiPieceIndex;
 }
 
 bool MakeBoard::isMouseOverBackButton(const sf::Vector2f& mousePos) const {

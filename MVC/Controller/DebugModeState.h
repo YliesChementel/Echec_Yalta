@@ -1,3 +1,6 @@
+#ifndef DEBUGMODESTATE_H
+#define DEBUGMODESTATE_H
+
 #include "BoardController.h"
 #include "State.h"
 
@@ -59,7 +62,12 @@ public:
                 controller.getMakeBoard().setTextEchec(echec);
                 if(controller.getJeu().getBoard().isEndOfGame()){
                     controller.getMakeBoard().setTextGame("Partie Terminee");
-                    controller.getMakeBoard().setTextEchec("Gagnant : "+controller.getJeu().getBoard().getWinner());
+                    if(controller.getJeu().getBoard().isStalemate()){
+                        controller.getMakeBoard().setTextEchec("Stalemate");
+                    }
+                    else{
+                        controller.getMakeBoard().setTextEchec("Gagnant : "+controller.getJeu().getBoard().getWinner());
+                    }
                     controller.setState(std::make_unique<VictoryState>());
                 }
                 break;
@@ -97,3 +105,5 @@ public:
 
     std::string getStateName() const override { return "DebugMode"; }
 };
+
+#endif

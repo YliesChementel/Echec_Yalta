@@ -14,6 +14,9 @@ class Plateau {
         void AffichageMatrice(Piece* matrix[12][12]);
         std::vector<std::pair<int, int>> MovePiece(int xStart, int yStart);
         void AfficherCoupsPossibles(std::vector<std::pair<int, int>> possibleMoves);
+        void resetEnPassant(int side, Joueur* playerList);
+        void Capture(int xMove, int yMove, int playerSide, Joueur* playerList, Piece* matrix[12][12]);
+        void SpecialMoves(int xStart, int yStart, int xMove, int yMove, int playerSide, Joueur* playerList, Piece* matrix[12][12]);
         void Move(int xStart, int yStart,int xMove,int yMove,Joueur* playerList, Piece* matrix[12][12]);
         std::vector<std::string> IsInCheck(Joueur* playerList, Piece* matrix[12][12]);
         bool IsCheckmate(int indexPlayer, std::string playerName, Joueur* playerList);
@@ -22,6 +25,7 @@ class Plateau {
         bool PawnOnEdge(int xStart, int yStart,int xMove, Piece* matrix[12][12]);
         void PawnPromotion(int xStart, int yStart, int promotionChoice, Joueur* playerList,Piece* matrix[12][12]);
         void IsCastling(int xStart, int yStart,int xMove,int yMove, Piece* matrix[12][12]);
+        void moveForAi(int xStart, int yStart,int xMove,int yMove, Joueur* playerList, Piece* matrix[12][12]);
         int evaluation(Joueur* players, int sideAi, Joueur* playerList);
         int minmax(Plateau plateau, int sideMove, int sideAi, int depth, int alpha, int beta, Joueur* players);
         Plateau* clone();
@@ -31,6 +35,7 @@ class Plateau {
         const std::vector<std::string>& getSidesInCheck() const { return sidesInCheck; }
         const std::string& getWinner() const { return winner; }
         bool isEndOfGame() const { return endOfGame; }
+        bool isStalemate() const { return stalemate; }
         bool isCastling() const { return castling; }
         bool isEnPassantMove() const { return isEnPassant; }
         bool isWhiteEnPassant() const { return whiteEnPassant; }
@@ -43,6 +48,7 @@ class Plateau {
         void setSidesInCheck(const std::vector<std::string>& sidesInCheck) { this->sidesInCheck = sidesInCheck; }
         void setWinner(const std::string& winner) { this->winner = winner; }
         void setEndOfGame(bool endOfGame) { this->endOfGame = endOfGame; }
+        void setStalemate(bool stalemate) { this->stalemate = stalemate; }
         void setCastling(bool castling) { this->castling = castling; }
         void setEnPassant(bool isEnPassant) { this->isEnPassant = isEnPassant; }
         void setWhiteEnPassant(bool whiteEnPassant) { this->whiteEnPassant = whiteEnPassant; }
@@ -56,6 +62,7 @@ class Plateau {
         std::vector<std::string> sidesInCheck;
         std::string winner;
         bool endOfGame;
+        bool stalemate;
         bool castling;
         bool isEnPassant;
         bool whiteEnPassant;

@@ -40,6 +40,7 @@ public:
     DrawBoard& getDrawBoard() { return drawBoard; }
     sf::RenderWindow& getWindow() { return window; }
     Jeu& getJeu() { return jeu; }
+    bool isDebugMode() const { return debugMode; }
     std::array<std::vector<PieceImage>*, 3>& getListePieces() { return listePieces; }
     int getCouleurIndex() const { return couleurIndex; }
     int getSelectedPieceIndex() const { return selectedPieceIndex; }
@@ -56,6 +57,7 @@ public:
     sf::Vector2f getOffsetImage() const { return offsetImage; }
     std::vector<FallingPiece>& getFallingConfetto() { return fallingConfetto; }
 
+    void setDebugMode(bool debugMode) { this->debugMode = debugMode; }
     void setCouleurIndex(int couleurIndex) { this->couleurIndex = couleurIndex; }
     void setSelectedPieceIndex(int selectedPieceIndex) { this->selectedPieceIndex = selectedPieceIndex; }
     void setCoupEnAttentePromotion(const std::pair<int, int>& coupEnAttentePromotion) { this->coupEnAttentePromotion = coupEnAttentePromotion; }
@@ -77,6 +79,7 @@ private:
     sf::RenderWindow& window;
     Jeu& jeu;
     std::array<bool, 3> ia;
+    bool debugMode;
 
     std::unique_ptr<State> currentState;
     int tour = 0;
@@ -111,7 +114,6 @@ private:
     sf::Sound sound;
     sf::SoundBuffer buffer;
 
-    
     std::vector<std::vector<int>> tilesToChangeColor;
 };
 

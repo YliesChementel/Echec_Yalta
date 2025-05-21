@@ -6,6 +6,7 @@
 Plateau::Plateau(){
     InitMatrix();
     endOfGame = false;
+    stalemate = false;
     castling = false;
     isEnPassant = false;
     whiteEnPassant = false;
@@ -252,46 +253,46 @@ void RemoveEnPassantMove(Piece** pieceList,int listSize){
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction qui déplace une pièce via les coordonnées données et gère la capture d'une pièce, ainsi que la mise en echec et echec et mat
-void Plateau::Move(int xStart, int yStart,int xMove,int yMove, Joueur* playerList, Piece* matrix[12][12]){
-    int playerSide = matrix[xStart][yStart]->getSide();
-
-    if(playerSide==1 && whiteEnPassant){
+void Plateau::resetEnPassant(int side, Joueur* playerList) {
+    if(side==1 && whiteEnPassant){
         RemoveEnPassantMove(playerList[0].getListPiece(),playerList[0].getSize());
         setWhiteEnPassant(false);
     }
-    else if(playerSide==2 && redEnPassant){
+    else if(side==2 && redEnPassant){
         RemoveEnPassantMove(playerList[1].getListPiece(),playerList[1].getSize());
         setRedEnPassant(false);
     }
-    else if(playerSide==3 && blackEnPassant){
+    else if(side==3 && blackEnPassant){
         RemoveEnPassantMove(playerList[2].getListPiece(),playerList[2].getSize());
         setBlackEnPassant(false);
     }
+}
 
+
+void Plateau::Capture(int xMove, int yMove, int playerSide, Joueur* playerList, Piece* matrix[12][12]) {
     if (matrix[xMove][yMove] != nullptr) {
-            std::cout << "Capture" << std::endl;
-            if(matrix[xMove][yMove]->getType()=="r"){
-                setEndOfGame(true);
-                if(playerSide==1){setWinner("Blanc");}
-                else if(playerSide==2){setWinner("Rouge");}
-                else{setWinner("Noir");}
-                std::cout << "Roi capturer, fin de partie" << std::endl;
-            }
+        if(matrix[xMove][yMove]->getType()=="r"){
+            setEndOfGame(true);
+            if(playerSide==1){setWinner("Blanc");}
+            else if(playerSide==2){setWinner("Rouge");}
+            else{setWinner("Noir");}
+            std::cout << "Roi capturer, fin de partie" << std::endl;
+        }
 
-            if(matrix[xMove][yMove]->getSide()==1){
-                playerList[0].removePiece(matrix[xMove][yMove]);
-            }
-            else if(matrix[xMove][yMove]->getSide()==2){
-                playerList[1].removePiece(matrix[xMove][yMove]);
-            }
-            else{
-                playerList[2].removePiece(matrix[xMove][yMove]);
-            }
+        if(matrix[xMove][yMove]->getSide()==1){
+            playerList[0].removePiece(matrix[xMove][yMove]);
+        }
+        else if(matrix[xMove][yMove]->getSide()==2){
+            playerList[1].removePiece(matrix[xMove][yMove]);
+        }
+        else{
+            playerList[2].removePiece(matrix[xMove][yMove]);
+        }
     }
+}
 
-    if(matrix[xStart][yStart]->getType()=="r" && !matrix[xStart][yStart]->getHasAlreadyMoved()){
+void Plateau::SpecialMoves(int xStart, int yStart, int xMove, int yMove, int playerSide, Joueur* playerList, Piece* matrix[12][12]) {
+     if(matrix[xStart][yStart]->getType()=="r" && !matrix[xStart][yStart]->getHasAlreadyMoved()){
         IsCastling(xStart, yStart, xMove, yMove, matrix);
     }
     else if(matrix[xStart][yStart]->getType()=="P"){
@@ -311,6 +312,9 @@ void Plateau::Move(int xStart, int yStart,int xMove,int yMove, Joueur* playerLis
         }
         else if(yMove!=yStart && matrix[xStart][yMove] != nullptr && matrix[xStart][yMove]->enPassant && xMove!=0 && yMove!=0 ){ // xstart pour la même ligne que le pion déplacé et ymove pour la colone d'à côté
             std::cout << "Capture" << std::endl;
+            std::cout << "xStart : " << xStart << " yStart : " << yStart << std::endl;
+            std::cout << "xMove : " << xMove << " yMove : " << yMove << std::endl;
+            std::cout <<"Piece capturée en passant : "<< matrix[xStart][yMove]->getSide() << std::endl;
             if(matrix[xStart][yMove]->getSide()==1){
                 playerList[0].removePiece(matrix[xStart][yMove]);
             }
@@ -324,6 +328,17 @@ void Plateau::Move(int xStart, int yStart,int xMove,int yMove, Joueur* playerLis
             setEnPassant(true);
         }
     }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Fonction qui déplace une pièce via les coordonnées données et gère la capture d'une pièce, ainsi que la mise en echec et echec et mat
+void Plateau::Move(int xStart, int yStart,int xMove,int yMove, Joueur* playerList, Piece* matrix[12][12]){
+    int playerSide = matrix[xStart][yStart]->getSide();
+    resetEnPassant(playerSide, playerList);
+
+    Capture(xMove, yMove, playerSide, playerList, matrix);
+
+    SpecialMoves(xStart, yStart, xMove, yMove, playerSide, playerList, matrix);
 
     matrix[xMove][yMove] = matrix[xStart][yStart];
     matrix[xStart][yStart] = nullptr;
@@ -336,59 +351,66 @@ void Plateau::Move(int xStart, int yStart,int xMove,int yMove, Joueur* playerLis
     }
     AffichageMatrice(matrix);
 
-
     std::cout << "Pièce déplacée de (" << xStart << "," << yStart << ") vers (" << xMove << "," << yMove << ")" << std::endl;
+
     if(!isEndOfGame()){
         std::vector<std::string> sides = IsInCheck(playerList, matrix);
         if(!sides.empty()) {
             setSidesInCheck(sides);
             std::cout << "Rois en échec : ";
-            for (const auto& side : sides){
-                std::cout << side << " ";
-            }
-            std::cout << std::endl;
-            if (std::count(sides.begin(), sides.end(), "blanc") != 0) {
-                if (IsCheckmate(0, "blanc", playerList)) {
-                    std::cout << "blanc en echec et mat" << std::endl;
-                    setEndOfGame(true);
-                    if(playerSide==1){setWinner("Blanc");}
-                    else if(playerSide==2){setWinner("Rouge");}
-                    else{setWinner("Noir");}
-                }
-                else{
-                    std::cout << "Ya encore une chance !" << std::endl;
-                }
-            }
-            else if(std::count(sides.begin(), sides.end(), "rouge") != 0){
-                if (IsCheckmate(1, "rouge", playerList)) {
-                    std::cout << "rouge en echec et mat" << std::endl;
-                    setEndOfGame(true);
-                    if(playerSide==1){setWinner("Blanc");}
-                    else if(playerSide==2){setWinner("Rouge");}
-                    else{setWinner("Noir");}
-                }
-                else{
-                    std::cout << "Ya encore une chance !" << std::endl;
-                }
-            }
-            else{
-                if (IsCheckmate(2, "noir", playerList)) {
-                    std::cout << "noir en echec et mat" << std::endl;
-                    setEndOfGame(true);
-                    if(playerSide==1){setWinner("Blanc");}
-                    else if(playerSide==2){setWinner("Rouge");}
-                    else{setWinner("Noir");}
-                }
-                else{
-                    std::cout << "Ya encore une chance !" << std::endl;
+            for (const auto& side : sides){ std::cout << side << " "<< std::endl; }
+
+            std::vector<std::pair<std::string, int>> checkList = {
+                {"blanc", 0}, {"rouge", 1}, {"noir", 2}
+            };
+            for (const auto& [sideStr, idx] : checkList) {
+                if (std::count(sides.begin(), sides.end(), sideStr)) {
+                    if (IsCheckmate(idx, sideStr, playerList)) {
+                        std::cout << sideStr << " en échec et mat" << std::endl;
+                        setEndOfGame(true);
+                        if(playerSide==1){setWinner("Blanc");}
+                        else if(playerSide==2){setWinner("Rouge");}
+                        else{setWinner("Noir");}
+                        return;
+                    } else {
+                        std::cout << "Ya encore une chance !" << std::endl;
+                    }
                 }
             }
         }
         else{
-            std::cout << "La partie continue" <<std::endl;
-            sidesInCheck.clear();
+            if(Stalemate(0, "blanc", playerList) || Stalemate(1, "rouge", playerList) || Stalemate(2, "noir", playerList)){
+                std::cout << "StaleMate" << std::endl;
+                setEndOfGame(true);
+                setStalemate(true);
+            }else{
+                std::cout << "La partie continue" <<std::endl;
+                sidesInCheck.clear();
+            }
+
+           
         }
     }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Fonction similaire à Move mais sera utiliser par L'IA
+void Plateau::moveForAi(int xStart, int yStart,int xMove,int yMove, Joueur* playerList, Piece* matrix[12][12]){
+    int playerSide = matrix[xStart][yStart]->getSide();
+    resetEnPassant(playerSide, playerList);
+
+    Capture(xMove, yMove, playerSide, playerList, matrix);
+
+    //SpecialMoves(xStart, yStart, xMove, yMove, playerSide, playerList, matrix);
+
+    matrix[xMove][yMove] = matrix[xStart][yStart];
+    matrix[xStart][yStart] = nullptr;
+
+    matrix[xMove][yMove]->setXPosition(xMove);
+    matrix[xMove][yMove]->setYPosition(yMove);
+    //if(!matrix[xMove][yMove]->getHasAlreadyMoved()){
+      //  matrix[xMove][yMove]->setHasAlreadyMoved(true);
+    //}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -477,7 +499,7 @@ std::string returnSidesInCheck(int indexAttacker, std::pair<int,int> king1, std:
     bool checkKing1 = false; bool checkKing2 = false;
 
     for (int i = 0; i < playerList[indexAttacker].getSize(); ++i) {
-        if (attackerPieces[i]->getType() != "r") {
+        //if (attackerPieces[i]->getType() != "r") {
             moves = attackerPieces[i]->possibleMove(attackerPieces[i]->getXPosition(), attackerPieces[i]->getYPosition(), matrix);
             for (const auto& move : moves) {
                 if (move == king1){
@@ -487,7 +509,7 @@ std::string returnSidesInCheck(int indexAttacker, std::pair<int,int> king1, std:
                     checkKing2 = true;
                 } 
             }
-        }
+        //}
     }
 
     if (checkKing1 && checkKing2){
@@ -690,10 +712,10 @@ std::vector<std::pair<int, int>> Plateau::RemoveKingInCheckMoves(std::string pla
 
 bool Plateau::Stalemate(int indexPlayer, const std::string& playerName, Joueur* playerList) {
     // vérif de si le roi est en echec
-    std::vector<std::string> inCheck = IsInCheck(playerList, this->matrix);
-    if (std::count(inCheck.begin(), inCheck.end(), playerName) != 0) {
-        return false;
-    }
+    //std::vector<std::string> inCheck = IsInCheck(playerList, this->matrix);
+    //if (std::count(inCheck.begin(), inCheck.end(), playerName) != 0) {
+        //return false;
+    //}
 
     //vérif des moves légaux des autres pièces
     Piece** listPieces = playerList[indexPlayer].getListPiece();
@@ -714,7 +736,6 @@ bool Plateau::Stalemate(int indexPlayer, const std::string& playerName, Joueur* 
     return true;
 }
 
-
 int Plateau::evaluation(Joueur* players, int sideAi, Joueur* playerList) {
   int evalValue = 0;
   int valuePiece = 0;
@@ -733,10 +754,20 @@ int Plateau::evaluation(Joueur* players, int sideAi, Joueur* playerList) {
                 valuePiece += x*10; 
             }
             else if(piece->getSide() == 2) {
-                valuePiece += 11-x*10; 
+                if(x>7){
+                    valuePiece += 11-x*10; 
+                }
+                else{
+                    valuePiece += x*10; 
+                }
             }
             else if(piece->getSide() == 3) {
-                valuePiece += 11-x*10; 
+                if(x>3 && x<8){
+                     valuePiece += x*10;
+                }
+                else{
+                   valuePiece += 11-x*10; 
+                } 
             }
         }
         else if(piece->getType() == "C"){
@@ -744,9 +775,8 @@ int Plateau::evaluation(Joueur* players, int sideAi, Joueur* playerList) {
         }
         else if(piece->getType() == "T"){
             valuePiece = 40;
-
             if(!piece->getHasAlreadyMoved()){
-                valuePiece += 50;
+                valuePiece += 20;
             }
             
         }
@@ -757,20 +787,6 @@ int Plateau::evaluation(Joueur* players, int sideAi, Joueur* playerList) {
             valuePiece = 90;
         }
         else if(piece->getType() == "r"){
-            /*std::vector<std::string> sides = IsInCheck(playerList, matrix);
-            if(!sides.empty()) {
-                for (const auto& side : sides){
-                    if(side == "blanc" && piece->getSide() == 1){
-                        valuePiece = -10000;
-                    }
-                    else if(side == "rouge" && piece->getSide() == 2){
-                        valuePiece = -10000;
-                    }
-                    else if(side == "noir" && piece->getSide() == 3){
-                        valuePiece = -10000;
-                    }
-                }
-            }*/
             valuePiece = 10000;
         }
         evalValue += signe * valuePiece;
@@ -796,10 +812,11 @@ Plateau* Plateau::clone() {
     return newPlateau;
 }
 
-
-
 int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int alpha, int beta, Joueur* players){
     if(depth==0 || plateau.endOfGame){
+        if(plateau.endOfGame){
+            std::cout << "Fin de partie" << std::endl;
+        }
         return evaluation(players, sideMove,players);
     }
 
@@ -811,8 +828,7 @@ int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int al
                 std::vector<std::pair<int,int>> moves = piece->possibleMove(piece->getXPosition(), piece->getYPosition(), plateau.matrix);
                 for(const auto& move : moves){
                     Plateau* newPlateau = plateau.clone();
-                    //newPlateau->Move(piece->getXPosition(), piece->getYPosition(), move.first, move.second, players, newPlateau->matrix);
-                    moveForClone(piece->getXPosition(), piece->getYPosition(), move.first, move.second, players, newPlateau->matrix);
+                    moveForAi(piece->getXPosition(), piece->getYPosition(), move.first, move.second, players, newPlateau->matrix);
                     int nextSide;
                     if(sideMove==0){
                         nextSide = 1;
@@ -841,7 +857,6 @@ int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int al
                     }
                     alpha = std::max(alpha, eval);
                     
-                    // Free memory
                     freeMatrix(newPlateau->matrix);
                     delete newPlateau;
                     
@@ -862,7 +877,6 @@ int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int al
                     std::vector<std::pair<int,int>> moves = piece->possibleMove(piece->getXPosition(), piece->getYPosition(), plateau.matrix);
                     for(const auto& move : moves){
                         Plateau* newPlateau = plateau.clone();
-                        //newPlateau->Move(piece->getXPosition(), piece->getYPosition(), move.first, move.second, players, newPlateau->matrix);
                         moveForClone(piece->getXPosition(), piece->getYPosition(), move.first, move.second, players, newPlateau->matrix);
 
                         int nextSide;
@@ -889,7 +903,6 @@ int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int al
                         minEval = std::min(minEval, eval);
                         beta = std::min(beta, eval);
                         
-                        // Free memory
                         freeMatrix(newPlateau->matrix);
                         delete newPlateau;
 

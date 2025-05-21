@@ -1,6 +1,10 @@
+#ifndef PROMOTIONSTATE_H
+#define PROMOTIONSTATE_H
+
 #include "BoardController.h"
 #include "State.h"
 #include "PlayState.h"
+#include "DebugModeState.h"
 
 class PromotionState : public State {
 public:
@@ -21,7 +25,12 @@ public:
             piecesCamp[controller.getSelectedPieceIndex()].getSprite()
                 .setTexture(controller.getDrawBoard().getPromotionTexture(choix, controller.getCouleurIndex()), true);
             
-            controller.setState(std::make_unique<PlayingState>());
+            if(controller.isDebugMode()){
+                controller.setState(std::make_unique<DebugModeState>());
+            }else{
+                controller.setState(std::make_unique<PlayingState>());
+            }
+            
         }
         else if (controller.getMakeBoard().isMouseOverBackButton(mousePos)) {
             controller.setHome(true);
@@ -53,3 +62,5 @@ public:
 
     std::string getStateName() const override { return "Promotion"; }
 };
+
+#endif
