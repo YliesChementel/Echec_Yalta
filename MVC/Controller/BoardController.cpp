@@ -18,7 +18,7 @@ void BoardController::run() {
                 window.close();
             }
             else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-                if(!jeu.getBoard().isEndOfGame()){
+                if(!jeu.getBoard().isEndOfGame() && !ia[tour]){
                     if(promotion){
                         sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                         int choix = PromotionChoix(mousePos);
@@ -45,7 +45,7 @@ void BoardController::run() {
             }
         }
         
-        // Rendu de la scène via la vue
+        
         drawBoard.clear();
         drawBoard.drawHexagons(makeBoard.getHexagon(), makeBoard.getHexagon2());
         drawBoard.drawLines(makeBoard.getLines());
@@ -57,7 +57,7 @@ void BoardController::run() {
         drawBoard.drawBoard({makeBoard.getMatrice1(),makeBoard.getMatrice2(),makeBoard.getMatrice3(),makeBoard.getMatrice4(),makeBoard.getMatrice5(),makeBoard.getMatrice6()});
         drawBoard.drawPieces(makeBoard.getWhitePieces(), makeBoard.getRedPieces(), makeBoard.getBlackPieces());
         
-        if(promotion){
+        if(promotion && !jeu.getBoard().isEndOfGame()){
             drawBoard.drawChoice(couleurIndex);
         }
         
@@ -110,8 +110,6 @@ void BoardController::TrouverPieceCapture(std::vector<int> positions){
         std::vector<PieceImage>& piecesAdverses = *listePieces[j];
         for (int k = 0; k < piecesAdverses.size(); ++k) {
             std::vector<int> pos = piecesAdverses[k].getTilePositions();
-            std::cout << "Position de la pièce adverse : " << pos[0] << " " << pos[1] << std::endl;
-            std::cout << "Position de la pièce sélectionnée : " << positions[0] << " " << positions[1] << std::endl;
             if (pos[0] == positions[0] && pos[1] == positions[1]) {
                 piecesAdverses.erase(piecesAdverses.begin() + k); // Supprimer la pièce adverse
                 if(k<rookRight){
@@ -397,5 +395,29 @@ void BoardController::aiMove(){
     if(jeu.getBoard().isEndOfGame()){
         makeBoard.setTextGame("Partie Terminee");
         makeBoard.setTextEchec("Gagnant : "+jeu.getBoard().getWinner());
+    }
+}
+
+
+void BoardController::makeConfetto() {
+    for (const auto& path : confettoPaths) {
+        sf::Texture texture;
+        if (texture.loadFromFile(path)) {
+            confettoTextures.push_back(texture);
+        } else {
+            std::cout << "Erreur chargement texture : " << path << "\n";
+        }
+    }
+    for (int j = 0; j < 8; ++j){
+        for (int i = 0; i < 8; ++i) {
+            float x = static_cast<float>(rand() % 1200);
+            fallingConfetto.emplace_back(confettoTextures[i], x, 200.f); 
+        }
+    }
+};
+
+void BoardController::update(float deltaTime) {
+    for (auto& confetto : fallingConfetto) {
+        confetto.update(deltaTime);
     }
 }

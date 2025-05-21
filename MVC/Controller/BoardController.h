@@ -8,7 +8,6 @@
 #include "Jeu.h"
 #include "FallingPiece.h"
 
-
 class BoardController {
 public:
     BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf::RenderWindow& window,Jeu& jeu, std::array<bool, 3> ia);
@@ -20,60 +19,22 @@ private:
     sf::RenderWindow& window;
     Jeu& jeu;
 
-    /////////////////
-    //
-    std::vector<std::pair<int, int>> possibleMoves;
-
-    std::array<std::vector<PieceImage>*, 3> listePieces;
-    void initListePieces();
-
     int tour = 0;
-    bool endOfGame=false;
+    bool endOfGame = false;
+    int rookRight = 7;
+    bool home = false;
+    std::array<bool, 3> ia;
 
-    int rookRight=7;
-
+    std::vector<std::pair<int, int>> possibleMoves;
+    std::array<std::vector<PieceImage>*, 3> listePieces;
     int indexDernierePiecePrise;
-    std::pair<int,int> coupEnAttentePromotion;
+    std::pair<int, int> coupEnAttentePromotion;
     bool promotion = false;
-    int PromotionChoix(const sf::Vector2f& mousePos);
 
-    void caslingChanges(int matrix,std::vector<PieceImage>& listePieces);
-    void enPassantChanges();
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Variables pour le drag & drop
     bool isDragging;
     int selectedPieceIndex;
     int couleurIndex;
     sf::Vector2f offsetImage;
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Gestion du son
-    sf::Sound sound;
-    sf::SoundBuffer buffer;
-    void handleSound();
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Gestion des événements
-    void handleMousePressed(const sf::Event& event);
-    void handleMouseMoved(const sf::Event& event);
-    void handleMouseReleased(const sf::Event& event);
-
-    void finDeTour();
-    bool TrouverPieceSelectioner(std::vector<PieceImage>& liste, int listeIndex, sf::Vector2f mousePos);
-    bool PlacerPieceDansMatrice(const std::vector<sf::ConvexShape>& matrice, int indexMatrice, const sf::Vector2f& mousePos);
-    void RemettreCouleurDefautCases();
-    void TrouverPieceCapture(std::vector<int> positions);
-
-    std::vector<std::vector<int>> tilesToChangeColor;
-    void handleCoup(std::vector<int>& tilePositions);
-    bool handleCoupJouer(std::vector<int>& tilePositionsOrigine,std::vector<int>& tilePositionsDestination);
-
-    void aiMove();
-    std::array<bool, 3> ia;
-
-    bool home;
-    void handleBackButtonClick(const sf::Vector2f& mousePos);
 
     std::vector<sf::Texture> confettoTextures;
     std::vector<FallingPiece> fallingConfetto;
@@ -88,28 +49,34 @@ private:
         "resources/images/confetti/Confetto_violet.png"
     };
 
-    void update(float deltaTime) {
-        for (auto& confetto : fallingConfetto) {
-            confetto.update(deltaTime);
-        }
-    }
+    sf::Sound sound;
+    sf::SoundBuffer buffer;
 
-    void makeConfetto() {
-        for (const auto& path : confettoPaths) {
-            sf::Texture texture;
-            if (texture.loadFromFile(path)) {
-                confettoTextures.push_back(texture);
-            } else {
-                std::cout << "Erreur chargement texture : " << path << "\n";
-            }
-        }
-        for (int j = 0; j < 8; ++j){
-            for (int i = 0; i < 8; ++i) {
-                float x = static_cast<float>(rand() % 1200);
-                fallingConfetto.emplace_back(confettoTextures[i], x, 200.f); 
-            }
-        }
-    };
+    void initListePieces();
+
+    void handleMousePressed(const sf::Event& event);
+    void handleMouseMoved(const sf::Event& event);
+    void handleMouseReleased(const sf::Event& event);
+    void handleBackButtonClick(const sf::Vector2f& mousePos);
+    void handleSound();
+
+    void finDeTour();
+    void aiMove();
+    void caslingChanges(int matrix, std::vector<PieceImage>& listePieces);
+    void enPassantChanges();
+    int PromotionChoix(const sf::Vector2f& mousePos);
+
+    bool TrouverPieceSelectioner(std::vector<PieceImage>& liste, int listeIndex, sf::Vector2f mousePos);
+    bool PlacerPieceDansMatrice(const std::vector<sf::ConvexShape>& matrice, int indexMatrice, const sf::Vector2f& mousePos);
+    void RemettreCouleurDefautCases();
+    void TrouverPieceCapture(std::vector<int> positions);
+
+    std::vector<std::vector<int>> tilesToChangeColor;
+    void handleCoup(std::vector<int>& tilePositions);
+    bool handleCoupJouer(std::vector<int>& tilePositionsOrigine, std::vector<int>& tilePositionsDestination);
+
+    void makeConfetto();
+    void update(float deltaTime);
 };
 
-#endif // BOARD_CONTROLLER_H
+#endif
