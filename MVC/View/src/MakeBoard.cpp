@@ -1,4 +1,4 @@
-#include "MakeBoard.h"
+#include "include/MakeBoard.hpp"
 #include <cmath>
 #include <iostream>
 
@@ -171,7 +171,7 @@ MakeBoard::MakeBoard() {
     backButton.setFillColor(beige);
     backButton.setOutlineColor(sf::Color::Black);
     backButton.setOutlineThickness(2);
-    backButtonText = createText("Acceuil", sf::Vector2f(1063, 12), 20, sf::Color::Black, font);
+    backButtonText = createText("Accueil", sf::Vector2f(1063, 12), 20, sf::Color::Black, font);
 }
 
 

@@ -1,6 +1,6 @@
-#include "BoardController.h"
-#include "State.h"
-#include "VictoryState.h"
+#include "BoardController.hpp"
+#include "State.hpp"
+#include "VictoryState.hpp"
 
 class PlayingState : public State {
 public:

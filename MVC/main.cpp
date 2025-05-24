@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
 
-#include "MainController.h"
+#include "Controller/include/MainController.hpp"
 
 int main() {
 

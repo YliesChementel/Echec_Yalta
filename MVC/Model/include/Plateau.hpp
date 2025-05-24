@@ -1,7 +1,7 @@
-#ifndef PLATEAU_H
-#define PLATEAU_H
-#include "Piece.h"
-#include "Joueur.h"
+#ifndef PLATEAU_HPP
+#define PLATEAU_HPP
+#include "Piece.hpp"
+#include "Joueur.hpp"
 #include <vector>
 
 class Piece;
@@ -27,7 +27,7 @@ class Plateau {
         void IsCastling(int xStart, int yStart,int xMove,int yMove, Piece* matrix[12][12]);
         void moveForAi(int xStart, int yStart,int xMove,int yMove, Joueur* playerList, Piece* matrix[12][12]);
         int evaluation(Joueur* players, int sideAi);
-        int minmax(Plateau plateau, int sideMove, int sideAi, int depth, int alpha, int beta, Joueur* players);
+        int minmax(Plateau plateau, int sideMove, int sideAi, int depth, int OrignialDepth, int alpha, int beta, Joueur* players);
         Plateau* clone();
 
         Piece* getMatrix(int x, int y) const { return matrix[x][y]; }

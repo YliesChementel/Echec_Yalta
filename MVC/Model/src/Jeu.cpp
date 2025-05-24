@@ -1,6 +1,6 @@
-#include "Jeu.h"
-#include "Piece.h"
-#include "Joueur.h"
+#include "include/Jeu.hpp"
+#include "include/Piece.hpp"
+#include "include/Joueur.hpp"
 #include <iostream>
 
 Jeu::Jeu(){

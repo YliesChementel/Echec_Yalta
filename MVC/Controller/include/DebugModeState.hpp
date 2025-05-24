@@ -1,8 +1,8 @@
-#ifndef DEBUGMODESTATE_H
-#define DEBUGMODESTATE_H
+#ifndef DEBUGMODESTATE_HPP
+#define DEBUGMODESTATE_HPP
 
-#include "BoardController.h"
-#include "State.h"
+#include "BoardController.hpp"
+#include "State.hpp"
 
 class DebugModeState : public State {
 public:

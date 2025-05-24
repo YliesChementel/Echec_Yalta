@@ -2,7 +2,7 @@
 #define VIEW_HPP
 
 #include <SFML/Graphics.hpp>
-#include "Makeboard.h"
+#include "Makeboard.hpp"
 
 
 class DrawBoard {

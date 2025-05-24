@@ -1,7 +1,7 @@
-#ifndef STATE_H
-#define STATE_H
+#ifndef STATE_HPP
+#define STATE_HPP
 
-#include "BoardController.h"
+#include "BoardController.hpp"
 
 class BoardController;
 

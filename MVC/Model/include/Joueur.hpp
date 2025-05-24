@@ -1,6 +1,6 @@
-#ifndef JOUEUR_H
-#define JOUEUR_H
-#include "Piece.h"
+#ifndef JOUEUR_HPP
+#define JOUEUR_HPP
+#include "Piece.hpp"
 
 class Joueur {
 public:

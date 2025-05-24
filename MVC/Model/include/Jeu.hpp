@@ -1,7 +1,7 @@
-#ifndef JEU_H
-#define JEU_H
-#include "Joueur.h"
-#include "Plateau.h"
+#ifndef JEU_HPP
+#define JEU_HPP
+#include "Joueur.hpp"
+#include "Plateau.hpp"
 
 class Jeu {
 public:

@@ -1,5 +1,5 @@
-#ifndef FALLING_PIECE_H
-#define FALLING_PIECE_H
+#ifndef FALLING_PIECE_HPP
+#define FALLING_PIECE_HPP
 
 #include <SFML/Graphics.hpp>
 #include <string>
@@ -22,6 +22,10 @@ public:
     void setRandomScale() {
         float scale = 0.2f + static_cast<float>(rand()) / RAND_MAX * 0.4f;
         sprite.setScale(scale, scale);
+    }
+
+    float getScale() const {
+        return sprite.getScale().x;
     }
 
     void update(float deltaTime) {

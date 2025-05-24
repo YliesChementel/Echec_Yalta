@@ -1,13 +1,13 @@
-#ifndef BOARD_CONTROLLER_H
-#define BOARD_CONTROLLER_H
+#ifndef BOARD_CONTROLLER_HPP
+#define BOARD_CONTROLLER_HPP
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include "State.h"
-#include "Makeboard.h"
-#include "DrawBoard.h"
-#include "Jeu.h"
-#include "FallingPiece.h"
+#include "State.hpp"
+#include "../View/include/MakeBoard.hpp"
+#include "../View/include/DrawBoard.hpp"
+#include "../Model/include/Jeu.hpp"
+#include "../View/include/FallingPiece.hpp"
 
 class BoardController {
 public:

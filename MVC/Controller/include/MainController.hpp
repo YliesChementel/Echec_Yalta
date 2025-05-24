@@ -1,9 +1,9 @@
-#ifndef MAINC_CONTROLLER_H
-#define MAINC_CONTROLLER_H
+#ifndef MAINC_CONTROLLER_HPP
+#define MAINC_CONTROLLER_HPP
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include "Menu.h"
+#include "../View/include/Menu.hpp"
 
 
 class MainController {

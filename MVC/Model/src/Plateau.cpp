@@ -1,4 +1,4 @@
-#include "Plateau.h"
+#include "include/Plateau.hpp"
 #include <iostream>
 #include <vector>
 #include <climits>
@@ -817,7 +817,7 @@ Plateau* Plateau::clone() {
     return newPlateau;
 }
 
-int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int alpha, int beta, Joueur* players){
+int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int OrignialDepth, int alpha, int beta, Joueur* players){
     if(depth==0 || plateau.endOfGame){
         return evaluation(players, sideAi);
     }
@@ -851,9 +851,9 @@ int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int al
                     playerListCopy[1].setListPiece(redListCopy); playerListCopy[1].setSize(redCopySize);
                     playerListCopy[2].setListPiece(blackListCopy); playerListCopy[2].setSize(blackCopySize);
 
-                    int eval = minmax(*newPlateau, nextSide, sideAi, depth-1, alpha, beta, playerListCopy);
+                    int eval = minmax(*newPlateau, nextSide, sideAi, depth-1, OrignialDepth, alpha, beta, playerListCopy);
                     maxEval = std::max(maxEval, eval);
-                    if(maxEval == eval){
+                    if(maxEval == eval && depth == OrignialDepth){
                         bestMoveStart = {piece->getXPosition(), piece->getYPosition()};
                         bestMoveEnd = move;
                     }
@@ -901,7 +901,7 @@ int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int al
                         playerListCopy[1].setListPiece(redListCopy); playerListCopy[1].setSize(redCopySize);
                         playerListCopy[2].setListPiece(blackListCopy); playerListCopy[2].setSize(blackCopySize);
 
-                        int eval = minmax(*newPlateau, nextSide, sideAi, depth-1, alpha, beta, playerListCopy);
+                        int eval = minmax(*newPlateau, nextSide, sideAi, depth-1, OrignialDepth, alpha, beta, playerListCopy);
                         minEval = std::min(minEval, eval);
                         beta = std::min(beta, eval);
                         

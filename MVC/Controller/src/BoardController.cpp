@@ -1,8 +1,8 @@
-#include "BoardController.h"
-#include "PromotionState.h"
-#include "AiState.h"
-#include "VictoryState.h"
-#include "DebugModeState.h"
+#include "include/BoardController.hpp"
+#include "include/PromotionState.hpp"
+#include "include/AiState.hpp"
+#include "include/VictoryState.hpp"
+#include "include/DebugModeState.hpp"
 #include <iostream>
 
 
@@ -96,8 +96,6 @@ void BoardController::TrouverPieceCapture(std::vector<int> positions){
         std::vector<PieceImage>& piecesAdverses = *listePieces[j];
         for (int k = 0; k < piecesAdverses.size(); ++k) {
             std::vector<int> pos = piecesAdverses[k].getTilePositions();
-            //std::cout << "pos : " << pos[0] << " " << pos[1] << std::endl;
-            //std::cout << "positions : " << positions[0] << " " << positions[1] << std::endl;
             if (pos[0] == positions[0] && pos[1] == positions[1]) {
                 std::cout << "Piece capturee" << std::endl;
                 piecesAdverses.erase(piecesAdverses.begin() + k); // Supprimer la pièce adverse
@@ -262,7 +260,7 @@ void BoardController::enPassantChanges(){
 
 
 void BoardController::aiMove(){
-    jeu.getBoard().minmax(jeu.getBoard(), tour, tour, 3, -1000000, 1000000, jeu.getPlayerList());
+    jeu.getBoard().minmax(jeu.getBoard(), tour, tour, 4, 4, -1000000, 1000000, jeu.getPlayerList());
     
     int IndexMatrixStart = makeBoard.determineSubMatrix(jeu.getBoard().getBestMoveStart().first, jeu.getBoard().getBestMoveStart().second);
     int IndexMatrixEnd = makeBoard.determineSubMatrix(jeu.getBoard().getBestMoveEnd().first, jeu.getBoard().getBestMoveEnd().second);

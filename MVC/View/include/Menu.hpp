@@ -1,5 +1,5 @@
-#ifndef MENU_H
-#define MENU_H
+#ifndef MENU_HPP
+#define MENU_HPP
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -7,7 +7,7 @@
 #include <SFML/Network.hpp>
 #include <iostream>
 #include <string>
-#include "FallingPiece.h"
+#include "FallingPiece.hpp"
 
 class Button {
 public:

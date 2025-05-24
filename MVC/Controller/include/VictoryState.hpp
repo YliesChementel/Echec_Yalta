@@ -1,13 +1,16 @@
-#ifndef AI_STATE_H
-#define AI_STATE_H
+#ifndef VICTORY_STATE_HPP
+#define VICTORY_STATE_HPP
 
-#include "BoardController.h"
-#include "State.h"
+#include "State.hpp"
+#include "BoardController.hpp"
+#include <SFML/Graphics.hpp>
+#include <vector>
+#include <random>
 
-class AiState : public State {
+class VictoryState : public State {
 public:
     void handleMousePressed(BoardController& controller, const sf::Event& event) override {
-        sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
+        sf::Vector2f mousePos = controller.getWindow().mapPixelToCoords(sf::Mouse::getPosition(controller.getWindow()));
         controller.handleBackButtonClick(mousePos);
     }
 
@@ -15,7 +18,11 @@ public:
 
     void handleMouseReleased(BoardController& controller, const sf::Event& event) override {}
 
-    void update(BoardController& controller, float deltaTime) override {}
+    void update(BoardController& controller, float deltaTime) override {
+        for (auto& confetto : controller.getFallingConfetto()) {
+            confetto.update(deltaTime);
+        }
+    }
 
     void render(BoardController& controller) override {
         controller.getDrawBoard().clear();
@@ -29,10 +36,15 @@ public:
         controller.getDrawBoard().drawBoard({controller.getMakeBoard().getMatrice1(),controller.getMakeBoard().getMatrice2(),controller.getMakeBoard().getMatrice3(),controller.getMakeBoard().getMatrice4(),controller.getMakeBoard().getMatrice5(),controller.getMakeBoard().getMatrice6()});
         controller.getDrawBoard().drawPieces(controller.getMakeBoard().getWhitePieces(), controller.getMakeBoard().getRedPieces(), controller.getMakeBoard().getBlackPieces());
         controller.getDrawBoard().drawBackButton(controller.getMakeBoard().getBackButton(), controller.getMakeBoard().getBackButtonText());
+
+        for (auto& confetto : controller.getFallingConfetto()) {
+            confetto.draw(controller.getWindow());
+        }
+        
         controller.getDrawBoard().display();
     }
 
-    std::string getStateName() const override { return "Ai"; }
+    std::string getStateName() const override { return "Victory"; }
 };
 
 #endif

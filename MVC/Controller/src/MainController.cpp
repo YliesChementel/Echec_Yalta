@@ -4,13 +4,13 @@
 #include <SFML/Network.hpp>
 #include <SFML/System/Clock.hpp>
 #include <iostream>
-#include "MainController.h"
-#include "BoardController.h"
-#include "MakeBoard.h"
-#include "DrawBoard.h"
-#include "BoardController.h"
-#include "Jeu.h"
-#include "Menu.h"
+#include "../include/MainController.hpp"
+#include "../include/BoardController.hpp"
+#include "../View/include/MakeBoard.hpp"
+#include "../View/include/DrawBoard.hpp"
+#include "../include/BoardController.hpp"
+#include "../Model/include/Jeu.hpp"
+#include "../View/include/Menu.hpp"
 
 void MainController::runGame(bool debugMode) {
     MakeBoard makeBoard;

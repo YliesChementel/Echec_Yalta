@@ -7,15 +7,15 @@ CXXFLAGS = -std=c++17 -IModel -IView -IController
 
 # Fichiers source
 SRC = main.cpp \
-      View/MakeBoard.cpp \
-      View/DrawBoard.cpp \
-	  View/Menu.cpp \
-      Controller/BoardController.cpp \
-	  Controller/MainController.cpp \
-	  Model/Jeu.cpp \
-	  Model/Plateau.cpp \
-      Model/Joueur.cpp \
-      Model/Piece.cpp
+      View/src/MakeBoard.cpp \
+      View/src/DrawBoard.cpp \
+	  View/src/Menu.cpp \
+      Controller/src/BoardController.cpp \
+	  Controller/src/MainController.cpp \
+	  Model/src/Jeu.cpp \
+	  Model/src/Plateau.cpp \
+      Model/src/Joueur.cpp \
+      Model/src/Piece.cpp
 
 # Librairies SFML
 LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio

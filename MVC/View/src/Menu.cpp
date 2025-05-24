@@ -4,10 +4,11 @@
 #include <SFML/Network.hpp>
 #include <SFML/System/Clock.hpp>
 #include <iostream>
-#include "Menu.h"
-#include "MakeBoard.h"
-#include "DrawBoard.h"
-#include "BoardController.h"
+#include "../include/Menu.hpp"
+#include "../include/MakeBoard.hpp"
+#include "../include/DrawBoard.hpp"
+#include "../../Controller/include/BoardController.hpp"
+#include <algorithm>
 
 
 Menu::Menu()
@@ -55,6 +56,8 @@ void Menu::update(float deltaTime) {
     for (auto& piece : fallingPieces) {
         piece.update(deltaTime);
     }
+
+    std::sort(fallingPieces.begin(), fallingPieces.end(), [](const FallingPiece& a, const FallingPiece& b) {return a.getScale() < b.getScale();});
 }
 
 

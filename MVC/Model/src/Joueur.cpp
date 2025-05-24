@@ -1,4 +1,4 @@
-#include "Joueur.h"
+#include "include/Joueur.hpp"
 #include <iostream>
 
 Joueur::Joueur() : pieceList(nullptr) {}

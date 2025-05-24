@@ -1,7 +1,7 @@
-#include "Piece.h"
+#include "include/Piece.hpp"
 #include <iostream>
 #include <algorithm>
-#include "Plateau.h"
+#include "include/Plateau.hpp"
 
 
 std::vector<std::pair<int, int>> Piece::possibleMove(int xStart, int yStart, Piece* matrix[12][12]){
