@@ -15,7 +15,15 @@ public:
 
     void handleMouseReleased(BoardController& controller, const sf::Event& event) override {}
 
-    void update(BoardController& controller, float deltaTime) override {}
+    void update(BoardController& controller, float deltaTime) override {
+        controller.setLoadingDotsTimer(controller.getLoadingDotsTimer() + deltaTime);
+        if (controller.getLoadingDotsTimer() >= controller.getLoadingDotsInterval()) {
+            controller.setLoadingDotsTimer(0.0f);
+
+            controller.setLoadingDotsCount((controller.getLoadingDotsCount() + 1) % 4);
+            controller.getMakeBoard().setTextGame(controller.getBaseText() + controller.getDots());
+        }
+    }
 
     void render(BoardController& controller) override {
         controller.getDrawBoard().clear();

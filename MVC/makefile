@@ -18,7 +18,7 @@ SRC = main.cpp \
       Model/src/Piece.cpp
 
 # Librairies SFML
-LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lpthread 
 
 # Règle principale
 all: $(TARGET)

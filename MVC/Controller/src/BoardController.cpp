@@ -16,10 +16,15 @@ BoardController::BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf:
             setState(std::make_unique<DebugModeState>());
             setDebugMode(debugMode);
             makeBoard.setTextGame("Debug Mode");
-            makeBoard.setTextEchec("Deplacement des pieces dans l'ordre voulu");
+            makeBoard.setTextEchec("Déplacement des pièces dans l'ordre voulu");
         }
         else{
             setState(std::make_unique<PlayingState>());
+            if(ia[tour]){
+                setBaseText("L'IA Blanc réfléchit");
+            }
+            else makeBoard.setTextGame("Au tour du joueur Blanc");
+
         }
         
     }
@@ -48,11 +53,24 @@ void BoardController::run() {
             currentState->render(*this);
             drawBoard.display();
 
-            if(!jeu.getBoard().isEndOfGame() && ia[tour] && !promotion){
-                if(currentState->getStateName() != "Ai"){
+            if (!jeu.getBoard().isEndOfGame() && ia[tour] && !promotion) {
+                if (currentState->getStateName() != "Ai") {
                     setState(std::make_unique<AiState>());
                 }
-                aiMove();
+
+                if (!iaEnCours) {
+                    makeBoard.setTextGame(baseText);
+                    setLoadingDotsTimer(0);
+                    setLoadingDotsCount(0);
+                    startAiMove();
+                    iaEnCours = true;
+                }
+
+                if (aiMoveReady) {
+                    aiMove(); 
+                    aiMoveReady = false;
+                    iaEnCours = false;
+                }
             }
             else if(!jeu.getBoard().isEndOfGame() && !ia[tour] && !promotion){
                 if(isDebugMode()){
@@ -64,7 +82,14 @@ void BoardController::run() {
                 }
             }
 
-            if (home) return;
+            if (home) {
+                stopAiThread = true;
+                if (aiThread.joinable()) {
+                    aiThread.join(); // Attend la fin du thread
+                }
+                return;
+            }
+            
         }
     }
 
@@ -203,10 +228,36 @@ int BoardController::PromotionChoix(const sf::Vector2f& mousePos) {
 
 
 void BoardController::finDeTour() {
-    if(tour==0){ makeBoard.setTextGame("Au tour du joueur Rouge");tour++;}
-    else if(tour==1){ makeBoard.setTextGame("Au tour du joueur Noir");tour++;}
-    else{ makeBoard.setTextGame("Au tour du joueur Blanc");tour=0;}
+    if(tour==0){
+        tour++;
+        if(ia[tour]){
+            this->setBaseText("L'IA Rouge réfléchit");
+            this->getMakeBoard().setTextGame(baseText);
+        }else{
+            makeBoard.setTextGame("Au tour du joueur Rouge");
+        }
+    }
+    else if(tour==1){
+        tour++;
+        if(ia[tour]){
+            this->setBaseText("L'IA Noir réfléchit");
+            makeBoard.setTextGame(baseText); 
+        }else{
+            makeBoard.setTextGame("Au tour du joueur Noir");
+        }
+    }
+    else{ 
+        tour=0;
+        if(ia[tour]){
+            this->setBaseText("L'IA Blanc réfléchit");
+            makeBoard.setTextGame(baseText);
+        }else{
+            makeBoard.setTextGame("Au tour du joueur Blanc");
+        }
+    }
 }
+
+
 
 
 void BoardController::caslingChanges(int matrix,std::vector<PieceImage>& listePieces){
@@ -259,9 +310,7 @@ void BoardController::enPassantChanges(){
 }
 
 
-void BoardController::aiMove(){
-    jeu.getBoard().minmax(jeu.getBoard(), tour, tour, 4, 4, -1000000, 1000000, jeu.getPlayerList());
-    
+void BoardController::aiMove(){    
     int IndexMatrixStart = makeBoard.determineSubMatrix(jeu.getBoard().getBestMoveStart().first, jeu.getBoard().getBestMoveStart().second);
     int IndexMatrixEnd = makeBoard.determineSubMatrix(jeu.getBoard().getBestMoveEnd().first, jeu.getBoard().getBestMoveEnd().second);
     int xStart = jeu.getBoard().getBestMoveStart().first;
@@ -317,8 +366,8 @@ void BoardController::aiMove(){
     }
     getMakeBoard().setTextEchec(echec);
     if(jeu.getBoard().isEndOfGame()){
-        makeBoard.setTextGame("Partie Terminee");
-        if(jeu.getBoard().isStalemate()){
+        makeBoard.setTextGame("Partie Terminée");
+        if(jeu.getBoard().isStalemate()){ 
             makeBoard.setTextEchec("Stalemate");
         }
         else{
@@ -350,10 +399,34 @@ void BoardController::update(float deltaTime) {
     for (auto& confetto : fallingConfetto) {
         confetto.update(deltaTime);
     }
-}
+} 
 
 void BoardController::PlaySound() {
     if (this->sound.getStatus() != sf::Sound::Playing) {
         this->sound.play();
     }
+}
+
+
+void BoardController::startAiMove() {
+    if (aiThread.joinable()) {
+        aiThread.join(); // Assure qu'on ne lance pas un second thread sans avoir terminé le premier
+    }
+    aiMoveReady = false;
+    aiCalculating = true;
+    stopAiThread = false;
+
+    aiThread = std::thread([this]() {
+         try {
+            jeu.getBoard().minmax(jeu.getBoard(), tour, tour, 4, 4, -1000000, 1000000, jeu.getPlayerList(),stopAiThread);
+            if (stopAiThread) return;
+            aiMoveReady = true;
+            aiCalculating = false;
+        } catch (const std::exception& e) {
+            std::cerr << "Exception dans le thread IA : " << e.what() << std::endl;
+        } catch (...) {
+            std::cerr << "Exception inconnue dans le thread IA" << std::endl;
+        }
+    });
+   // aiThread.detach(); 
 }

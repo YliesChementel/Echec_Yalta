@@ -8,6 +8,8 @@
 #include "../View/include/DrawBoard.hpp"
 #include "../Model/include/Jeu.hpp"
 #include "../View/include/FallingPiece.hpp"
+#include <thread>
+#include <atomic>
 
 class BoardController {
 public:
@@ -35,6 +37,7 @@ public:
     void enPassantChanges();
     void makeConfetto();
     void update(float deltaTime);
+    void startAiMove();
 
     MakeBoard& getMakeBoard() { return makeBoard; }
     DrawBoard& getDrawBoard() { return drawBoard; }
@@ -56,6 +59,15 @@ public:
     const std::vector<std::vector<int>>& getTilesToChangeColor() const { return tilesToChangeColor; }
     sf::Vector2f getOffsetImage() const { return offsetImage; }
     std::vector<FallingPiece>& getFallingConfetto() { return fallingConfetto; }
+    std::array<bool, 3>& getIa() { return ia; }
+    float getLoadingDotsTimer() const { return loadingDotsTimer; }
+    int getLoadingDotsCount() const { return loadingDotsCount; }
+    const std::string& getBaseText() const { return baseText; }
+    const float getLoadingDotsInterval() const { return LOADING_DOTS_INTERVAL; }
+    std::string getDots() const {
+        return std::string(loadingDotsCount, '.');
+    }
+    
 
     void setDebugMode(bool debugMode) { this->debugMode = debugMode; }
     void setCouleurIndex(int couleurIndex) { this->couleurIndex = couleurIndex; }
@@ -72,6 +84,9 @@ public:
     void clearTilesToChangeColor() { tilesToChangeColor.clear(); }
     void setOffsetImage(const sf::Vector2f& offsetImage) { this->offsetImage = offsetImage; }
     void setFallingConfetto(const std::vector<FallingPiece>& fallingConfetto) { this->fallingConfetto = fallingConfetto; }
+    void setLoadingDotsTimer(float timer) { this->loadingDotsTimer = timer; }
+    void setLoadingDotsCount(int count) { this->loadingDotsCount = count; }
+    void setBaseText(const std::string& text) { this->baseText = text; }
 
 private:
     MakeBoard& makeBoard;
@@ -115,6 +130,18 @@ private:
     sf::SoundBuffer buffer;
 
     std::vector<std::vector<int>> tilesToChangeColor;
+
+    // Variables pour l'animation des points de chargement
+    float loadingDotsTimer = 0.0f;
+    int loadingDotsCount = 0;
+    const float LOADING_DOTS_INTERVAL = 0.5f;
+    std::string baseText;
+
+    std::atomic<bool> stopAiThread = false;
+    std::thread aiThread;
+    std::atomic<bool> aiMoveReady = false;
+    std::atomic<bool> aiCalculating = false;
+    bool iaEnCours = false;
 };
 
 #endif

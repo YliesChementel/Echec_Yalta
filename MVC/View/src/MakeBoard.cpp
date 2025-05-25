@@ -1,6 +1,8 @@
 #include "include/MakeBoard.hpp"
 #include <cmath>
 #include <iostream>
+#include <locale>
+#include <codecvt>
 
 const float PI = 3.14159265359f;
 
@@ -236,7 +238,9 @@ std::vector<sf::ConvexShape> MakeBoard::createMatrixLosange( const sf::Vector2f&
 
 sf::Text MakeBoard::createText(const std::string& textStr, const sf::Vector2f& startPosition, unsigned int characterSize, sf::Color color, sf::Font& font) {
     sf::Text text;
-    text.setString(textStr);
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::wstring wtext = converter.from_bytes(textStr);
+    text.setString(wtext);
     text.setFont(font);
     text.setFillColor(color);
     text.setCharacterSize(characterSize);

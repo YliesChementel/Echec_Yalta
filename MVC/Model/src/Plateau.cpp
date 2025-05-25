@@ -2,6 +2,8 @@
 #include <iostream>
 #include <vector>
 #include <climits>
+#include <atomic>
+#include <thread>
 
 Plateau::Plateau(){
     InitMatrix();
@@ -817,7 +819,7 @@ Plateau* Plateau::clone() {
     return newPlateau;
 }
 
-int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int OrignialDepth, int alpha, int beta, Joueur* players){
+int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int OrignialDepth, int alpha, int beta, Joueur* players, std::atomic<bool>& stopFlag){
     if(depth==0 || plateau.endOfGame){
         return evaluation(players, sideAi);
     }
@@ -826,9 +828,11 @@ int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int Or
         int maxEval = INT_MIN;
         if(players[sideMove].getSize() > 0){
             for(int j = 0; j < players[sideMove].getSize(); ++j){
+                if (stopFlag) return 0;
                 Piece* piece = players[sideMove].getListPiece()[j];
                 std::vector<std::pair<int,int>> moves = piece->possibleMove(piece->getXPosition(), piece->getYPosition(), plateau.matrix);
                 for(const auto& move : moves){
+                    if (stopFlag) return 0;
                     Plateau* newPlateau = plateau.clone();
                     newPlateau->moveForAi(piece->getXPosition(), piece->getYPosition(), move.first, move.second, players, newPlateau->matrix);
                     int nextSide;
@@ -851,7 +855,7 @@ int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int Or
                     playerListCopy[1].setListPiece(redListCopy); playerListCopy[1].setSize(redCopySize);
                     playerListCopy[2].setListPiece(blackListCopy); playerListCopy[2].setSize(blackCopySize);
 
-                    int eval = minmax(*newPlateau, nextSide, sideAi, depth-1, OrignialDepth, alpha, beta, playerListCopy);
+                    int eval = minmax(*newPlateau, nextSide, sideAi, depth-1, OrignialDepth, alpha, beta, playerListCopy, stopFlag);
                     maxEval = std::max(maxEval, eval);
                     if(maxEval == eval && depth == OrignialDepth){
                         bestMoveStart = {piece->getXPosition(), piece->getYPosition()};
@@ -875,9 +879,11 @@ int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int Or
         for(int i = 0; i < 3; ++i){
             if(players[i].getSize() > 0 && i != sideAi){
                 for(int j = 0; j < players[i].getSize(); ++j){
+                    if (stopFlag) return 0;
                     Piece* piece = players[i].getListPiece()[j];
                     std::vector<std::pair<int,int>> moves = piece->possibleMove(piece->getXPosition(), piece->getYPosition(), plateau.matrix);
                     for(const auto& move : moves){
+                        if (stopFlag) return 0;
                         Plateau* newPlateau = plateau.clone();
                         newPlateau->moveForAi(piece->getXPosition(), piece->getYPosition(), move.first, move.second, players, newPlateau->matrix);
 
@@ -901,7 +907,7 @@ int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int Or
                         playerListCopy[1].setListPiece(redListCopy); playerListCopy[1].setSize(redCopySize);
                         playerListCopy[2].setListPiece(blackListCopy); playerListCopy[2].setSize(blackCopySize);
 
-                        int eval = minmax(*newPlateau, nextSide, sideAi, depth-1, OrignialDepth, alpha, beta, playerListCopy);
+                        int eval = minmax(*newPlateau, nextSide, sideAi, depth-1, OrignialDepth, alpha, beta, playerListCopy, stopFlag);
                         minEval = std::min(minEval, eval);
                         beta = std::min(beta, eval);
                         
