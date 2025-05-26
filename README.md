@@ -1,6 +1,6 @@
 # Échecs Yalta 
 
-Les échecs Yalta sont une variante du jeu d'échecs à trois joueurs. Chaque joueur contrôle une armée (blanche, rouge ou noire) sur un plateau hexagonal spécial.
+Les échecs Yalta constituent une variante de jeu d'échecs permettant de jouer à trois joueurs. Chaque joueur contrôle une armée (blanche, rouge ou noire) sur un plateau hexagonal.
 
 ## Description du Jeu
 
