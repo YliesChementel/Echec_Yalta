@@ -432,19 +432,20 @@ void Plateau::SpecialMoves(int xStart, int yStart, int xMove, int yMove, int pla
                 }
             }
         }
-        else if(yMove!=yStart && matrix[xStart][yMove] != nullptr && matrix[xStart][yMove]->enPassant && xMove!=0 && yMove!=0 ){ // xstart pour la même ligne que le pion déplacé et ymove pour la colone d'à côté
-            //std::cout << "Capture" << std::endl;
-            if(matrix[xStart][yMove]->getSide()==1){
-                playerList[0].removePiece(matrix[xStart][yMove]);
+        else if(yMove!=yStart && matrix[xMove][yMove] == nullptr && matrix[xStart][yMove] != nullptr && matrix[xStart][yMove]->enPassant){
+            if(matrix[xStart][yMove]->getType() == "P" && matrix[xStart][yMove]->enPassant){
+                if(matrix[xStart][yMove]->getSide()==1){
+                    playerList[0].removePiece(matrix[xStart][yMove]);
+                }
+                else if(matrix[xStart][yMove]->getSide()==2){
+                    playerList[1].removePiece(matrix[xStart][yMove]);
+                }
+                else{
+                    playerList[2].removePiece(matrix[xStart][yMove]);
+                }
+                matrix[xStart][yMove]=nullptr;
+                setEnPassant(true);
             }
-            else if(matrix[xStart][yMove]->getSide()==2){
-                playerList[1].removePiece(matrix[xStart][yMove]);
-            }
-            else{
-                playerList[2].removePiece(matrix[xStart][yMove]);
-            }
-            matrix[xStart][yMove]=nullptr;
-            setEnPassant(true);
         }
     }
 }

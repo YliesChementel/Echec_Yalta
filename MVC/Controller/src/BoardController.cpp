@@ -13,7 +13,7 @@
 /**
  * @brief Constructeur initialisant le contrôleur du plateau
  */
-BoardController::BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf::RenderWindow& window,Jeu& jeu, std::array<bool, 3> ia, bool debugMode, bool isAiDifficult)
+BoardController::BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf::RenderWindow& window,Jeu& jeu, std::array<bool, 3> ia, bool debugMode, bool isAiDifficult) 
     : makeBoard(makeBoard), drawBoard(drawBoard), window(window),jeu(jeu) , Dragging(false), selectedPieceIndex(-1),home(false) {
         handleSound(); 
         initListePieces();
@@ -27,7 +27,7 @@ BoardController::BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf:
         }
         else{
             setState(std::make_unique<PlayingState>());
-            if(ia[tour]){
+            if(ia[tour]){ 
                 setBaseText("L'IA Blanc réfléchit");
             }
             else makeBoard.setTextGame("Au tour du joueur Blanc");
@@ -43,7 +43,7 @@ void BoardController::run() {
         sf::Clock clock;
         while (window.isOpen()) {
             sf::Event event;
-            while (window.pollEvent(event)) {
+            while (window.pollEvent(event)) { 
                 if (event.type == sf::Event::Closed) {
                     window.close();
                 }
@@ -247,10 +247,6 @@ void BoardController::handleCoup(std::vector<int>& tilePositions) {
  * @return true si le coup est valide
  */
 bool BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std::vector<int>& tilePositionsDestination){
-    std::cout<<"rook right white "<< rookRightWhite<<std::endl;
-    std::cout<<"rook right red "<< rookRightRed<<std::endl;
-    std::cout<<"rook right black "<< rookRightBlack<<std::endl;
-
     std::pair<int, int> coupOrigine = makeBoard.indexEnCoordonneDePlateau(tilePositionsOrigine[0], tilePositionsOrigine[1]);
     std::pair<int, int> coupDestination = makeBoard.indexEnCoordonneDePlateau(tilePositionsDestination[0], tilePositionsDestination[1]);
     bool coupAutoriser = false;
@@ -352,6 +348,7 @@ void BoardController::caslingChanges(int matrix,std::vector<PieceImage>& listePi
  * @brief Gère les changements lors d'une prise en passant
  */
 void BoardController::enPassantChanges(){
+
     std::vector<PieceImage>& piecesCamp = *listePieces[couleurIndex];
     int matrix = piecesCamp[selectedPieceIndex].getTilePositions()[1];
     int losange = piecesCamp[selectedPieceIndex].getTilePositions()[0];
@@ -362,6 +359,13 @@ void BoardController::enPassantChanges(){
     else if(matrix==4){ losange -=1; }
     else if(matrix==5){ losange -=1; }
     else{ losange -=4; }
+
+    std::pair<int, int> coord = makeBoard.indexEnCoordonneDePlateau(losange, matrix);
+
+    if(jeu.getBoard().getMatrix()[coord.first][coord.second]!=nullptr && !jeu.getBoard().getMatrix()[coord.first][coord.second]->enPassant){
+        return;
+    }
+
 
     for (int j = 0; j < listePieces.size(); ++j) {
         if (j == couleurIndex) continue;

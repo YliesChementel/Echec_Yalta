@@ -118,7 +118,7 @@ private:
     sf::RenderWindow& window;     ///< Fenêtre SFML
     Jeu& jeu;                     ///< Modèle de jeu
     std::array<bool, 3> ia;       ///< Configuration des joueurs IA
-    bool debugMode;               ///< Mode debug activé/désactivé
+    bool debugMode=false;               ///< Mode debug activé/désactivé
 
     // État du jeu
     std::unique_ptr<State> currentState;  ///< État actuel du jeu

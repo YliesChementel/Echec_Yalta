@@ -51,9 +51,16 @@ public:
                     );
                     controller.getJeu().getBoard().setCastling(false);
                 }
-                
                 // Gestion de la prise en passant
-                if (controller.getJeu().getBoard().isEnPassantMove()) {
+                if(controller.getJeu().getBoard().isWhiteEnPassant() ) {
+                    controller.enPassantChanges();
+                }
+
+                if(controller.getJeu().getBoard().isRedEnPassant()) {
+                    controller.enPassantChanges();
+                }
+
+                if(controller.getJeu().getBoard().isBlackEnPassant() ) {
                     controller.enPassantChanges();
                 }
                 
