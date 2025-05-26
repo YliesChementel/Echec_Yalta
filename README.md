@@ -6,6 +6,8 @@ Les échecs Yalta sont une variante du jeu d'échecs à trois joueurs. Chaque jo
 
 Le jeu se déroule sur un plateau hexagonal divisé en 6 sections. Chaque joueur commence avec 16 pièces traditionnelles (8 pions, 2 tours, 2 cavaliers, 2 fous, 1 reine et 1 roi) disposées sur deux rangées.
 
+![Plateau de Jeu](MVC/resources/images/ReadMeImages/plateau.png)
+
 ### Règles Spéciales
 - Le plateau est divisé en 6 sections hexagonales
 - Une zone centrale spéciale (rosace) avec des règles de capture particulières
