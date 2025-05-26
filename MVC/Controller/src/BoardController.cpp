@@ -143,12 +143,26 @@ void BoardController::TrouverPieceCapture(std::vector<int> positions){
         for (int k = 0; k < piecesAdverses.size(); ++k) {
             std::vector<int> pos = piecesAdverses[k].getTilePositions();
             if (pos[0] == positions[0] && pos[1] == positions[1]) {
-                std::cout << "Piece capturee" << std::endl;
+                //std::cout << "Piece capturee" << std::endl;
                 piecesAdverses.erase(piecesAdverses.begin() + k);
-                if(k<rookRight){
-                    rookRight--;
+                if(j == 0){
+                   if(k<rookRightWhite){
+                        rookRightWhite--;
+                    }
+                    break; 
                 }
-                break;
+                else if(j == 1){
+                    if(k<rookRightRed){
+                        rookRightRed--;
+                    }
+                    break; 
+                }
+                else{
+                    if(k<rookRightBlack){
+                        rookRightBlack--;
+                    }
+                    break; 
+                }
             }
         }
     }
@@ -233,6 +247,10 @@ void BoardController::handleCoup(std::vector<int>& tilePositions) {
  * @return true si le coup est valide
  */
 bool BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std::vector<int>& tilePositionsDestination){
+    std::cout<<"rook right white "<< rookRightWhite<<std::endl;
+    std::cout<<"rook right red "<< rookRightRed<<std::endl;
+    std::cout<<"rook right black "<< rookRightBlack<<std::endl;
+
     std::pair<int, int> coupOrigine = makeBoard.indexEnCoordonneDePlateau(tilePositionsOrigine[0], tilePositionsOrigine[1]);
     std::pair<int, int> coupDestination = makeBoard.indexEnCoordonneDePlateau(tilePositionsDestination[0], tilePositionsDestination[1]);
     bool coupAutoriser = false;
@@ -250,7 +268,7 @@ bool BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std
                 return true;
             }
         }
-        std::cout<<"coup non autoriser"<<std::endl;
+        //std::cout<<"coup non autoriser"<<std::endl;
     }
     return false;
 }
@@ -309,10 +327,12 @@ void BoardController::caslingChanges(int matrix,std::vector<PieceImage>& listePi
         makeBoard.PlacementPiece(tour, makeBoard.getMatrice(1)[3], listePieces, 1,3);
     }
     else if(matrix==2){
-        makeBoard.PlacementPiece(rookRight, makeBoard.getMatrice(2)[13], listePieces, 2,13);
+        std::cout<<"rook right white "<< rookRightWhite<<std::endl;
+        makeBoard.PlacementPiece(rookRightWhite, makeBoard.getMatrice(2)[13], listePieces, 2,13);
     }
     else if(matrix==3){
-        makeBoard.PlacementPiece(rookRight, makeBoard.getMatrice(3)[13], listePieces, 3,13);
+        std::cout<<"rook right red "<< rookRightRed<<std::endl;
+        makeBoard.PlacementPiece(rookRightRed, makeBoard.getMatrice(3)[13], listePieces, 3,13);
     }
     else if(matrix==4){
         int tour = 0;
@@ -323,7 +343,8 @@ void BoardController::caslingChanges(int matrix,std::vector<PieceImage>& listePi
         makeBoard.PlacementPiece(tour, makeBoard.getMatrice(5)[3], listePieces, 5,3);
     }
     else{
-        makeBoard.PlacementPiece(rookRight, makeBoard.getMatrice(6)[13], listePieces, 6,13);
+        std::cout<<"rook right black "<< rookRightBlack<<std::endl;
+        makeBoard.PlacementPiece(rookRightBlack, makeBoard.getMatrice(6)[13], listePieces, 6,13);
     }
 }
 

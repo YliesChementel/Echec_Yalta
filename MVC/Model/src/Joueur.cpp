@@ -89,6 +89,13 @@ void Joueur::removePiece(Piece* piece) {
 void Joueur::replacePiece(Piece* oldPiece,Piece* newPiece) {
     for (int i = 0; i < pieceListSize; ++i) {
         if (pieceList[i] == oldPiece) {
+            // Copier les coordonnées et l'état de l'ancienne pièce
+            newPiece->setXPosition(oldPiece->getXPosition());
+            newPiece->setYPosition(oldPiece->getYPosition());
+            newPiece->setHasAlreadyMoved(oldPiece->getHasAlreadyMoved());
+            newPiece->setSide(oldPiece->getSide());
+            
+            // Remplacer l'ancienne pièce par la nouvelle
             pieceList[i] = newPiece;
             break;
         }

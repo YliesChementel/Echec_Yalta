@@ -34,7 +34,7 @@ Menu::Menu()
       redAICheckbox(0, 0, "resources/images/RedKing.png", 20),
       blackAICheckbox(0, 0, "resources/images/BlackKing.png", 20),
       easyAICheckbox(0, 0, "resources/images/WhitePawn.png", 20),
-      hardAICheckbox(0, 0, "resources/images/BlackQueen.png", 20),
+      hardAICheckbox(0, 0, "resources/images/BlackQueen.png", 20), 
       debugModeButton(1010, 940, "Debug Mode", 20)
 {
     // Dimensions de la fenêtre et des éléments

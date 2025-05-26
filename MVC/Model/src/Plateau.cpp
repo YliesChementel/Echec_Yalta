@@ -433,7 +433,7 @@ void Plateau::SpecialMoves(int xStart, int yStart, int xMove, int yMove, int pla
             }
         }
         else if(yMove!=yStart && matrix[xStart][yMove] != nullptr && matrix[xStart][yMove]->enPassant && xMove!=0 && yMove!=0 ){ // xstart pour la même ligne que le pion déplacé et ymove pour la colone d'à côté
-            std::cout << "Capture" << std::endl;
+            //std::cout << "Capture" << std::endl;
             if(matrix[xStart][yMove]->getSide()==1){
                 playerList[0].removePiece(matrix[xStart][yMove]);
             }
@@ -481,16 +481,16 @@ void Plateau::Move(int xStart, int yStart,int xMove,int yMove, Joueur* playerLis
     if(!matrix[xMove][yMove]->getHasAlreadyMoved()){
         matrix[xMove][yMove]->setHasAlreadyMoved(true);
     }
-    AffichageMatrice(matrix);
+    //AffichageMatrice(matrix);
 
-    std::cout << "Pièce déplacée de (" << xStart << "," << yStart << ") vers (" << xMove << "," << yMove << ")" << std::endl;
+    //std::cout << "Pièce déplacée de (" << xStart << "," << yStart << ") vers (" << xMove << "," << yMove << ")" << std::endl;
 
     if(!isEndOfGame()){
         std::vector<std::string> sides = IsInCheck(playerList, matrix);
         if(!sides.empty()) {
             setSidesInCheck(sides);
-            std::cout << "Rois en échec : ";
-            for (const auto& side : sides){ std::cout << side << " "<< std::endl; }
+            //std::cout << "Rois en échec : ";
+            //for (const auto& side : sides){ std::cout << side << " "<< std::endl; }
 
             std::vector<std::pair<std::string, int>> checkList = {
                 {"blanc", 0}, {"rouge", 1}, {"noir", 2}
@@ -498,25 +498,25 @@ void Plateau::Move(int xStart, int yStart,int xMove,int yMove, Joueur* playerLis
             for (const auto& [sideStr, idx] : checkList) {
                 if (std::count(sides.begin(), sides.end(), sideStr)) {
                     if (IsCheckmate(idx, sideStr, playerList)) {
-                        std::cout << sideStr << " en échec et mat" << std::endl;
+                        //std::cout << sideStr << " en échec et mat" << std::endl;
                         setEndOfGame(true);
                         if(playerSide==1){setWinner("Blanc");}
                         else if(playerSide==2){setWinner("Rouge");}
                         else{setWinner("Noir");}
                         return;
                     } else {
-                        std::cout << "Ya encore une chance !" << std::endl;
+                        //std::cout << "Ya encore une chance !" << std::endl;
                     }
                 }
             }
         }
         else{
             if(Stalemate(0, "blanc", playerList) || Stalemate(1, "rouge", playerList) || Stalemate(2, "noir", playerList)){
-                std::cout << "StaleMate" << std::endl;
+                //std::cout << "StaleMate" << std::endl;
                 setEndOfGame(true);
                 setStalemate(true);
             }else{
-                std::cout << "La partie continue" <<std::endl;
+                //std::cout << "La partie continue" <<std::endl;
                 sidesInCheck.clear();
             }
 
@@ -846,7 +846,7 @@ bool Plateau::IsCheckmate(int indexPlayer, std::string playerName, Joueur* playe
         }
     }
 
-    std::cout << "Les " << playerName << "s sont en ÉCHEC ET MAT !" << std::endl;
+    //std::cout << "Les " << playerName << "s sont en ÉCHEC ET MAT !" << std::endl;
     return true;
 }
 

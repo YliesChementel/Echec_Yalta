@@ -13,6 +13,8 @@
 #include <iostream>
 #include <string>
 #include "FallingPiece.hpp"
+#include <locale>
+#include <codecvt>
 
 /**
  * @class Button
@@ -40,8 +42,9 @@ public:
 
         font.loadFromFile("resources/font/arial.ttf"); 
         text.setFont(font);
-        //text.setStyle(sf::Text::Bold);
-        text.setString(label);
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+        std::wstring wtext = converter.from_bytes(label);
+        text.setString(wtext);
         text.setCharacterSize(fontSize);
         text.setFillColor(sf::Color::Black);
         text.setPosition(x + 10, y + 10);

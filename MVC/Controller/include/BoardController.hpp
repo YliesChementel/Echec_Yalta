@@ -77,7 +77,6 @@ public:
     bool isPromotion() const { return promotion; }
     int getTour() const { return tour; }
     bool isEndOfGame() const { return endOfGame; }
-    int getRookRight() const { return rookRight; }
     bool isDragging() const { return Dragging; }
     const std::vector<std::pair<int, int>>& getPossibleMoves() const { return possibleMoves; }
     int getIndexDernierePiecePrise() const { return indexDernierePiecePrise; }
@@ -102,7 +101,6 @@ public:
     void setPromotion(bool promotion) { this->promotion = promotion; }
     void setTour(int tour) { this->tour = tour; }
     void setEndOfGame(bool endOfGame) { this->endOfGame = endOfGame; }
-    void setRookRight(int rookRight) { this->rookRight = rookRight; }
     void setDragging(bool isDragging) { this->Dragging = isDragging; }
     void setIndexDernierePiecePrise(int indexDernierePiecePrise) { this->indexDernierePiecePrise = indexDernierePiecePrise; }
     void addTileToChangeColor(const std::vector<int>& tile) { tilesToChangeColor.push_back(tile); }
@@ -126,7 +124,9 @@ private:
     std::unique_ptr<State> currentState;  ///< État actuel du jeu
     int tour = 0;                         ///< Tour actuel (0: Blanc, 1: Rouge, 2: Noir)
     bool endOfGame = false;               ///< Indique si la partie est terminée
-    int rookRight = 7;                    ///< Index de la tour droite pour le roque
+    int rookRightWhite = 7;                    ///< Index de la tour blanc droite pour le roque
+    int rookRightRed = 7;                      ///< Index de la tour rouge droite pour le roque
+    int rookRightBlack = 7;                    ///< Index de la tour noir droite pour le roque
     bool home = false;                    ///< Indique si on retourne au menu
     bool promotion = false;               ///< Indique si une promotion est en cours
 

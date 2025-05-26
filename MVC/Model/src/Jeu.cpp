@@ -24,7 +24,7 @@ Jeu::Jeu(){
         InitPieceList(playerList[i], i + 1);
     }
     board.PlacePiece(playerList[0].getListPiece(), playerList[1].getListPiece(), playerList[2].getListPiece());
-    board.AffichageMatrice(board.getMatrix());
+    //board.AffichageMatrice(board.getMatrix());
 }
 
 /**
