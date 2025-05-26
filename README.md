@@ -1,6 +1,6 @@
-# Yalta Chess
+# Échecs Yalta 
 
-Yalta Chess est une variante du jeu d'échecs à trois joueurs. Chaque joueur contrôle une armée (blanche, rouge ou noire) sur un plateau hexagonal spécial.
+Les échecs Yalta sont une variante du jeu d'échecs à trois joueurs. Chaque joueur contrôle une armée (blanche, rouge ou noire) sur un plateau hexagonal spécial.
 
 ## Description du Jeu
 
