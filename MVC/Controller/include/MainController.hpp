@@ -46,7 +46,7 @@ class MainController {
          * @brief Lance une partie de jeu
          * @param debugMode Indique si le mode debug est activé
          */
-        void runGame(bool debugMode);
+        void runGame(bool debugMode, bool isAiDifficult);
         
     private:
         GameState currentState;           ///< État actuel du jeu

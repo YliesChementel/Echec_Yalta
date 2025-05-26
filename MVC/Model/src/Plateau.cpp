@@ -963,11 +963,17 @@ std::vector<std::pair<int, int>> Plateau::RemoveKingInCheckMoves(std::string pla
  * @return true si le joueur est en pat, false sinon
  */
 bool Plateau::Stalemate(int indexPlayer, const std::string& playerName, Joueur* playerList) {
-    // vérif de si le roi est en echec
-    //std::vector<std::string> inCheck = IsInCheck(playerList, this->matrix);
-    //if (std::count(inCheck.begin(), inCheck.end(), playerName) != 0) {
-        //return false;
-    //}
+    // Vérification si tous les joueurs n'ont plus que leur roi
+    bool onlyKingsRemaining = true;
+    for(int i = 0; i < 3; ++i) {
+        if(playerList[i].getSize() != 1 || playerList[i].getListPiece()[0]->getType() != "r") {
+            onlyKingsRemaining = false;
+            break;
+        }
+    }
+    if(onlyKingsRemaining) {
+        return true;
+    }
 
     //vérif des moves légaux des autres pièces
     Piece** listPieces = playerList[indexPlayer].getListPiece();
@@ -1072,7 +1078,10 @@ int Plateau::evaluation(Joueur* players, int sideAi) {
         valuePiece = 0;
     }
   }
-  return evalValue;
+
+  // Ajout d'un élément aléatoire (±10% de la valeur d'évaluation)
+  float randomFactor = 0.9f + (static_cast<float>(rand()) / RAND_MAX) * 0.2f; // Entre 0.9 et 1.1
+  return static_cast<int>(evalValue * randomFactor);
 }
 
 /**

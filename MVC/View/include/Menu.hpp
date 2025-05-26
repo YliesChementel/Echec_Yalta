@@ -264,16 +264,31 @@ class Menu {
          */
         bool isBlackAI() const { return blackAICheckbox.getState(); }
 
+        /**
+         * @brief Vérifie si le joueur blanc est contrôlé par une IA facile
+         * @return true si le joueur blanc est une IA facile, false sinon
+         */
+        bool isEasyAI() const { return easyAICheckbox.getState(); }
+
+        /**
+         * @brief Vérifie si le joueur blanc est contrôlé par une IA difficile
+         * @return true si le joueur blanc est une IA difficile, false sinon
+         */
+        bool isHardAI() const { return hardAICheckbox.getState(); }
+
     private:
         sf::Font font;                     ///< Police utilisée pour le texte
         Button title;                      ///< Titre du jeu
         Button playButton;                 ///< Bouton pour démarrer la partie
         Button quitButton;                 ///< Bouton pour quitter
         Button frameCheckbox;              ///< Cadre pour les cases à cocher IA
+        Button frameDifficultyCheckbox;     ///< Cadre pour les cases à cocher de difficulté
         Button debugModeButton;            ///< Bouton pour activer le mode debug
         Checkbox whiteAICheckbox;          ///< Case à cocher pour l'IA blanche
         Checkbox redAICheckbox;            ///< Case à cocher pour l'IA rouge
         Checkbox blackAICheckbox;          ///< Case à cocher pour l'IA noire
+        Checkbox easyAICheckbox;           ///< Case à cocher pour l'IA facile
+        Checkbox hardAICheckbox;           ///< Case à cocher pour l'IA difficile
         bool playButtonClicked = false;    ///< État du bouton Jouer
         bool debugModeButtonClicked = false; ///< État du bouton Mode Debug
 

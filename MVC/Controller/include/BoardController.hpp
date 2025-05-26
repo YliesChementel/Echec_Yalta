@@ -26,8 +26,9 @@ public:
      * @param jeu Référence au modèle de jeu
      * @param ia Tableau indiquant quels joueurs sont contrôlés par l'IA
      * @param debugMode Indique si le mode debug est activé
+     * @param isAiDifficult Indique si l'IA est difficile
      */
-    BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf::RenderWindow& window, Jeu& jeu, std::array<bool, 3> ia, bool debugMode);
+    BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf::RenderWindow& window, Jeu& jeu, std::array<bool, 3> ia, bool debugMode, bool isAiDifficult);
 
     /**
      * @brief Lance la boucle principale du contrôleur
@@ -174,6 +175,7 @@ private:
     std::atomic<bool> aiMoveReady = false;            ///< Indique si le coup de l'IA est prêt
     std::atomic<bool> aiCalculating = false;          ///< Indique si l'IA est en train de calculer
     bool iaEnCours = false;                           ///< Indique si c'est le tour de l'IA
+    int depthLevel;                                   ///< Niveau de profondeur pour l'IA
 };
 
 #endif

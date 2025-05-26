@@ -13,7 +13,7 @@
 /**
  * @brief Constructeur initialisant le contrôleur du plateau
  */
-BoardController::BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf::RenderWindow& window,Jeu& jeu, std::array<bool, 3> ia, bool debugMode)
+BoardController::BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf::RenderWindow& window,Jeu& jeu, std::array<bool, 3> ia, bool debugMode, bool isAiDifficult)
     : makeBoard(makeBoard), drawBoard(drawBoard), window(window),jeu(jeu) , Dragging(false), selectedPieceIndex(-1),home(false) {
         handleSound(); 
         initListePieces();
@@ -32,6 +32,8 @@ BoardController::BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf:
             }
             else makeBoard.setTextGame("Au tour du joueur Blanc");
         }
+        if(isAiDifficult){depthLevel=4;}
+        else{depthLevel=3;}
     }
 
 /**
@@ -464,7 +466,7 @@ void BoardController::startAiMove() {
 
     aiThread = std::thread([this]() {
          try {
-            jeu.getBoard().minmax(jeu.getBoard(), tour, tour, 4, 4, -1000000, 1000000, jeu.getPlayerList(),stopAiThread);
+            jeu.getBoard().minmax(jeu.getBoard(), tour, tour, depthLevel, depthLevel, -1000000, 1000000, jeu.getPlayerList(),stopAiThread);
             if (stopAiThread) return;
             aiMoveReady = true;
             aiCalculating = false;

@@ -21,12 +21,12 @@
  * @brief Lance une partie de jeu avec les paramètres spécifiés
  * @param debugMode Indique si le mode debug est activé
  */
-void MainController::runGame(bool debugMode) {
+void MainController::runGame(bool debugMode,bool isAiDifficult) {
     MakeBoard makeBoard;
     DrawBoard drawBoard(window);
     Jeu jeu;
     // Initialise le contrôleur du plateau avec les paramètres du menu
-    BoardController controller(makeBoard, drawBoard, window, jeu, {menu.isWhiteAI(),menu.isRedAI(),menu.isBlackAI()}, debugMode);
+    BoardController controller(makeBoard, drawBoard, window, jeu, {menu.isWhiteAI(),menu.isRedAI(),menu.isBlackAI()}, debugMode, isAiDifficult);
     controller.run();
 }
 
@@ -44,7 +44,7 @@ void MainController::run(){
             }
             // Gestion de l'état de jeu
             else if(currentState == GameState::GAME){
-                runGame(menu.isDebugModeButtonClicked());
+                runGame(menu.isDebugModeButtonClicked(),menu.isHardAI());
                 menu.setDebugModeButtonClicked(false);
                 setGameState(GameState::MENU);
             }

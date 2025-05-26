@@ -28,10 +28,13 @@ Menu::Menu()
     : playButton(0, 0, "Jouer",24),       
       quitButton(0, 0, "Quitter",24), 
       frameCheckbox(0, 0, "Choix IA", 20),  
+      frameDifficultyCheckbox(0, 0, "Difficulté IA", 20),
       title(0, 0, "Jeu d'echec Yalta",50),
       whiteAICheckbox(0, 0, "resources/images/WhiteKing.png", 20),
       redAICheckbox(0, 0, "resources/images/RedKing.png", 20),
       blackAICheckbox(0, 0, "resources/images/BlackKing.png", 20),
+      easyAICheckbox(0, 0, "resources/images/WhitePawn.png", 20),
+      hardAICheckbox(0, 0, "resources/images/BlackQueen.png", 20),
       debugModeButton(1010, 940, "Debug Mode", 20)
 {
     // Dimensions de la fenêtre et des éléments
@@ -42,7 +45,7 @@ Menu::Menu()
     float verticalSpacing = 25;  
 
     // Calcul de la hauteur totale des boutons pour le centrage vertical
-    float totalButtonsHeight = 3 * buttonHeight + 2 * verticalSpacing;
+    float totalButtonsHeight = 4 * buttonHeight + 3 * verticalSpacing; // Augmenté pour tenir compte des nouvelles cases
     float startY = (windowHeight - totalButtonsHeight) / 2;
 
     // Positionnement des éléments
@@ -61,7 +64,18 @@ Menu::Menu()
     frameCheckbox.setPosition(checkboxX - 15, checkboxY - 40);
     frameCheckbox.setSize(200,100);
 
-    quitButton.setPosition((1150 - buttonWidth) / 2, startY + 2 * (buttonHeight + verticalSpacing));
+    // Positionnement des cases à cocher pour la difficulté
+    float difficultyCheckboxY = checkboxY + 80; // Augmenté l'espacement
+    easyAICheckbox.setPosition(checkboxX, difficultyCheckboxY+30);
+    hardAICheckbox.setPosition(checkboxX + 75, difficultyCheckboxY+30);
+
+    frameDifficultyCheckbox.setPosition(checkboxX - 15, difficultyCheckboxY-10);
+    frameDifficultyCheckbox.setSize(200,100);
+
+    easyAICheckbox.toggle();
+
+    // Positionnement du bouton quitter plus bas
+    quitButton.setPosition((1150 - buttonWidth) / 2, difficultyCheckboxY + 100);
     debugModeButton.setSize(135, 50);
 
     // Initialisation des pièces tombantes
@@ -124,6 +138,22 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
         if (blackAICheckbox.isClicked(mousePos)) {
             blackAICheckbox.toggle();
         }
+        if (easyAICheckbox.isClicked(mousePos)) {
+            if(!easyAICheckbox.getState()){
+                easyAICheckbox.toggle();
+                if (hardAICheckbox.getState()) {
+                    hardAICheckbox.toggle(); // Désactive l'autre option
+                }
+            }
+        }
+        if (hardAICheckbox.isClicked(mousePos)) {
+            if(!hardAICheckbox.getState()){
+                hardAICheckbox.toggle();
+                if (easyAICheckbox.getState()) {
+                    easyAICheckbox.toggle(); // Désactive l'autre option
+                }
+            }
+        }
         if(debugModeButton.isClicked(mousePos)){
             debugModeButtonClicked = true;
         }
@@ -156,9 +186,12 @@ void Menu::render(sf::RenderWindow& window) {
     playButton.draw(window);
     quitButton.draw(window);
     frameCheckbox.draw(window);
+    frameDifficultyCheckbox.draw(window);
     whiteAICheckbox.draw(window);
     redAICheckbox.draw(window);
     blackAICheckbox.draw(window);
+    easyAICheckbox.draw(window);
+    hardAICheckbox.draw(window);
     debugModeButton.draw(window); 
 
     // Mise à jour de l'affichage
