@@ -1,3 +1,8 @@
+/**
+ * @file VictoryState.hpp
+ * @brief État du jeu représentant l'écran de victoire avec des confettis
+ */
+
 #ifndef VICTORY_STATE_HPP
 #define VICTORY_STATE_HPP
 
@@ -9,6 +14,9 @@
 
 class VictoryState : public State {
 public:
+    /**
+     * @brief Gère les clics de souris sur le bouton retour
+     */
     void handleMousePressed(BoardController& controller, const sf::Event& event) override {
         sf::Vector2f mousePos = controller.getWindow().mapPixelToCoords(sf::Mouse::getPosition(controller.getWindow()));
         controller.handleBackButtonClick(mousePos);
@@ -18,12 +26,18 @@ public:
 
     void handleMouseReleased(BoardController& controller, const sf::Event& event) override {}
 
+    /**
+     * @brief Met à jour la position des confettis
+     */
     void update(BoardController& controller, float deltaTime) override {
         for (auto& confetto : controller.getFallingConfetto()) {
             confetto.update(deltaTime);
         }
     }
 
+    /**
+     * @brief Dessine l'écran de victoire avec le plateau, les pièces et les confettis
+     */
     void render(BoardController& controller) override {
         controller.getDrawBoard().clear();
         controller.getDrawBoard().drawHexagons(controller.getMakeBoard().getHexagon(), controller.getMakeBoard().getHexagon2());

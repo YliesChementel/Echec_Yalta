@@ -1,9 +1,17 @@
+/**
+ * @file PlayState.hpp
+ * @brief État du jeu gérant le déroulement normal d'une partie
+ */
+
 #include "BoardController.hpp"
 #include "State.hpp"
 #include "VictoryState.hpp"
 
 class PlayingState : public State {
 public:
+    /**
+     * @brief Gère la sélection et le déplacement des pièces
+     */
     void handleMousePressed(BoardController& controller, const sf::Event& event) override {
         sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
         
@@ -14,12 +22,18 @@ public:
         }
     }
 
+    /**
+     * @brief Gère le déplacement de la pièce sélectionnée avec la souris
+     */
     void handleMouseMoved(BoardController& controller, const sf::Event& event) override {
         if (!controller.isDragging()) return;
         sf::Vector2f mousePos = controller.getWindow().mapPixelToCoords(sf::Mouse::getPosition(controller.getWindow()));
         (*controller.getListePieces()[controller.getCouleurIndex()])[controller.getSelectedPieceIndex()].getSprite().setPosition(mousePos - controller.getOffsetImage());
     }
 
+    /**
+     * @brief Gère le placement de la pièce et la vérification des règles du jeu
+     */
     void handleMouseReleased(BoardController& controller, const sf::Event& event) override {
         if (!controller.isDragging()) return;
 
@@ -29,6 +43,7 @@ public:
         for (int i = 1; i <= 6; i++) {
             if (controller.PlacerPieceDansMatrice(controller.getMakeBoard().getMatrice(i), i, mousePos)) {
                 piecePut = true;
+                // Gestion du roque
                 if (controller.getJeu().getBoard().isCastling()) {
                     controller.caslingChanges(
                         (*controller.getListePieces()[controller.getCouleurIndex()])[controller.getSelectedPieceIndex()].getTilePositions()[1],
@@ -37,12 +52,14 @@ public:
                     controller.getJeu().getBoard().setCastling(false);
                 }
                 
+                // Gestion de la prise en passant
                 if (controller.getJeu().getBoard().isEnPassantMove()) {
                     controller.enPassantChanges();
                 }
                 
                 controller.PlaySound();
                 
+                // Mise à jour des messages d'échec
                 std::string echec =" ";
                 if(!controller.getJeu().getBoard().getSidesInCheck().empty()){
                     echec+="Rois en echec : ";
@@ -52,6 +69,8 @@ public:
                     }
                 }
                 controller.getMakeBoard().setTextEchec(echec);
+
+                // Vérification de la fin de partie
                 if(controller.getJeu().getBoard().isEndOfGame()){
                     controller.getMakeBoard().setTextGame("Partie Terminee");
                     if(controller.getJeu().getBoard().isStalemate()){
@@ -70,7 +89,8 @@ public:
             }
         }
         
-        if(!piecePut){ // Replacement d'une pièce à sa position initial si le déplacement est hors du plateau
+        // Remise en place de la pièce si le déplacement est invalide
+        if(!piecePut){
             int matrix = (*controller.getListePieces()[controller.getCouleurIndex()])[controller.getSelectedPieceIndex()].getTilePositions()[1];
             int selectedPieceIndex = controller.getSelectedPieceIndex();
             controller.getMakeBoard().ReplacementPiece(selectedPieceIndex, controller.getCouleurIndex(), matrix, (*controller.getListePieces()[controller.getCouleurIndex()]));
@@ -82,6 +102,9 @@ public:
         controller.RemettreCouleurDefautCases();
     }
 
+    /**
+     * @brief Dessine l'état de jeu actuel
+     */
     void render(BoardController& controller) override {
         controller.getDrawBoard().clear();
         controller.getDrawBoard().drawHexagons(controller.getMakeBoard().getHexagon(), controller.getMakeBoard().getHexagon2());

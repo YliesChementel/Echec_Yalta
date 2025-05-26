@@ -1,3 +1,8 @@
+/**
+ * @file Plateau.cpp
+ * @brief Implémentation de la classe Plateau qui gère le plateau de jeu d'échecs Yalta
+ */
+
 #include "include/Plateau.hpp"
 #include <iostream>
 #include <vector>
@@ -5,6 +10,17 @@
 #include <atomic>
 #include <thread>
 
+/**
+ * @brief Constructeur de la classe Plateau
+ * 
+ * Initialise la matrice du plateau et les variables d'état du jeu :
+ * - endOfGame : indique si la partie est terminée
+ * - stalemate : indique si la partie est en pat
+ * - castling : indique si un roque est en cours
+ * - isEnPassant : indique si une prise en passant est possible
+ * - whiteEnPassant, redEnPassant, blackEnPassant : indiquent si une prise en passant
+ *   est possible pour chaque joueur
+ */
 Plateau::Plateau(){
     InitMatrix();
     endOfGame = false;
@@ -16,8 +32,12 @@ Plateau::Plateau(){
     blackEnPassant = false;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction pour initialiser la matrix à null
+/**
+ * @brief Initialise la matrice du plateau
+ * 
+ * Place des pointeurs nuls dans toutes les cases de la matrice 12x12
+ * pour indiquer qu'elles sont vides.
+ */
 void Plateau::InitMatrix(){
     for (int i = 0; i < 12; ++i) {
         for (int j = 0; j < 12; ++j) {
@@ -26,8 +46,19 @@ void Plateau::InitMatrix(){
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction qui place les pièces des joueurs dans la matrix
+/**
+ * @brief Place les pièces des joueurs sur le plateau
+ * 
+ * Place les pièces des trois joueurs (blanc, rouge, noir) dans leurs positions
+ * initiales sur le plateau Yalta. Le plateau est divisé en trois zones :
+ * - Joueur blanc : lignes 0-1
+ * - Joueur rouge : lignes 6-7
+ * - Joueur noir : lignes 10-11
+ * 
+ * @param whitePieces Liste des pièces du joueur blanc
+ * @param redPieces Liste des pièces du joueur rouge
+ * @param blackPieces Liste des pièces du joueur noir
+ */
 void Plateau::PlacePiece(Piece** whitePieces, Piece** redPieces, Piece** blackPieces) {
     int whiteIndex = 0, redIndex = 0, blackIndex = 0;
 
@@ -99,8 +130,16 @@ void Plateau::PlacePiece(Piece** whitePieces, Piece** redPieces, Piece** blackPi
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction pour afficher la matrix dans le CLI
+/**
+ * @brief Affiche la matrice du plateau dans la console
+ * 
+ * Affiche une représentation textuelle du plateau où :
+ * - Les pièces sont représentées par leur type
+ * - Les cases vides sont représentées par 'X'
+ * - Les cases non existantes du plateau Yalta sont représentées par des espaces
+ * 
+ * @param matrix Matrice du plateau à afficher
+ */
 void Plateau::AffichageMatrice(Piece* matrix[12][12]){
     std::cout << "   ";
     for (int j = 0; j < 12; ++j) {
@@ -135,8 +174,17 @@ void Plateau::AffichageMatrice(Piece* matrix[12][12]){
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction pour afficher les coupsPosibles dans le CLI
+/**
+ * @brief Affiche les coups possibles sur le plateau
+ * 
+ * Affiche une représentation textuelle du plateau où :
+ * - Les pièces sont représentées par leur type
+ * - Les cases vides sont représentées par 'X'
+ * - Les coups possibles sont représentés par 'O'
+ * - Les cases non existantes du plateau Yalta sont représentées par des espaces
+ * 
+ * @param possibleMoves Liste des coups possibles à afficher
+ */
 void Plateau::AfficherCoupsPossibles(std::vector<std::pair<int, int>> possibleMoves) {
     std::cout << "   ";
     for (int j = 0; j < 12; ++j) {
@@ -178,8 +226,17 @@ void Plateau::AfficherCoupsPossibles(std::vector<std::pair<int, int>> possibleMo
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction qui retourne les moves possibles à partir de coordonnées données
+/**
+ * @brief Retourne les mouvements possibles pour une pièce
+ * 
+ * Si la pièce est un roi, vérifie d'abord si les mouvements ne mettent pas
+ * le roi en échec. Sinon, retourne directement les mouvements possibles
+ * calculés par la pièce.
+ * 
+ * @param xStart Position X de départ
+ * @param yStart Position Y de départ
+ * @return Liste des mouvements possibles
+ */
 std::vector<std::pair<int, int>> Plateau::MovePiece(int xStart, int yStart) {
     Piece* piece = matrix[xStart][yStart];
     if(piece->getType()=="r"){
@@ -194,7 +251,20 @@ std::vector<std::pair<int, int>> Plateau::MovePiece(int xStart, int yStart) {
     }
 }
 
-
+/**
+ * @brief Vérifie si un roque est possible
+ * 
+ * Vérifie les conditions pour effectuer un roque :
+ * - Le roi et la tour n'ont pas encore bougé
+ * - Aucune pièce ne se trouve entre eux
+ * - Le roi n'est pas en échec
+ * 
+ * @param xStart Position X de départ
+ * @param yStart Position Y de départ
+ * @param xMove Direction X du mouvement
+ * @param yMove Direction Y du mouvement
+ * @param matrix Matrice du plateau
+ */
 void Plateau::IsCastling(int xStart, int yStart,int xMove,int yMove, Piece* matrix[12][12]){
     if(matrix[xStart][yStart]->getSide()==1){
         if(xMove==0 && yMove==2){
@@ -246,7 +316,20 @@ void Plateau::IsCastling(int xStart, int yStart,int xMove,int yMove, Piece* matr
     }
 }
 
-
+/**
+ * @brief Réinitialise les drapeaux de prise en passant pour toutes les pièces d'un joueur
+ * 
+ * Cette fonction est appelée après chaque coup pour réinitialiser les drapeaux
+ * de prise en passant. La prise en passant n'est possible que pendant un tour
+ * après qu'un pion a avancé de deux cases.
+ * 
+ * La fonction parcourt toutes les pièces du joueur et réinitialise leur drapeau
+ * enPassant à false. Cela permet de s'assurer que la prise en passant n'est
+ * possible que pendant le tour suivant le mouvement du pion.
+ * 
+ * @param pieceList Liste des pièces du joueur dont il faut réinitialiser les drapeaux
+ * @param listSize Nombre de pièces dans la liste
+ */
 void RemoveEnPassantMove(Piece** pieceList,int listSize){
     for (int i = 0; i < listSize; i++) {
         if (pieceList[i]->enPassant){
@@ -255,22 +338,42 @@ void RemoveEnPassantMove(Piece** pieceList,int listSize){
     }
 }
 
+/**
+ * @brief Réinitialise les drapeaux de prise en passant
+ * 
+ * Réinitialise les drapeaux de prise en passant pour un joueur spécifique
+ * après son coup.
+ * 
+ * @param side Numéro du joueur (1: blanc, 2: rouge, 3: noir)
+ * @param playerList Liste des joueurs
+ */
 void Plateau::resetEnPassant(int side, Joueur* playerList) {
     if(side==1 && whiteEnPassant){
         RemoveEnPassantMove(playerList[0].getListPiece(),playerList[0].getSize());
         setWhiteEnPassant(false);
     }
-    else if(side==2 && redEnPassant){
+    if(side==2 && redEnPassant){
         RemoveEnPassantMove(playerList[1].getListPiece(),playerList[1].getSize());
         setRedEnPassant(false);
     }
-    else if(side==3 && blackEnPassant){
+    if(side==3 && blackEnPassant){
         RemoveEnPassantMove(playerList[2].getListPiece(),playerList[2].getSize());
         setBlackEnPassant(false);
     }
 }
 
-
+/**
+ * @brief Effectue une capture de pièce
+ * 
+ * Supprime la pièce capturée de la liste des pièces du joueur
+ * et la retire du plateau.
+ * 
+ * @param xMove Position X de la pièce capturée
+ * @param yMove Position Y de la pièce capturée
+ * @param playerSide Numéro du joueur qui capture
+ * @param playerList Liste des joueurs
+ * @param matrix Matrice du plateau
+ */
 void Plateau::Capture(int xMove, int yMove, int playerSide, Joueur* playerList, Piece* matrix[12][12]) {
     if (matrix[xMove][yMove] != nullptr) {
         
@@ -294,6 +397,22 @@ void Plateau::Capture(int xMove, int yMove, int playerSide, Joueur* playerList, 
     }
 }
 
+/**
+ * @brief Gère les mouvements spéciaux
+ * 
+ * Gère les mouvements spéciaux comme :
+ * - La promotion des pions
+ * - La prise en passant
+ * - Le roque
+ * 
+ * @param xStart Position X de départ
+ * @param yStart Position Y de départ
+ * @param xMove Position X d'arrivée
+ * @param yMove Position Y d'arrivée
+ * @param playerSide Numéro du joueur
+ * @param playerList Liste des joueurs
+ * @param matrix Matrice du plateau
+ */
 void Plateau::SpecialMoves(int xStart, int yStart, int xMove, int yMove, int playerSide, Joueur* playerList, Piece* matrix[12][12]) {
      if(matrix[xStart][yStart]->getType()=="r" && !matrix[xStart][yStart]->getHasAlreadyMoved()){
         IsCastling(xStart, yStart, xMove, yMove, matrix);
@@ -330,8 +449,21 @@ void Plateau::SpecialMoves(int xStart, int yStart, int xMove, int yMove, int pla
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction qui déplace une pièce via les coordonnées données et gère la capture d'une pièce, ainsi que la mise en echec et echec et mat
+/**
+ * @brief Effectue un mouvement de pièce
+ * 
+ * Déplace une pièce d'une position à une autre en gérant :
+ * - La capture éventuelle
+ * - Les mouvements spéciaux
+ * - La mise à jour des positions
+ * 
+ * @param xStart Position X de départ
+ * @param yStart Position Y de départ
+ * @param xMove Position X d'arrivée
+ * @param yMove Position Y d'arrivée
+ * @param playerList Liste des joueurs
+ * @param matrix Matrice du plateau
+ */
 void Plateau::Move(int xStart, int yStart,int xMove,int yMove, Joueur* playerList, Piece* matrix[12][12]){
     int playerSide = matrix[xStart][yStart]->getSide();
     resetEnPassant(playerSide, playerList);
@@ -393,8 +525,21 @@ void Plateau::Move(int xStart, int yStart,int xMove,int yMove, Joueur* playerLis
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction similaire à Move mais sera utiliser par L'IA
+/**
+ * @brief Effectue un mouvement pour l'IA
+ * 
+ * Version simplifiée de Move() pour l'IA qui ne gère pas :
+ * - L'affichage
+ * - La détection d'échec et mat
+ * - La détection de pat
+ * 
+ * @param xStart Position X de départ
+ * @param yStart Position Y de départ
+ * @param xMove Position X d'arrivée
+ * @param yMove Position Y d'arrivée
+ * @param playerList Liste des joueurs
+ * @param matrix Matrice du plateau
+ */
 void Plateau::moveForAi(int xStart, int yStart,int xMove,int yMove, Joueur* playerList, Piece* matrix[12][12]){
     int playerSide = matrix[xStart][yStart]->getSide();
     //this->resetEnPassant(playerSide, playerList);
@@ -413,8 +558,19 @@ void Plateau::moveForAi(int xStart, int yStart,int xMove,int yMove, Joueur* play
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction similaire à Move mais sera utiliser par la copy du plateau pour la détection des echec et mat
+/**
+ * @brief Effectue un mouvement pour un clone du plateau
+ * 
+ * Version simplifiée de Move() pour les clones du plateau utilisés
+ * dans l'algorithme minmax.
+ * 
+ * @param xStart Position X de départ
+ * @param yStart Position Y de départ
+ * @param xMove Position X d'arrivée
+ * @param yMove Position Y d'arrivée
+ * @param playerList Liste des joueurs
+ * @param matrix Matrice du plateau
+ */
 void moveForClone(int xStart, int yStart,int xMove,int yMove, Joueur* playerList, Piece* matrix[12][12]){
     if (matrix[xMove][yMove] != nullptr) {
         if(matrix[xMove][yMove]->getSide()==1){
@@ -435,8 +591,17 @@ void moveForClone(int xStart, int yStart,int xMove,int yMove, Joueur* playerList
     matrix[xMove][yMove]->setYPosition(yMove);
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction pour faire des copies des listes de pièces des joueurs, et prendre leurs tailles
+/**
+ * @brief Clone la liste des pièces d'un joueur
+ * 
+ * Crée une copie profonde de la liste des pièces d'un joueur
+ * pour l'utiliser dans l'algorithme minmax.
+ * 
+ * @param copy Matrice source
+ * @param side Numéro du joueur
+ * @param size Taille de la liste des pièces
+ * @return Liste des pièces clonées
+ */
 Piece** clonePieceListe(Piece* copy[12][12], int side, int& size) {
     int count = 0;
     for (int i = 0; i < 12; ++i){
@@ -464,8 +629,15 @@ Piece** clonePieceListe(Piece* copy[12][12], int side, int& size) {
     return list;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction pour faire une copy de la matrix via les méthode clone() des pièces
+/**
+ * @brief Clone la matrice du plateau
+ * 
+ * Crée une copie profonde de la matrice du plateau
+ * pour l'utiliser dans l'algorithme minmax.
+ * 
+ * @param copy Matrice destination
+ * @param original Matrice source
+ */
 void cloneMatrix(Piece* copy[12][12], Piece* original[12][12]) {
     for (int i = 0; i < 12; ++i) {
         for (int j = 0; j < 12; ++j) {
@@ -478,8 +650,13 @@ void cloneMatrix(Piece* copy[12][12], Piece* original[12][12]) {
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction pour supprimer la copy de la matrix de pièce
+/**
+ * @brief Libère la mémoire de la matrice
+ * 
+ * Supprime toutes les pièces de la matrice et libère leur mémoire.
+ * 
+ * @param matrix Matrice à libérer
+ */
 void freeMatrix(Piece* (*matrix)[12]) {
     for (int i = 0; i < 12; ++i) {
         for (int j = 0; j < 12; ++j) {
@@ -491,8 +668,19 @@ void freeMatrix(Piece* (*matrix)[12]) {
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction pour vérifier si les pièces attaquantes mettent les autres joueurs en echec
+/**
+ * @brief Retourne les joueurs en échec
+ * 
+ * Détermine quels joueurs sont en échec après un mouvement
+ * en vérifiant si leurs rois peuvent être capturés.
+ * 
+ * @param indexAttacker Index du joueur qui attaque
+ * @param king1 Position du roi du joueur 1
+ * @param king2 Position du roi du joueur 2
+ * @param playerList Liste des joueurs
+ * @param matrix Matrice du plateau
+ * @return Chaîne contenant les numéros des joueurs en échec
+ */
 std::string returnSidesInCheck(int indexAttacker, std::pair<int,int> king1, std::pair<int,int> king2, Joueur* playerList, Piece* matrix[12][12]) {
     std::vector<std::pair<int, int>> moves;
     Piece** attackerPieces = playerList[indexAttacker].getListPiece();
@@ -524,8 +712,12 @@ std::string returnSidesInCheck(int indexAttacker, std::pair<int,int> king1, std:
     return "aucun";
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction pour trouver la position du roi d'un player
+/**
+ * @brief Trouve la position du roi d'un joueur
+ * 
+ * @param player Joueur dont on cherche le roi
+ * @return Position (x,y) du roi
+ */
 std::pair<int, int> findKingPosition(Joueur& player) {
     Piece** pieces = player.getListPiece();
     for (int i = 0; i < player.getSize(); ++i) {
@@ -536,8 +728,13 @@ std::pair<int, int> findKingPosition(Joueur& player) {
     return { -1, -1 };
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction pour vérifier si les rois sont en echec, si oui alors sa couleur est retourner
+/**
+ * @brief Vérifier si les rois sont en echec, si oui alors sa couleur est retourner
+ * 
+ * @param playerList Liste des joueurs
+ * @param matrix Matrice du plateau
+ * @return Liste des joueurs en échec
+ */
 std::vector<std::string> Plateau::IsInCheck(Joueur* playerList, Piece* matrix[12][12]) {
     std::pair<int, int> whiteKing, redKing, blackKing;
 
@@ -601,6 +798,18 @@ std::vector<std::string> Plateau::IsInCheck(Joueur* playerList, Piece* matrix[12
     return sidesCheck;
 }
 
+/**
+ * @brief Vérifie si un joueur est en échec et mat
+ * 
+ * Un joueur est en échec et mat si :
+ * - Son roi est en échec
+ * - Aucun mouvement ne peut le sortir de l'échec
+ * 
+ * @param indexPlayer Index du joueur à vérifier
+ * @param playerName Nom du joueur
+ * @param playerList Liste des joueurs
+ * @return true si le joueur est en échec et mat, false sinon
+ */
 bool Plateau::IsCheckmate(int indexPlayer, std::string playerName, Joueur* playerList) {
 
     Piece** listPieces = playerList[indexPlayer].getListPiece();
@@ -641,6 +850,15 @@ bool Plateau::IsCheckmate(int indexPlayer, std::string playerName, Joueur* playe
     return true;
 }
 
+/**
+ * @brief Vérifie si un pion est sur le bord du plateau
+ * 
+ * @param xStart Position X du pion
+ * @param yStart Position Y du pion
+ * @param xMove Position X d'arrivée
+ * @param matrix Matrice du plateau
+ * @return true si le pion est sur le bord, false sinon
+ */
 bool Plateau::PawnOnEdge(int xStart, int yStart,int xMove, Piece* matrix[12][12]){
     if(matrix[xStart][yStart]->getType()=="P"){
         if(xMove==0 || xMove==7 || xMove==11){
@@ -650,6 +868,18 @@ bool Plateau::PawnOnEdge(int xStart, int yStart,int xMove, Piece* matrix[12][12]
     return false;
 }
 
+/**
+ * @brief Gère la promotion d'un pion
+ * 
+ * Remplace un pion qui atteint le bord du plateau par une nouvelle pièce
+ * choisie par le joueur (dame, tour, fou ou cavalier).
+ * 
+ * @param xStart Position X du pion
+ * @param yStart Position Y du pion
+ * @param promotionChoice Type de pièce choisie pour la promotion
+ * @param playerList Liste des joueurs
+ * @param matrix Matrice du plateau
+ */
 void Plateau::PawnPromotion(int xStart, int yStart, int promotionChoice, Joueur* playerList,Piece* matrix[12][12]){
     Piece* piecePromotion;
     int pieceSide = matrix[xStart][yStart]->getSide();
@@ -678,6 +908,16 @@ void Plateau::PawnPromotion(int xStart, int yStart, int promotionChoice, Joueur*
     matrix[xStart][yStart]=piecePromotion;
 }
 
+/**
+ * @brief Retire les mouvements qui mettent le roi en échec
+ * 
+ * Filtre la liste des mouvements possibles pour ne garder que ceux
+ * qui ne mettent pas le roi en échec.
+ * 
+ * @param playerName Nom du joueur
+ * @param piece Pièce qui se déplace
+ * @return Liste des mouvements valides
+ */
 std::vector<std::pair<int, int>> Plateau::RemoveKingInCheckMoves(std::string playerName, Piece* piece) {
     std::vector<std::pair<int, int>> possibleMoves = piece->possibleMove(piece->getXPosition(), piece->getYPosition(), this->matrix);
     std::vector<std::pair<int, int>> validMoves;
@@ -710,6 +950,18 @@ std::vector<std::pair<int, int>> Plateau::RemoveKingInCheckMoves(std::string pla
     return validMoves;
 }
 
+/**
+ * @brief Vérifie si un joueur est en pat
+ * 
+ * Un joueur est en pat si :
+ * - Son roi n'est pas en échec
+ * - Aucun mouvement n'est possible
+ * 
+ * @param indexPlayer Index du joueur à vérifier
+ * @param playerName Nom du joueur
+ * @param playerList Liste des joueurs
+ * @return true si le joueur est en pat, false sinon
+ */
 bool Plateau::Stalemate(int indexPlayer, const std::string& playerName, Joueur* playerList) {
     // vérif de si le roi est en echec
     //std::vector<std::string> inCheck = IsInCheck(playerList, this->matrix);
@@ -736,6 +988,18 @@ bool Plateau::Stalemate(int indexPlayer, const std::string& playerName, Joueur* 
     return true;
 }
 
+/**
+ * @brief Évalue la position d'un joueur
+ * 
+ * Calcule un score pour la position d'un joueur en fonction de :
+ * - La valeur matérielle des pièces
+ * - La position des pièces sur le plateau
+ * - La sécurité du roi
+ * 
+ * @param players Liste des joueurs
+ * @param sideAi Numéro du joueur IA
+ * @return Score de la position
+ */
 int Plateau::evaluation(Joueur* players, int sideAi) {
   int evalValue = 0;
   int valuePiece = 0;
@@ -751,39 +1015,39 @@ int Plateau::evaluation(Joueur* players, int sideAi) {
             valuePiece = 10;
 
             if(piece->getSide() == 1) {
-                valuePiece += x*10; 
+                valuePiece += x; 
             }
             else if(piece->getSide() == 2) {
-                if(x>7){
-                    valuePiece += 11-x*10; 
+                if(x>6){
+                    valuePiece += 11-x; 
                 }
                 else{
-                    valuePiece += x*10; 
+                    valuePiece += x; 
                 }
             }
             else if(piece->getSide() == 3) {
                 if(x>3 && x<8){
-                     valuePiece += x*10;
+                     valuePiece += x;
                 }
                 else{
-                   valuePiece += 11-x*10; 
+                   valuePiece += 11-x; 
                 } 
             }
 
             if(piece->getHasAlreadyMoved()){
-                valuePiece += 10;
+                valuePiece += 2;
             }
         }
         else if(piece->getType() == "C"){
             valuePiece = 30;
             if(piece->getHasAlreadyMoved()){
-                valuePiece += 20;
+                valuePiece += 3;
             }
         }
         else if(piece->getType() == "T"){
             valuePiece = 40;
             if(!piece->getHasAlreadyMoved()){
-                valuePiece += 30;
+                valuePiece += 5;
             }
             
         }
@@ -794,34 +1058,43 @@ int Plateau::evaluation(Joueur* players, int sideAi) {
             valuePiece = 90;
         }
         else if(piece->getType() == "r"){
-            valuePiece = 10000;
+            if(!piece->getHasAlreadyMoved()){
+                valuePiece += 20;
+            }
+            valuePiece += 10000;
         }
-        evalValue += signe * valuePiece;
+
+        if(((x > 2 && x < 5) || x == 8) && piece->getType() != "r") { // Bonus pour contrôle du centre
+            valuePiece += 3;
+        }
+
+        evalValue += signe * valuePiece;        
         valuePiece = 0;
     }
   }
   return evalValue;
 }
 
-Plateau* Plateau::clone() {
-    Plateau* newPlateau = new Plateau();
-    cloneMatrix(newPlateau->matrix, this->matrix);
-
-    newPlateau->setSidesInCheck(sidesInCheck);
-    newPlateau->setWinner(winner);
-    newPlateau->setEndOfGame(endOfGame);
-    newPlateau->setCastling(castling);
-    newPlateau->setEnPassant(isEnPassant);
-    newPlateau->setWhiteEnPassant(whiteEnPassant);
-    newPlateau->setRedEnPassant(redEnPassant);
-    newPlateau->setBlackEnPassant(blackEnPassant);
-    
-    return newPlateau;
-}
-
+/**
+ * @brief Implémente l'algorithme minmax avec élagage alpha-beta
+ * 
+ * Recherche le meilleur coup possible pour l'IA en explorant
+ * l'arbre des coups possibles jusqu'à une profondeur donnée.
+ * 
+ * @param plateau Plateau de jeu
+ * @param sideMove Joueur qui doit jouer
+ * @param sideAi Numéro du joueur IA
+ * @param depth Profondeur restante de recherche
+ * @param OrignialDepth Profondeur initiale de recherche
+ * @param alpha Valeur alpha pour l'élagage
+ * @param beta Valeur beta pour l'élagage
+ * @param players Liste des joueurs
+ * @param stopFlag Drapeau pour arrêter la recherche
+ * @return Meilleur score trouvé
+ */
 int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int OrignialDepth, int alpha, int beta, Joueur* players, std::atomic<bool>& stopFlag){
     if(depth==0 || plateau.endOfGame){
-        return evaluation(players, sideAi);
+        return this->evaluation(players, sideAi);
     }
 
     if(sideMove==sideAi){
@@ -924,4 +1197,30 @@ int Plateau::minmax(Plateau plateau, int sideMove, int sideAi, int depth, int Or
         }
         return minEval;
     }   
+}
+
+/**
+ * @brief Crée une copie profonde du plateau
+ * 
+ * Clone le plateau en copiant :
+ * - La matrice des pièces
+ * - L'état du jeu (échec, fin de partie, etc.)
+ * - Les drapeaux de prise en passant
+ * 
+ * @return Pointeur vers le nouveau plateau
+ */
+Plateau* Plateau::clone() {
+    Plateau* newPlateau = new Plateau();
+    cloneMatrix(newPlateau->matrix, this->matrix);
+
+    newPlateau->setSidesInCheck(sidesInCheck);
+    newPlateau->setWinner(winner);
+    newPlateau->setEndOfGame(endOfGame);
+    newPlateau->setCastling(castling);
+    newPlateau->setEnPassant(isEnPassant);
+    newPlateau->setWhiteEnPassant(whiteEnPassant);
+    newPlateau->setRedEnPassant(redEnPassant);
+    newPlateau->setBlackEnPassant(blackEnPassant);
+    
+    return newPlateau;
 }

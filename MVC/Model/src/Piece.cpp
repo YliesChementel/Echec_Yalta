@@ -1,21 +1,48 @@
+/**
+ * @file Piece.cpp
+ * @brief Implémentation des classes de pièces du jeu d'échecs
+ */
+
 #include "include/Piece.hpp"
 #include <iostream>
 #include <algorithm>
 #include "include/Plateau.hpp"
 
-
+/**
+ * @brief Implémentation par défaut de possibleMove
+ * Retourne une position invalide (-1,-1)
+ */
 std::vector<std::pair<int, int>> Piece::possibleMove(int xStart, int yStart, Piece* matrix[12][12]){
     return std::vector<std::pair<int, int>>{std::make_pair(-1, -1)};
 }
 
+/**
+ * @brief Obtient le numéro du joueur propriétaire
+ * @return Numéro du joueur (1: Blanc, 2: Rouge, 3: Noir)
+ */
 int Piece::getSide() {
     return side;
 }
 
+/**
+ * @brief Modifie le numéro du joueur propriétaire
+ * @param side Nouveau numéro de joueur
+ */
 void Piece::setSide(int side) {
     this->side=side;
 }
 
+/**
+ * @brief Détermine la sous-matrice en fonction des coordonnées
+ * 
+ * Le plateau Yalta est divisé en 6 sous-matrices :
+ * 1: haut gauche   2: haut milieu   3: milieu gauche
+ * 4: milieu droite 5: bas milieu    6: bas droite
+ * 
+ * @param x Position X
+ * @param y Position Y
+ * @return Numéro de la sous-matrice (1-6)
+ */
 int Piece::determineSubMatrix(int x, int y) const {
     if (x < 4 && y < 4) return 1; // haut gauche
     if (x < 4 && y >= 4 && y < 8) return 2; // haut milieu
@@ -26,15 +53,27 @@ int Piece::determineSubMatrix(int x, int y) const {
     return 0;
 }
 
+/**
+ * @brief Ajuste les coordonnées pour le plateau Yalta
+ * 
+ * Gère les cas particuliers de déplacement entre les sous-matrices :
+ * - Passage par le centre
+ * - Inversion des coordonnées pour certaines sous-matrices
+ * 
+ * @param xStart Position X de départ
+ * @param yStart Position Y de départ
+ * @param xDestination Position X d'arrivée
+ * @param yDestination Position Y d'arrivée
+ * @param xMove Déplacement en X
+ * @param yMove Déplacement en Y
+ */
 void Piece::adjustCoordinates(int& xStart, int& yStart, int& xDestination, int& yDestination,int& xMove, int& yMove) const {
     int matrixStart = determineSubMatrix(xStart, yStart);
     int matrixDestination = determineSubMatrix(xDestination, yDestination);
 
+    // Gestion du passage par le centre
     if((xDestination > 3 && xDestination < 8) && (yDestination > 3 && yDestination < 8)){
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //Lignes
-
+        // Ajustements pour les mouvements horizontaux et verticaux
         if(xMove==-1 && yMove==0){//va en haut
             xDestination-=4;
         }
@@ -48,9 +87,7 @@ void Piece::adjustCoordinates(int& xStart, int& yStart, int& xDestination, int& 
             yDestination-=4;
         }
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //Diagonales
-
+        // Ajustements pour les mouvements diagonaux
         else if(xMove==-1 && yMove==-1){// va haut-gauche
             if(matrixStart==4){
                 yDestination-=4;
@@ -85,50 +122,88 @@ void Piece::adjustCoordinates(int& xStart, int& yStart, int& xDestination, int& 
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Intéractions des matrices 4, 5 et 6 qui sont inversées
-
-    else if ((matrixStart == 6 && matrixDestination == 5) || (matrixStart == 5 && yDestination == 3)) { // Inversion horizontale de la matrix bas-milieu + (cas particulier 7-3)
+    // Gestion des inversions entre sous-matrices
+    else if ((matrixStart == 6 && matrixDestination == 5) || (matrixStart == 5 && yDestination == 3)) {
+        // Inversion horizontale de la matrix bas-milieu + (cas particulier 7-3)
         yDestination = 11 - yDestination;
-        if ((xMove == 0 || xMove == 1 || xMove == -1) && yMove == -1) {// Pour toutes les directions où yMove == -1, donc gauche, bas-gauche et haut-gauche
+        if ((xMove == 0 || xMove == 1 || xMove == -1) && yMove == -1) {
             yMove = 1;
         }
     }
-    else if ((matrixStart == 6 && matrixDestination == 4) || (matrixStart == 4 && xDestination == 3 )) { // Inversion verticale de la matrix milieu-droite
+    else if ((matrixStart == 6 && matrixDestination == 4) || (matrixStart == 4 && xDestination == 3 )) {
+        // Inversion verticale de la matrix milieu-droite
         xDestination = 11 - xDestination;
-        if (xMove == -1 && (yMove == 0 || yMove == -1 || yMove == 1)) { // Pour toutes les directions où xMove == -1, donc haut, haut-gauche et haut-droite
+        if (xMove == -1 && (yMove == 0 || yMove == -1 || yMove == 1)) {
             xMove = 1;
         }
     }
 }
 
-// Vérifie si les coordonnées sont en dehors du plateau
+// Fonctions utilitaires pour la vérification des mouvements
+
+/**
+ * @brief Vérifie si les coordonnées sont en dehors du plateau
+ * @param x Position X
+ * @param y Position Y
+ * @return true si les coordonnées sont invalides
+ */
 bool isOutOfBoard(int x, int y) {
     return x < 0 || x >= 12 || y < 0 || y >= 12;
 }
 
-// Vérifie si la case ciblée n'existe pas
+/**
+ * @brief Vérifie si la case ciblée n'existe pas
+ * @param x Position X
+ * @param y Position Y
+ * @return true si la case n'existe pas
+ */
 bool isSquareExist(int x, int y) {
     return (x < 4 && y > 7) || (x > 7 && y < 4);
 }
 
-// Vérifie si le déplacement rencontre le mur de la matrix 5
+/**
+ * @brief Vérifie si le déplacement rencontre le mur de la matrix 5
+ * @param xStart Position X de départ
+ * @param yStart Position Y de départ
+ * @param xMove Déplacement en X
+ * @param yMove Déplacement en Y
+ * @return true si le mur est rencontré
+ */
 bool isWallInMatrix5(int xStart, int yStart, int xMove, int yMove) {
     return (yStart == 7 && (yStart + yMove == 8)) && ((xMove == 0 && yMove == 1) || (xMove == -1 && yMove == 1) || (xMove == 1 && yMove == 1));
 }
 
-// Vérifie si le déplacement rencontre le mur de la matrix 4
+/**
+ * @brief Vérifie si le déplacement rencontre le mur de la matrix 4
+ * @param xStart Position X de départ
+ * @param yStart Position Y de départ
+ * @param xMove Déplacement en X
+ * @param yMove Déplacement en Y
+ * @return true si le mur est rencontré
+ */
 bool isWallInMatrix4(int xStart, int yStart, int xMove, int yMove) {
     return (xStart == 7 && (xStart + xMove == 8)) && ((xMove == 1 && yMove == -1) || (xMove == 1 && yMove == 0) || (xMove == 1 && yMove == 1));
 }
 
-
+/**
+ * @brief Calcule récursivement les mouvements possibles dans une direction
+ * 
+ * Utilisé par les pièces qui peuvent se déplacer sur plusieurs cases
+ * (Tour, Fou, Reine). Gère les cas particuliers du plateau Yalta.
+ * 
+ * @param xStart Position X de départ
+ * @param yStart Position Y de départ
+ * @param xMove Direction X
+ * @param yMove Direction Y
+ * @param possibleMoves Liste des mouvements possibles
+ * @param matrix Matrice du plateau
+ */
 void Piece::recursiveMove(int xStart, int yStart, int xMove, int yMove,std::vector<std::pair<int, int>>& possibleMoves,Piece* matrix[12][12]) {
     int xDestination = xStart + xMove;
     int yDestination = yStart + yMove;
     if (!isWallInMatrix5(xStart, yStart, xMove, yMove)) {
         if (!isWallInMatrix4(xStart, yStart, xMove, yMove)) {
-
+            // Gestion des cas particuliers du centre du plateau
             if((xStart==3 && yStart==3) && (xMove==1 && yMove==1)){
                 if(matrix[4][8] != nullptr){
                     if(matrix[4][8]->getSide()!=this->getSide()){
@@ -277,6 +352,21 @@ void Piece::recursiveMove(int xStart, int yStart, int xMove, int yMove,std::vect
     }
 }
 
+/**
+ * @brief Calcule les mouvements possibles pour un cavalier
+ * 
+ * Le cavalier se déplace en L : 2 cases dans une direction puis 1 case perpendiculairement.
+ * Gère les cas particuliers du plateau Yalta.
+ * 
+ * @param xStart Position X de départ
+ * @param yStart Position Y de départ
+ * @param xMove Direction X
+ * @param yMove Direction Y
+ * @param possibleMoves Liste des mouvements possibles
+ * @param verification Étape de vérification (0: premier mouvement, 1: second mouvement)
+ * @param methodTwo Méthode alternative de calcul
+ * @param matrix Matrice du plateau
+ */
 void Piece::knightMove(int xStart, int yStart, int xMove, int yMove,std::vector<std::pair<int, int>>& possibleMoves,int verification,bool methodTwo, Piece* matrix[12][12]) {
     int xDestination = xStart + xMove;
     int yDestination = yStart + yMove;
@@ -328,6 +418,19 @@ void Piece::knightMove(int xStart, int yStart, int xMove, int yMove,std::vector<
     }
 }
 
+/**
+ * @brief Calcule les mouvements possibles pour un roi
+ * 
+ * Le roi peut se déplacer d'une case dans toutes les directions.
+ * Gère également le roque si le roi n'a pas encore bougé.
+ * 
+ * @param xStart Position X de départ
+ * @param yStart Position Y de départ
+ * @param xMove Direction X
+ * @param yMove Direction Y
+ * @param possibleMoves Liste des mouvements possibles
+ * @param matrix Matrice du plateau
+ */
 void Piece::kingMove(int xStart, int yStart, int xMove, int yMove,std::vector<std::pair<int, int>>& possibleMoves, Piece* matrix[12][12]) {
     int xDestination = xStart + xMove;
     int yDestination = yStart + yMove;
@@ -462,6 +565,19 @@ void Piece::kingMove(int xStart, int yStart, int xMove, int yMove,std::vector<st
     }
 }
 
+/**
+ * @brief Vérifie et ajoute les mouvements de roque possibles
+ * 
+ * Le roque est possible si :
+ * - Le roi et la tour n'ont pas encore bougé
+ * - Aucune pièce ne se trouve entre eux
+ * - Le roi n'est pas en échec
+ * 
+ * @param xStart Position X du roi
+ * @param yStart Position Y du roi
+ * @param possibleMoves Liste des mouvements possibles
+ * @param matrix Matrice du plateau
+ */
 void Piece::castling(int xStart, int yStart, std::vector<std::pair<int, int>>& possibleMoves, Piece* matrix[12][12]){
     Piece* piece = matrix[xStart][yStart];
     if(piece->side==1){
@@ -502,6 +618,20 @@ void Piece::castling(int xStart, int yStart, std::vector<std::pair<int, int>>& p
     }
 }
 
+/**
+ * @brief Calcule les mouvements possibles pour un pion
+ * 
+ * Le pion peut :
+ * - Avancer d'une ou deux cases au premier coup
+ * - Capturer en diagonale
+ * - Se promouvoir en atteignant le bord
+ * 
+ * @param xStart Position X de départ
+ * @param yStart Position Y de départ
+ * @param possibleMoves Liste des mouvements possibles
+ * @param stop Compteur pour le double pas initial
+ * @param matrix Matrice du plateau
+ */
 void Piece::pawnMove(int xStart, int yStart, std::vector<std::pair<int, int>>& possibleMoves, int stop, Piece* matrix[12][12]) {
     if (stop == 2) return; 
 
@@ -541,6 +671,17 @@ void Piece::pawnMove(int xStart, int yStart, std::vector<std::pair<int, int>>& p
     }
 }
 
+/**
+ * @brief Calcule les mouvements possibles pour un pion après son premier coup
+ * 
+ * Version simplifiée de pawnMove qui ne permet que le déplacement d'une case
+ * et les captures.
+ * 
+ * @param xStart Position X de départ
+ * @param yStart Position Y de départ
+ * @param possibleMoves Liste des mouvements possibles
+ * @param matrix Matrice du plateau
+ */
 void Piece::pawnMove2(int xStart, int yStart, std::vector<std::pair<int, int>>& possibleMoves, Piece* matrix[12][12]) {
     int xMove;
     int matrixStart = determineSubMatrix(xStart, yStart);
@@ -578,7 +719,20 @@ void Piece::pawnMove2(int xStart, int yStart, std::vector<std::pair<int, int>>& 
     }
 }
 
-
+/**
+ * @brief Vérifie et ajoute les captures en passant possibles
+ * 
+ * La prise en passant est possible si :
+ * - Le pion adverse vient d'avancer de deux cases
+ * - Le pion est adjacent au pion qui capture
+ * 
+ * @param x Position X du pion
+ * @param y Position Y du pion
+ * @param xMove Direction X
+ * @param yMove Direction Y
+ * @param moves Liste des mouvements possibles
+ * @param matrix Matrice du plateau
+ */
 void Piece::captureEnPassant(int x, int y, int xMove, int yMove, std::vector<std::pair<int, int>>& moves, Piece* matrix[12][12]){
     int xCapture = x + xMove;
     int yCapture = y + yMove;
@@ -594,6 +748,16 @@ void Piece::captureEnPassant(int x, int y, int xMove, int yMove, std::vector<std
     }
 }
 
+/**
+ * @brief Vérifie et ajoute les captures diagonales possibles pour un pion
+ * 
+ * @param x Position X du pion
+ * @param y Position Y du pion
+ * @param xMove Direction X
+ * @param yMove Direction Y
+ * @param moves Liste des mouvements possibles
+ * @param matrix Matrice du plateau
+ */
 void Piece::captureByPawn(int x, int y, int xMove, int yMove, std::vector<std::pair<int, int>>& moves, Piece* matrix[12][12]) {
     int xCapture = x + xMove;
     int yCapture = y + yMove;
@@ -607,6 +771,17 @@ void Piece::captureByPawn(int x, int y, int xMove, int yMove, std::vector<std::p
     }
 }
 
+/**
+ * @brief Gère les captures spéciales au centre du plateau
+ * 
+ * Le plateau Yalta a des règles spéciales pour les captures
+ * au centre du plateau (rosace).
+ * 
+ * @param x Position X de la pièce
+ * @param y Position Y de la pièce
+ * @param moves Liste des mouvements possibles
+ * @param matrix Matrice du plateau
+ */
 void Piece::captureOnBoardCenter(int x, int y, std::vector<std::pair<int, int>>& moves, Piece* matrix[12][12]) {
     std::vector<std::pair<int, int>> centerMoves;
 

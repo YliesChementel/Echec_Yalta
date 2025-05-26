@@ -1,3 +1,8 @@
+/**
+ * @file PromotionState.hpp
+ * @brief État du jeu gérant la promotion des pions
+ */
+
 #ifndef PROMOTIONSTATE_HPP
 #define PROMOTIONSTATE_HPP
 
@@ -8,11 +13,15 @@
 
 class PromotionState : public State {
 public:
+    /**
+     * @brief Gère la sélection de la pièce de promotion et le bouton retour
+     */
     void handleMousePressed(BoardController& controller, const sf::Event& event) override {
         sf::Vector2f mousePos = controller.getWindow().mapPixelToCoords(sf::Mouse::getPosition(controller.getWindow()));
         int choix = controller.PromotionChoix(mousePos);
         
         if (choix != -1) {
+            // Effectue la promotion du pion
             controller.getJeu().getBoard().PawnPromotion(
                 controller.getCoupEnAttentePromotion().first,
                 controller.getCoupEnAttentePromotion().second,
@@ -21,10 +30,12 @@ public:
                 controller.getJeu().getBoard().getMatrix()
             );
             
+            // Met à jour l'apparence de la pièce
             std::vector<PieceImage>& piecesCamp = *controller.getListePieces()[controller.getCouleurIndex()];
             piecesCamp[controller.getSelectedPieceIndex()].getSprite()
                 .setTexture(controller.getDrawBoard().getPromotionTexture(choix, controller.getCouleurIndex()), true);
             
+            // Retourne au mode de jeu approprié
             if(controller.isDebugMode()){
                 controller.setState(std::make_unique<DebugModeState>());
             }else{
@@ -44,6 +55,9 @@ public:
 
     void update(BoardController& controller, float deltaTime) override {}
 
+    /**
+     * @brief Dessine l'écran de promotion avec les choix de pièces
+     */
     void render(BoardController& controller) override {
         controller.getDrawBoard().clear();
         controller.getDrawBoard().drawHexagons(controller.getMakeBoard().getHexagon(), controller.getMakeBoard().getHexagon2());

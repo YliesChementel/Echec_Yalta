@@ -1,35 +1,68 @@
+/**
+ * @file DrawBoard.cpp
+ * @brief Implémentation de la classe DrawBoard pour le rendu graphique du plateau de jeu
+ */
+
 #include "include/DrawBoard.hpp"
 #include <iterator>
 #include <vector>
 #include <iostream>
 
+/**
+ * @brief Constructeur de la classe DrawBoard
+ * Initialise la fenêtre de rendu et charge les textures de promotion
+ * @param win Référence à la fenêtre de rendu SFML
+ */
 DrawBoard::DrawBoard(sf::RenderWindow& win) : window(win) { loadPromotionTextures(); }
 
+/**
+ * @brief Efface la fenêtre avec une couleur de fond
+ */
 void DrawBoard::clear() {
     this->window.clear(sf::Color(48, 46, 43));
 }
 
+/**
+ * @brief Met à jour l'affichage de la fenêtre
+ */
 void DrawBoard::display() {
     window.display();
 }
 
+/**
+ * @brief Dessine deux hexagones sur la fenêtre
+ * @param hex1 Premier hexagone à dessiner
+ * @param hex2 Deuxième hexagone à dessiner
+ */
 void DrawBoard::drawHexagons(const sf::ConvexShape& hex1, const sf::ConvexShape& hex2) {
     window.draw(hex1);
     window.draw(hex2);
 }
 
+/**
+ * @brief Dessine les lignes de connexion entre les hexagones
+ * @param lines Vecteur de paires de points définissant les lignes
+ */
 void DrawBoard::drawLines(const std::vector<std::array<sf::Vertex, 2>>& lines) {
     for (const auto& line : lines) {
         window.draw(line.data(), 2, sf::Lines);
     }
 }
 
+/**
+ * @brief Dessine un ensemble de textes sur la fenêtre
+ * @param texts Vecteur des textes à afficher
+ */
 void DrawBoard::drawText(const std::vector<sf::Text>& texts) {
     for (const auto& text : texts) {
         window.draw(text);
     }
 }
 
+/**
+ * @brief Dessine un texte centré horizontalement
+ * @param text Texte à afficher
+ */
 void DrawBoard::drawTextGame(sf::Text& text) {
     sf::FloatRect bounds = text.getLocalBounds();
     float x = (window.getSize().x - bounds.width) / 2.f - bounds.left;
@@ -39,7 +72,10 @@ void DrawBoard::drawTextGame(sf::Text& text) {
     window.draw(text);
 }
 
-
+/**
+ * @brief Dessine le plateau de jeu complet
+ * @param matrices Vecteur de matrices contenant les hexagones du plateau
+ */
 void DrawBoard::drawBoard(const std::vector<std::vector<sf::ConvexShape>>& matrices) {
     for (const auto& matrice : matrices) {
         for (const auto& losange : matrice) {
@@ -48,6 +84,12 @@ void DrawBoard::drawBoard(const std::vector<std::vector<sf::ConvexShape>>& matri
     }
 }
 
+/**
+ * @brief Dessine toutes les pièces sur le plateau
+ * @param whites Vecteur des pièces blanches
+ * @param blacks Vecteur des pièces noires
+ * @param reds Vecteur des pièces rouges
+ */
 void DrawBoard::drawPieces(const std::vector<PieceImage>& whites, const std::vector<PieceImage>& blacks, const std::vector<PieceImage>& reds) {
     for (const auto& piece : whites) {
         window.draw(piece.getSprite());
@@ -60,6 +102,10 @@ void DrawBoard::drawPieces(const std::vector<PieceImage>& whites, const std::vec
     }
 }
 
+/**
+ * @brief Assombrit la couleur d'une case
+ * @param losange Case à assombrir
+ */
 void DrawBoard::changeColorTileDark(sf::ConvexShape& losange) {
     sf::Color actuel = losange.getFillColor();
 
@@ -70,6 +116,10 @@ void DrawBoard::changeColorTileDark(sf::ConvexShape& losange) {
     losange.setFillColor(darkerColor);
 }
 
+/**
+ * @brief Éclaircit la couleur d'une case
+ * @param losange Case à éclaircir
+ */
 void DrawBoard::changeColorTileBright(sf::ConvexShape& losange) {
     sf::Color actuel = losange.getFillColor();
 
@@ -80,6 +130,12 @@ void DrawBoard::changeColorTileBright(sf::ConvexShape& losange) {
     losange.setFillColor(brighterColor);
 }
 
+/**
+ * @brief Crée un carré avec une image pour l'interface de promotion
+ * @param texture Texture à afficher
+ * @param position Position du carré
+ * @return Paire contenant le carré et le sprite
+ */
 std::pair<sf::RectangleShape, sf::Sprite> createImageSquare(sf::Texture& texture, const sf::Vector2f& position) {
     sf::RectangleShape square(sf::Vector2f(100, 100));
     square.setPosition(position);
@@ -97,6 +153,10 @@ std::pair<sf::RectangleShape, sf::Sprite> createImageSquare(sf::Texture& texture
     return {square, sprite};
 }
 
+/**
+ * @brief Dessine l'interface de promotion des pions
+ * @param camp Camp du joueur (0: blanc, 1: rouge, 2: noir)
+ */
 void DrawBoard::drawChoice(int camp) {
     std::vector<sf::Texture> texturesPromotion;
     promotionChoix.clear();
@@ -125,6 +185,10 @@ void DrawBoard::drawChoice(int camp) {
     window.draw(squareRook);   window.draw(spriteRook);
 }
 
+/**
+ * @brief Charge les textures pour l'interface de promotion
+ * Charge les textures des pièces pour chaque camp (blanc, rouge, noir)
+ */
 void DrawBoard::loadPromotionTextures() {
     std::vector<std::string> nomsFicherWhite = {
         "WhiteQueen.png",
@@ -170,6 +234,11 @@ void DrawBoard::loadPromotionTextures() {
     }
 }
 
+/**
+ * @brief Dessine un bouton retour avec son texte
+ * @param button Forme du bouton
+ * @param text Texte du bouton
+ */
 void DrawBoard::drawBackButton(const sf::RectangleShape& button, const sf::Text& text) {
     window.draw(button);
     window.draw(text);

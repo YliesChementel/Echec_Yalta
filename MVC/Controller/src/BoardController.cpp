@@ -1,3 +1,8 @@
+/**
+ * @file BoardController.cpp
+ * @brief Implémentation du contrôleur du plateau de jeu
+ */
+
 #include "include/BoardController.hpp"
 #include "include/PromotionState.hpp"
 #include "include/AiState.hpp"
@@ -5,7 +10,9 @@
 #include "include/DebugModeState.hpp"
 #include <iostream>
 
-
+/**
+ * @brief Constructeur initialisant le contrôleur du plateau
+ */
 BoardController::BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf::RenderWindow& window,Jeu& jeu, std::array<bool, 3> ia, bool debugMode)
     : makeBoard(makeBoard), drawBoard(drawBoard), window(window),jeu(jeu) , Dragging(false), selectedPieceIndex(-1),home(false) {
         handleSound(); 
@@ -24,11 +31,12 @@ BoardController::BoardController(MakeBoard& makeBoard, DrawBoard& drawBoard, sf:
                 setBaseText("L'IA Blanc réfléchit");
             }
             else makeBoard.setTextGame("Au tour du joueur Blanc");
-
         }
-        
     }
 
+/**
+ * @brief Boucle principale du contrôleur gérant les événements et les états
+ */
 void BoardController::run() {
         sf::Clock clock;
         while (window.isOpen()) {
@@ -53,6 +61,7 @@ void BoardController::run() {
             currentState->render(*this);
             drawBoard.display();
 
+            // Gestion du tour de l'IA
             if (!jeu.getBoard().isEndOfGame() && ia[tour] && !promotion) {
                 if (currentState->getStateName() != "Ai") {
                     setState(std::make_unique<AiState>());
@@ -72,28 +81,30 @@ void BoardController::run() {
                     iaEnCours = false;
                 }
             }
+            // Gestion du tour du joueur
             else if(!jeu.getBoard().isEndOfGame() && !ia[tour] && !promotion){
                 if(isDebugMode()){
                     setState(std::make_unique<DebugModeState>());
                 }
                 else{
                     setState(std::make_unique<PlayingState>());
-
                 }
             }
 
+            // Retour au menu
             if (home) {
                 stopAiThread = true;
                 if (aiThread.joinable()) {
-                    aiThread.join(); // Attend la fin du thread
+                    aiThread.join();
                 }
                 return;
             }
-            
         }
     }
 
-
+/**
+ * @brief Initialise la liste des pièces pour chaque couleur
+ */
 void BoardController::initListePieces() {
     listePieces = {
         &makeBoard.getWhitePieces(),
@@ -102,6 +113,10 @@ void BoardController::initListePieces() {
     };
 }
 
+/**
+ * @brief Trouve et sélectionne une pièce sous la souris
+ * @return true si une pièce a été sélectionnée
+ */
 bool BoardController::TrouverPieceSelectioner(std::vector<PieceImage>& liste, int listeIndex, sf::Vector2f mousePos) {
     for (int i = 0; i < liste.size(); ++i) {
         if (liste[i].getSprite().getGlobalBounds().contains(mousePos)) {
@@ -115,15 +130,19 @@ bool BoardController::TrouverPieceSelectioner(std::vector<PieceImage>& liste, in
     return false;
 }
 
+/**
+ * @brief Gère la capture d'une pièce
+ * @param positions Position de la pièce à capturer
+ */
 void BoardController::TrouverPieceCapture(std::vector<int> positions){
     for (int j = 0; j < listePieces.size(); ++j) {
-        if (j == couleurIndex) continue; // Ignore les pièces de la même couleur
+        if (j == couleurIndex) continue;
         std::vector<PieceImage>& piecesAdverses = *listePieces[j];
         for (int k = 0; k < piecesAdverses.size(); ++k) {
             std::vector<int> pos = piecesAdverses[k].getTilePositions();
             if (pos[0] == positions[0] && pos[1] == positions[1]) {
                 std::cout << "Piece capturee" << std::endl;
-                piecesAdverses.erase(piecesAdverses.begin() + k); // Supprimer la pièce adverse
+                piecesAdverses.erase(piecesAdverses.begin() + k);
                 if(k<rookRight){
                     rookRight--;
                 }
@@ -133,7 +152,10 @@ void BoardController::TrouverPieceCapture(std::vector<int> positions){
     }
 }
 
-
+/**
+ * @brief Place une pièce dans une matrice du plateau
+ * @return true si le placement a réussi
+ */
 bool BoardController::PlacerPieceDansMatrice(const std::vector<sf::ConvexShape>& matrix, int indexMatrice, const sf::Vector2f& mousePos) {
     if (makeBoard.PieceDansMatrice(mousePos, matrix)) {
         for (int i = 0; i < matrix.size(); ++i) {
@@ -153,6 +175,9 @@ bool BoardController::PlacerPieceDansMatrice(const std::vector<sf::ConvexShape>&
     return false;
 }
 
+/**
+ * @brief Remet les cases à leur couleur par défaut
+ */
 void BoardController::RemettreCouleurDefautCases(){
     for(const auto& tile : tilesToChangeColor) {
         drawBoard.changeColorTileBright(makeBoard.getMatrice(tile[1])[tile[0]]);
@@ -160,12 +185,18 @@ void BoardController::RemettreCouleurDefautCases(){
     tilesToChangeColor.clear();
 }
 
+/**
+ * @brief Gère le clic sur le bouton retour
+ */
 void BoardController::handleBackButtonClick(const sf::Vector2f& mousePos) {
     if (makeBoard.isMouseOverBackButton(mousePos)) {
         home = true;
     }
 }
 
+/**
+ * @brief Initialise le son de déplacement
+ */
 void BoardController::handleSound() {
     if (!this->buffer.loadFromFile("resources/sound/coup.ogg")) {
         throw std::runtime_error("Erreur de chargement du son!");
@@ -173,7 +204,9 @@ void BoardController::handleSound() {
     this->sound.setBuffer(this->buffer);
 }
 
-
+/**
+ * @brief Gère les coups possibles pour une pièce
+ */
 void BoardController::handleCoup(std::vector<int>& tilePositions) {
     std::pair<int, int> coupOrigine = makeBoard.indexEnCoordonneDePlateau(tilePositions[0], tilePositions[1]);
     this->possibleMoves = jeu.getBoard().MovePiece(coupOrigine.first,coupOrigine.second);
@@ -193,6 +226,10 @@ void BoardController::handleCoup(std::vector<int>& tilePositions) {
     }
 }
 
+/**
+ * @brief Vérifie et exécute un coup
+ * @return true si le coup est valide
+ */
 bool BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std::vector<int>& tilePositionsDestination){
     std::pair<int, int> coupOrigine = makeBoard.indexEnCoordonneDePlateau(tilePositionsOrigine[0], tilePositionsOrigine[1]);
     std::pair<int, int> coupDestination = makeBoard.indexEnCoordonneDePlateau(tilePositionsDestination[0], tilePositionsDestination[1]);
@@ -200,7 +237,6 @@ bool BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std
     if(coupOrigine!=coupDestination){
         for (const auto& coup : this->possibleMoves) {
             if(coupDestination==coup){
-
                if(jeu.getBoard().PawnOnEdge(coupOrigine.first,coupOrigine.second,coupDestination.first, jeu.getBoard().getMatrix())){
                     coupEnAttentePromotion = {coupDestination.first, coupDestination.second};
                     setState(std::make_unique<PromotionState>());
@@ -217,7 +253,10 @@ bool BoardController::handleCoupJouer(std::vector<int>& tilePositionsOrigine,std
     return false;
 }
 
-
+/**
+ * @brief Gère le choix de promotion d'un pion
+ * @return L'index du choix de promotion (-1 si aucun choix)
+ */
 int BoardController::PromotionChoix(const sf::Vector2f& mousePos) {
     for (auto& choix : drawBoard.promotionChoix) {
         if (choix.first.getGlobalBounds().contains(mousePos))
@@ -226,7 +265,9 @@ int BoardController::PromotionChoix(const sf::Vector2f& mousePos) {
     return -1;
 }
 
-
+/**
+ * @brief Passe au tour suivant
+ */
 void BoardController::finDeTour() {
     if(tour==0){
         tour++;
@@ -257,9 +298,9 @@ void BoardController::finDeTour() {
     }
 }
 
-
-
-
+/**
+ * @brief Gère les changements de position lors du roque
+ */
 void BoardController::caslingChanges(int matrix,std::vector<PieceImage>& listePieces){
     if(matrix==1){
         int tour = 0;
@@ -284,6 +325,9 @@ void BoardController::caslingChanges(int matrix,std::vector<PieceImage>& listePi
     }
 }
 
+/**
+ * @brief Gère les changements lors d'une prise en passant
+ */
 void BoardController::enPassantChanges(){
     std::vector<PieceImage>& piecesCamp = *listePieces[couleurIndex];
     int matrix = piecesCamp[selectedPieceIndex].getTilePositions()[1];
@@ -297,19 +341,21 @@ void BoardController::enPassantChanges(){
     else{ losange -=4; }
 
     for (int j = 0; j < listePieces.size(); ++j) {
-        if (j == couleurIndex) continue; // Ignore les pièces de la même couleur
+        if (j == couleurIndex) continue;
         std::vector<PieceImage>& ennemyPieces = *listePieces[j];
         for (int k = 0; k < ennemyPieces.size(); ++k) {
             std::vector<int> pos = ennemyPieces[k].getTilePositions();
             if (pos[0] == losange && pos[1] == matrix) {
-                ennemyPieces.erase(ennemyPieces.begin() + k); // Supprimer le pion arrière
+                ennemyPieces.erase(ennemyPieces.begin() + k);
                 break;
             }
         }
     }
 }
 
-
+/**
+ * @brief Exécute le coup calculé par l'IA
+ */
 void BoardController::aiMove(){    
     int IndexMatrixStart = makeBoard.determineSubMatrix(jeu.getBoard().getBestMoveStart().first, jeu.getBoard().getBestMoveStart().second);
     int IndexMatrixEnd = makeBoard.determineSubMatrix(jeu.getBoard().getBestMoveEnd().first, jeu.getBoard().getBestMoveEnd().second);
@@ -342,16 +388,6 @@ void BoardController::aiMove(){
         makeBoard.PlacementPieceAI(makeBoard.getBlackPieces(), IndexMatrixStart, IndexLosStart, IndexMatrixEnd, IndexLosEnd, selectedPieceIndex);
     }
 
-    /*if (jeu.getBoard().isCastling()) {
-        std::vector<PieceImage>& piecesCamp = *listePieces[couleurIndex];
-        caslingChanges(piecesCamp[selectedPieceIndex].getTilePositions()[1],piecesCamp);
-        jeu.getBoard().setCastling(false);
-    }
-    
-    if (jeu.getBoard().isEnPassantMove()) {
-        enPassantChanges();
-    }*/
-
     finDeTour();
     jeu.getBoard().Move(jeu.getBoard().getBestMoveStart().first, jeu.getBoard().getBestMoveStart().second, jeu.getBoard().getBestMoveEnd().first, jeu.getBoard().getBestMoveEnd().second, jeu.getPlayerList(), jeu.getBoard().getMatrix());
     TrouverPieceCapture({IndexLosEnd, IndexMatrixEnd});
@@ -377,7 +413,9 @@ void BoardController::aiMove(){
     }
 }
 
-
+/**
+ * @brief Initialise les confettis pour l'écran de victoire
+ */
 void BoardController::makeConfetto() {
     for (const auto& path : confettoPaths) {
         sf::Texture texture;
@@ -393,24 +431,32 @@ void BoardController::makeConfetto() {
             fallingConfetto.emplace_back(confettoTextures[i], x, 200.f); 
         }
     }
-};
+}
 
+/**
+ * @brief Met à jour l'état des confettis
+ */
 void BoardController::update(float deltaTime) {
     for (auto& confetto : fallingConfetto) {
         confetto.update(deltaTime);
     }
 } 
 
+/**
+ * @brief Joue le son de déplacement
+ */
 void BoardController::PlaySound() {
     if (this->sound.getStatus() != sf::Sound::Playing) {
         this->sound.play();
     }
 }
 
-
+/**
+ * @brief Démarre le calcul du coup de l'IA dans un thread séparé
+ */
 void BoardController::startAiMove() {
     if (aiThread.joinable()) {
-        aiThread.join(); // Assure qu'on ne lance pas un second thread sans avoir terminé le premier
+        aiThread.join();
     }
     aiMoveReady = false;
     aiCalculating = true;
@@ -428,5 +474,4 @@ void BoardController::startAiMove() {
             std::cerr << "Exception inconnue dans le thread IA" << std::endl;
         }
     });
-   // aiThread.detach(); 
 }

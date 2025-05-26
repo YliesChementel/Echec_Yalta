@@ -11,6 +11,8 @@ class Piece;
 class Plateau {
     public:
         Plateau();
+
+        // Méthodes de gestion du plateau
         void InitMatrix();
         void PlacePiece(Piece** whitePieces, Piece** redPieces, Piece** blackPieces);
         void AffichageMatrice(Piece* matrix[12][12]);
@@ -32,6 +34,7 @@ class Plateau {
         int minmax(Plateau plateau, int sideMove, int sideAi, int depth, int OrignialDepth, int alpha, int beta, Joueur* players, std::atomic<bool>& stopFlag);
         Plateau* clone();
 
+        // Getters
         Piece* getMatrix(int x, int y) const { return matrix[x][y]; }
         Piece* (*getMatrix())[12] { return matrix; }
         const std::vector<std::string>& getSidesInCheck() const { return sidesInCheck; }
@@ -46,6 +49,7 @@ class Plateau {
         const std::pair<int, int>& getBestMoveStart() const { return bestMoveStart; }
         const std::pair<int, int>& getBestMoveEnd() const { return bestMoveEnd; }
 
+        // Setters
         void setMatrix(int x, int y, Piece* piece) { matrix[x][y] = piece; }
         void setSidesInCheck(const std::vector<std::string>& sidesInCheck) { this->sidesInCheck = sidesInCheck; }
         void setWinner(const std::string& winner) { this->winner = winner; }
@@ -60,18 +64,18 @@ class Plateau {
         void setBestMoveEnd(const std::pair<int, int>& bestMoveEnd) { this->bestMoveEnd = bestMoveEnd; }
 
     private:
-        Piece* matrix[12][12];
-        std::vector<std::string> sidesInCheck;
-        std::string winner;
-        bool endOfGame;
-        bool stalemate;
-        bool castling;
-        bool isEnPassant;
-        bool whiteEnPassant;
-        bool redEnPassant;
-        bool blackEnPassant;
-        std::pair<int, int> bestMoveStart;
-        std::pair<int, int> bestMoveEnd;
+        Piece* matrix[12][12]; // Matrice 12x12 représentant le plateau de jeu, chaque case contient un pointeur vers une pièce ou nullptr
+        std::vector<std::string> sidesInCheck; // Liste des couleurs (joueurs) actuellement en échec
+        std::string winner; // Nom du joueur gagnant à la fin de la partie
+        bool endOfGame; // Indique si la partie est terminée (échec et mat ou pat)
+        bool stalemate; // Indique si la partie s'est terminée par un pat (aucun coup légal mais pas d'échec)
+        bool castling; // Indique si un roque (castling) est en cours
+        bool isEnPassant; // Indique si une prise en passant est possible pour le prochain coup
+        bool whiteEnPassant; // Indique si une prise en passant est possible pour le joueur blanc
+        bool redEnPassant; // Indique si une prise en passant est possible pour le joueur rouge
+        bool blackEnPassant; // Indique si une prise en passant est possible pour le joueur noir
+        std::pair<int, int> bestMoveStart; // Coordonnées du meilleur coup de départ trouvé par l'IA (minmax)
+        std::pair<int, int> bestMoveEnd; // Coordonnées du meilleur coup d'arrivée trouvé par l'IA (minmax)
 };
 
 #endif

@@ -1,57 +1,77 @@
+/**
+ * @file MakeBoard.cpp
+ * @brief Implémentation de la classe MakeBoard pour la création et la gestion du plateau de jeu
+ */
+
 #include "include/MakeBoard.hpp"
 #include <cmath>
 #include <iostream>
 #include <locale>
 #include <codecvt>
 
-const float PI = 3.14159265359f;
+const float PI = 3.14159265359f;  ///< Constante Pi pour les calculs trigonométriques
 
+/**
+ * @brief Constructeur de la classe MakeBoard
+ * 
+ * Initialise le plateau de jeu en créant :
+ * - Les hexagones extérieur et intérieur
+ * - Les lignes de séparation
+ * - Les matrices de losanges
+ * - Les textes de coordonnées
+ * - Les pièces pour chaque camp
+ */
 MakeBoard::MakeBoard() {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Création de l'héxagon du plateau
-    std::vector<float> side_lengths = {450, 460, 460, 450, 460, 460};
-    std::vector<sf::Vector2f> points;
-    float angle = 0;
-    sf::Vector2f origin(350, 150);
+    std::vector<float> side_lengths = {450, 460, 460, 450, 460, 460};  // Longueurs des côtés de l'hexagone
+    std::vector<sf::Vector2f> points;  // Points de l'hexagone
+    float angle = 0;  // Angle initial
+    sf::Vector2f origin(350, 150);  // Point d'origine
     points.push_back(origin + sf::Vector2f(side_lengths[0], 0));
     
+    // Calcul des points de l'hexagone
     for (int i = 1; i < 6; i++) {
         angle += PI / 3;
         points.push_back(points.back() + sf::Vector2f(std::cos(angle), std::sin(angle)) * side_lengths[i]);
     }
 
+    // Configuration de l'hexagone extérieur
     this->hexagon.setPointCount(6);
     for (size_t i = 0; i < 6; i++) this->hexagon.setPoint(i, points[i]);
     this->hexagon.setFillColor(sf::Color::Transparent);
     this->hexagon.setOutlineColor(sf::Color::White);
     this->hexagon.setOutlineThickness(2);
 
+    // Calcul du centre de l'hexagone
     sf::Vector2f center(0, 0);
     for (const auto& p : points) center += p;
     center /= static_cast<float>(points.size());
 
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Création de l'héxagon 2
+    // Création de l'héxagon 2 (intérieur)
     std::vector<sf::Vector2f> points2;
-    std::vector<float> side_lengths2 = {500, 510, 510, 500, 510, 510};
+    std::vector<float> side_lengths2 = {500, 510, 510, 500, 510, 510};  // Longueurs des côtés du deuxième hexagone
     points2.push_back(origin + sf::Vector2f(side_lengths2[0], 0));
     
+    // Calcul des points du deuxième hexagone
     for (int i = 1; i < 6; i++) {
         angle += PI / 3;
         points2.push_back(points2.back() + sf::Vector2f(std::cos(angle), std::sin(angle)) * side_lengths2[i]);
     }
 
+    // Calcul du centre du deuxième hexagone
     sf::Vector2f center2(0, 0);
     for (const auto& p : points2) center2 += p;
     center2 /= static_cast<float>(points2.size());
 
-    // Déplacer tous les points de l'héxagone 2 pour qu'il soit centré sur le même point que l'héxagone 1
+    // Alignement des deux hexagones
     sf::Vector2f offset = center - center2; 
     for (auto& p : points2) {
-        p += offset;  // Appliquer l'offset à chaque point
+        p += offset;
     }
 
+    // Configuration du deuxième hexagone
     this->hexagon2.setPointCount(6);
     for (size_t i = 0; i < 6; i++) this->hexagon2.setPoint(i, points2[i]);
     this->hexagon2.setFillColor(sf::Color::White);
@@ -76,7 +96,7 @@ MakeBoard::MakeBoard() {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Création des lignes des matrices pour créer les losanges en leurs donnant une position sur ces lignes
+    // Création des lignes des matrices pour créer les losanges
     std::vector<sf::Vector2f> mat1_lines = createMatrixLines(center, milieux[1], milieux[0], points[3], points[4], points[2]);
     std::vector<sf::Vector2f> mat2_lines = createMatrixLines(center, milieux[5], milieux[1], points[2], points[3], points[1]);
     std::vector<sf::Vector2f> mat3_lines = createMatrixLines(center, milieux[0], milieux[4], points[4], points[5], points[3]);
@@ -84,11 +104,10 @@ MakeBoard::MakeBoard() {
     std::vector<sf::Vector2f> mat5_lines = createMatrixLines(center, milieux[2], milieux[5], points[1], points[2], points[0]);
     std::vector<sf::Vector2f> mat6_lines = createMatrixLines(center, milieux[3], milieux[2], points[0], points[1], points[5]);
 
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Création des losanges
-    sf::Color blanc(0xFE, 0xF7, 0xE5);
-    sf::Color beige(0xEE, 0xCF, 0xA1);
+    // Création des losanges pour chaque matrice
+    sf::Color blanc(0xFE, 0xF7, 0xE5);  // Couleur claire
+    sf::Color beige(0xEE, 0xCF, 0xA1);  // Couleur foncée
     this->matrice1 = createMatrixLosange(center,mat1_lines, points[3], milieux[1], milieux[0], beige, blanc);
     this->matrice2 = createMatrixLosange(center,mat2_lines, points[2], milieux[5], milieux[1], blanc, beige);
     this->matrice3 = createMatrixLosange(center,mat3_lines, points[4], milieux[0], milieux[4], blanc, beige);
@@ -102,6 +121,7 @@ MakeBoard::MakeBoard() {
         throw std::runtime_error("Error loading font!");
     }
 
+    // Définition des coordonnées pour chaque bord du plateau
     std::vector<std::string> lettresBas = {"a", "b", "c", "d", "e", "f", "g", "h"};
     std::vector<std::string> lettresHaut = {"8", "7", "6", "5", "9", "10", "11", "12"};
     std::vector<std::string> chiffresBasGauche = {"1", "2", "3", "4", "5", "6", "7", "8"};
@@ -109,6 +129,7 @@ MakeBoard::MakeBoard() {
     std::vector<std::string> lettresHautGauche = {"l", "k", "j", "i", "d", "c", "b", "a"};
     std::vector<std::string> lettresBasDroite = {"1", "2", "3", "4", "9", "10", "11", "12"};
 
+    // Positionnement des textes de coordonnées
     sf::Vector2f startBas = milieu(points[3], points2[4]) - sf::Vector2f(-30, 18);
     sf::Vector2f startHaut = milieu(points[5], points2[0]) - sf::Vector2f(-30, 18);
     sf::Vector2f startBasGauche = milieu(points[4], points2[5]) + sf::Vector2f(213, 370);
@@ -116,6 +137,7 @@ MakeBoard::MakeBoard() {
     sf::Vector2f startHautGauche = milieu(points[5], points2[0]) - sf::Vector2f(35, -15);
     sf::Vector2f startBasDroite = milieu(points[2], points2[3]) + sf::Vector2f(7, -55);
 
+    // Création des textes de coordonnées
     for (size_t i = 0; i < 8; ++i) {
         this->coordText.push_back(createText(lettresBas[i], startBas + sf::Vector2f(i * 57.0f, 0.0f), 28, sf::Color::Black, this->font));
         if(i > 4) {
@@ -129,7 +151,6 @@ MakeBoard::MakeBoard() {
         this->coordText.push_back(createText(lettresHautGauche[i], startHautGauche + sf::Vector2f(7 - i * 29.0f, i * 50.0f), 28, sf::Color::Black, this->font));
         if(i > 4) {
             this->coordText.push_back(createText(lettresBasDroite[i], startBasDroite + sf::Vector2f(i * 28.0f, 7 - i * 50.0f), 28, sf::Color::Black, this->font));
-
         }
         else {
             this->coordText.push_back(createText(lettresBasDroite[i], startBasDroite + sf::Vector2f(i * 29.0f, 7 - i * 50.0f), 28, sf::Color::Black, this->font));
@@ -138,6 +159,7 @@ MakeBoard::MakeBoard() {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Création des pièces du jeu
+    // Chargement des textures et création des pièces pour chaque camp
     std::vector<std::string> texturePathWhite = {
         "WhiteRook.png", "WhiteKnight.png", "WhiteBishop.png", "WhiteQueen.png",
         "WhiteKing.png", "WhiteBishop.png", "WhiteKnight.png", "WhiteRook.png",
@@ -165,6 +187,7 @@ MakeBoard::MakeBoard() {
     this->texturesBlack = loadTextures(texturePathBlack);
     this->BlackPieces = CreerPiece(this->matrice5, this->matrice6, 5, 6,texturesBlack,"Black");
 
+    // Initialisation des textes et du bouton retour
     setTextGame("Bienvenue sur le jeu Yalta !"); 
     setTextEchec(""); 
 
@@ -176,28 +199,62 @@ MakeBoard::MakeBoard() {
     backButtonText = createText("Accueil", sf::Vector2f(1063, 12), 20, sf::Color::Black, font);
 }
 
-
+/**
+ * @brief Calcule le point milieu entre deux points
+ * @param p1 Premier point
+ * @param p2 Deuxième point
+ * @return Point milieu
+ */
 sf::Vector2f MakeBoard::milieu(const sf::Vector2f& p1, const sf::Vector2f& p2) {
     return (p1 + p2) / 2.0f;
 }
 
+/**
+ * @brief Crée une ligne entre deux points
+ * @param start Point de départ
+ * @param end Point d'arrivée
+ * @param color Couleur de la ligne
+ * @return Tableau de deux sommets formant la ligne
+ */
 std::array<sf::Vertex, 2> MakeBoard::createLine(const sf::Vector2f& start, const sf::Vector2f& end, sf::Color color) {
     return {sf::Vertex(start, color), sf::Vertex(end, color)};
 }
 
+/**
+ * @brief Crée les lignes d'une matrice
+ * @param center Centre de la matrice
+ * @param milieu1 Premier point milieu
+ * @param milieu2 Deuxième point milieu
+ * @param point1 Premier point
+ * @param point2 Deuxième point
+ * @param point3 Troisième point
+ * @return Vecteur des points formant les lignes
+ */
 std::vector<sf::Vector2f> MakeBoard::createMatrixLines(const sf::Vector2f& center, const sf::Vector2f& milieu1,const sf::Vector2f& milieu2, const sf::Vector2f& point1, const sf::Vector2f& point2, const sf::Vector2f& point3) {
     std::vector<sf::Vector2f> lines;
-        for (float ratio : {0.25f, 0.50f, 0.75f}) {
-            lines.push_back(center + ratio * (milieu1 - center));
-            lines.push_back((1 - (1 - ratio) / 2) * point1 + ((1 - ratio) / 2) * point2);
-        }
-        for (float ratio : {0.25f, 0.50f, 0.75f}) {
-            lines.push_back(center + ratio * (milieu2 - center));
-            lines.push_back((1 - (1 + ratio) / 2) * point3 + ((1 + ratio) / 2) * point1);
-        }
+    // Création des lignes pour la première partie de la matrice
+    for (float ratio : {0.25f, 0.50f, 0.75f}) {
+        lines.push_back(center + ratio * (milieu1 - center));
+        lines.push_back((1 - (1 - ratio) / 2) * point1 + ((1 - ratio) / 2) * point2);
+    }
+    // Création des lignes pour la deuxième partie de la matrice
+    for (float ratio : {0.25f, 0.50f, 0.75f}) {
+        lines.push_back(center + ratio * (milieu2 - center));
+        lines.push_back((1 - (1 + ratio) / 2) * point3 + ((1 + ratio) / 2) * point1);
+    }
     return lines;
 }
 
+/**
+ * @brief Crée un losange
+ * @param p1 Premier point
+ * @param p2 Deuxième point
+ * @param p3 Troisième point
+ * @param p4 Quatrième point
+ * @param fill Couleur de remplissage
+ * @param outline Couleur du contour
+ * @return Losange créé
+ */
 sf::ConvexShape MakeBoard::createLosange(const sf::Vector2f& p1, const sf::Vector2f& p2, const sf::Vector2f& p3, const sf::Vector2f& p4, sf::Color fill, sf::Color outline) {
     sf::ConvexShape losange;
     losange.setPointCount(4);
@@ -211,8 +268,20 @@ sf::ConvexShape MakeBoard::createLosange(const sf::Vector2f& p1, const sf::Vecto
     return losange;
 }
 
-std::vector<sf::ConvexShape> MakeBoard::createMatrixLosange( const sf::Vector2f& center,const std::vector<sf::Vector2f>& mat_lines, const sf::Vector2f& point, const sf::Vector2f& milieu1, const sf::Vector2f& milieu2,sf::Color color1,sf::Color color2) {
+/**
+ * @brief Crée une matrice de losanges
+ * @param center Centre de la matrice
+ * @param mat_lines Lignes de la matrice
+ * @param point Point de référence
+ * @param milieu1 Premier point milieu
+ * @param milieu2 Deuxième point milieu
+ * @param color1 Première couleur
+ * @param color2 Deuxième couleur
+ * @return Vecteur des losanges créés
+ */
+std::vector<sf::ConvexShape> MakeBoard::createMatrixLosange(const sf::Vector2f& center, const std::vector<sf::Vector2f>& mat_lines, const sf::Vector2f& point, const sf::Vector2f& milieu1, const sf::Vector2f& milieu2, sf::Color color1, sf::Color color2) {
     std::vector<sf::ConvexShape> shapes;
+    // Création des losanges pour chaque section de la matrice
     shapes.push_back(createLosange(center, mat_lines[0], mat_lines[6] + 0.25f * (mat_lines[7] - mat_lines[6]), mat_lines[6], color1, sf::Color::Black));
     shapes.push_back(createLosange(mat_lines[0], mat_lines[2], mat_lines[6] + 0.5f * (mat_lines[7] - mat_lines[6]), mat_lines[6] + 0.25f * (mat_lines[7] - mat_lines[6]), color2, sf::Color::Black));
     shapes.push_back(createLosange(mat_lines[2], mat_lines[4], mat_lines[6] + 0.75f * (mat_lines[7] - mat_lines[6]), mat_lines[6] + 0.5f * (mat_lines[7] - mat_lines[6]), color1, sf::Color::Black));
@@ -235,7 +304,15 @@ std::vector<sf::ConvexShape> MakeBoard::createMatrixLosange( const sf::Vector2f&
     return shapes;
 }
 
-
+/**
+ * @brief Crée un texte
+ * @param textStr Texte à afficher
+ * @param startPosition Position de départ
+ * @param characterSize Taille des caractères
+ * @param color Couleur du texte
+ * @param font Police à utiliser
+ * @return Texte créé
+ */
 sf::Text MakeBoard::createText(const std::string& textStr, const sf::Vector2f& startPosition, unsigned int characterSize, sf::Color color, sf::Font& font) {
     sf::Text text;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -248,6 +325,11 @@ sf::Text MakeBoard::createText(const std::string& textStr, const sf::Vector2f& s
     return text;
 }
 
+/**
+ * @brief Calcule le centre d'un losange
+ * @param shape Losange
+ * @return Point central
+ */
 sf::Vector2f MakeBoard::calculerCentreLosange(const sf::ConvexShape& shape) {
     sf::Vector2f centre;
     const sf::Vector2f& A = shape.getPoint(0);
@@ -257,7 +339,14 @@ sf::Vector2f MakeBoard::calculerCentreLosange(const sf::ConvexShape& shape) {
     return centre;
 }
 
-// Fonction pour charger une image et la centrer dans un losange (sf::ConvexShape)
+/**
+ * @brief Charge une image dans un losange
+ * @param shape Losange cible
+ * @param scaleX Échelle horizontale
+ * @param scaleY Échelle verticale
+ * @param texture Texture à charger
+ * @return Sprite créé
+ */
 sf::Sprite MakeBoard::chargerImageDansLosange(const sf::ConvexShape& shape, float scaleX, float scaleY, sf::Texture& texture) {
     sf::Sprite sprite;
     sprite.setTexture(texture);
@@ -265,10 +354,14 @@ sf::Sprite MakeBoard::chargerImageDansLosange(const sf::ConvexShape& shape, floa
     sf::Vector2f centre = calculerCentreLosange(shape);
     sf::FloatRect bounds = sprite.getGlobalBounds();
     sprite.setPosition(centre.x - bounds.width / 2.0f, centre.y - bounds.height / 2.0f);
-
     return sprite;
 }
 
+/**
+ * @brief Charge les textures des pièces
+ * @param filePaths Chemins des fichiers de textures
+ * @return Vecteur des textures chargées
+ */
 std::vector<sf::Texture> MakeBoard::loadTextures(const std::vector<std::string>& filePaths) {
     std::vector<sf::Texture> textures;
     for (const auto& path : filePaths) {
@@ -281,28 +374,46 @@ std::vector<sf::Texture> MakeBoard::loadTextures(const std::vector<std::string>&
     return textures;
 }
 
+/**
+ * @brief Crée les pièces pour un camp
+ * @param matriceA Première matrice
+ * @param matriceB Deuxième matrice
+ * @param positionMatriceA Position dans la première matrice
+ * @param positionMatriceB Position dans la deuxième matrice
+ * @param textures Textures des pièces
+ * @param camp Camp des pièces
+ * @return Vecteur des pièces créées
+ */
 std::vector<PieceImage> MakeBoard::CreerPiece(const std::vector<sf::ConvexShape> matriceA, const std::vector<sf::ConvexShape> matriceB, int positionMatriceA, int positionMatriceB, std::vector<sf::Texture>& textures,std::string camp) {
     std::vector<PieceImage> pieceImage;
-    sf:: Texture texture;
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[15], 0.2f, 0.2f,textures[0]),std::vector<int>{15, positionMatriceA},camp));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[11], 0.2f, 0.2f, textures[1]),std::vector<int>{11, positionMatriceA},camp));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[7], 0.2f, 0.2f, textures[2]),std::vector<int>{7, positionMatriceA},camp));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[3], 0.2f, 0.2f, textures[3]),std::vector<int>{3, positionMatriceA},camp));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[12], 0.2f, 0.2f, textures[4]),std::vector<int>{12, positionMatriceB},camp));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[13], 0.2f, 0.2f, textures[5]),std::vector<int>{13, positionMatriceB},camp));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[14], 0.2f, 0.2f, textures[6]),std::vector<int>{14, positionMatriceB},camp));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[15], 0.2f, 0.2f, textures[7]),std::vector<int>{15, positionMatriceB},camp));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[14], 0.2f, 0.2f, textures[8]),std::vector<int>{14, positionMatriceA},camp));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[10], 0.2f, 0.2f, textures[9]),std::vector<int>{10, positionMatriceA},camp));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[6], 0.2f, 0.2f, textures[10]),std::vector<int>{6, positionMatriceA},camp));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceA[2], 0.2f, 0.2f, textures[11]),std::vector<int>{2, positionMatriceA},camp));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[8], 0.2f, 0.2f, textures[12]),std::vector<int>{8, positionMatriceB},camp));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[9], 0.2f, 0.2f, textures[13]),std::vector<int>{9, positionMatriceB},camp));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[10], 0.2f, 0.2f, textures[14]),std::vector<int>{10, positionMatriceB},camp));
-    pieceImage.push_back(PieceImage(chargerImageDansLosange( matriceB[11], 0.2f, 0.2f, textures[15]),std::vector<int>{11, positionMatriceB},camp));
+    sf::Texture texture;
+    // Création des pièces majeures (tours, cavaliers, fous, reine, roi)
+    pieceImage.push_back(PieceImage(chargerImageDansLosange(matriceA[15], 0.2f, 0.2f,textures[0]),std::vector<int>{15, positionMatriceA},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange(matriceA[11], 0.2f, 0.2f, textures[1]),std::vector<int>{11, positionMatriceA},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange(matriceA[7], 0.2f, 0.2f, textures[2]),std::vector<int>{7, positionMatriceA},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange(matriceA[3], 0.2f, 0.2f, textures[3]),std::vector<int>{3, positionMatriceA},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange(matriceB[12], 0.2f, 0.2f, textures[4]),std::vector<int>{12, positionMatriceB},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange(matriceB[13], 0.2f, 0.2f, textures[5]),std::vector<int>{13, positionMatriceB},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange(matriceB[14], 0.2f, 0.2f, textures[6]),std::vector<int>{14, positionMatriceB},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange(matriceB[15], 0.2f, 0.2f, textures[7]),std::vector<int>{15, positionMatriceB},camp));
+    // Création des pions
+    pieceImage.push_back(PieceImage(chargerImageDansLosange(matriceA[14], 0.2f, 0.2f, textures[8]),std::vector<int>{14, positionMatriceA},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange(matriceA[10], 0.2f, 0.2f, textures[9]),std::vector<int>{10, positionMatriceA},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange(matriceA[6], 0.2f, 0.2f, textures[10]),std::vector<int>{6, positionMatriceA},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange(matriceA[2], 0.2f, 0.2f, textures[11]),std::vector<int>{2, positionMatriceA},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange(matriceB[8], 0.2f, 0.2f, textures[12]),std::vector<int>{8, positionMatriceB},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange(matriceB[9], 0.2f, 0.2f, textures[13]),std::vector<int>{9, positionMatriceB},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange(matriceB[10], 0.2f, 0.2f, textures[14]),std::vector<int>{10, positionMatriceB},camp));
+    pieceImage.push_back(PieceImage(chargerImageDansLosange(matriceB[11], 0.2f, 0.2f, textures[15]),std::vector<int>{11, positionMatriceB},camp));
     return pieceImage;
 }
 
+/**
+ * @brief Vérifie si un point est dans une matrice
+ * @param point Point à vérifier
+ * @param matrice Matrice à tester
+ * @return true si le point est dans la matrice
+ */
 bool MakeBoard::PieceDansMatrice(const sf::Vector2f& point, const std::vector<sf::ConvexShape> matrice){
     std::vector<sf::Vector2i> polygon = {
         sf::Vector2i(matrice[0].getPoint(0).x, matrice[0].getPoint(0).y),
@@ -312,6 +423,7 @@ bool MakeBoard::PieceDansMatrice(const sf::Vector2f& point, const std::vector<sf
     };
     bool inside = false;
 
+    // Algorithme du ray casting pour déterminer si le point est dans le polygone
     for (int i = 0, j = 4 - 1; i < 4; j = i++) {
         if ((point.y > polygon[i].y) != (point.y > polygon[j].y) &&(point.x < (polygon[j].x - polygon[i].x) * (point.y - polygon[i].y) / (polygon[j].y - polygon[i].y) + polygon[i].x)) {
             inside = !inside;
@@ -321,15 +433,20 @@ bool MakeBoard::PieceDansMatrice(const sf::Vector2f& point, const std::vector<sf
     return inside;
 }
 
+/**
+ * @brief Vérifie si un point est dans un losange
+ * @param shape Losange à tester
+ * @param point Point à vérifier
+ * @return true si le point est dans le losange
+ */
 bool MakeBoard::PieceDansLosange(const sf::ConvexShape& shape, const sf::Vector2f& point){
     int n = shape.getPointCount();
     bool inside = false;
-    // On parcourt les bords du polygone (les segments entre les points successifs)
+    // Algorithme du ray casting pour déterminer si le point est dans le losange
     for (int i = 0, j = n - 1; i < n; j = i++) {
         sf::Vector2f p1 = shape.getPoint(i);
         sf::Vector2f p2 = shape.getPoint(j);
 
-        // Vérification si le point est à l'intérieur du polygone en utilisant l'algorithme du ray-casting
         if (((p1.y > point.y) != (p2.y > point.y)) &&
             (point.x < (p2.x - p1.x) * (point.y - p1.y) / (p2.y - p1.y) + p1.x)) {
             inside = !inside;
@@ -339,7 +456,11 @@ bool MakeBoard::PieceDansLosange(const sf::ConvexShape& shape, const sf::Vector2
     return inside;
 }
 
-
+/**
+ * @brief Obtient une matrice par son index
+ * @param index Index de la matrice
+ * @return Référence à la matrice demandée
+ */
 std::vector<sf::ConvexShape>& MakeBoard::getMatrice(int index) {
     switch(index) {
         case 1: return matrice1;
@@ -352,12 +473,17 @@ std::vector<sf::ConvexShape>& MakeBoard::getMatrice(int index) {
     }
 }
 
-
-
-// Fonction pour placer la pièce à sa position à la nouvelle position si coup valide 
+/**
+ * @brief Place une pièce sur le plateau
+ * @param selectedPieceIndex Index de la pièce sélectionnée
+ * @param losange Losange cible
+ * @param listePieces Liste des pièces
+ * @param IndexMat Index de la matrice
+ * @param IndexLos Index du losange
+ */
 void MakeBoard::PlacementPiece(int& selectedPieceIndex, const sf::ConvexShape& losange, std::vector<PieceImage>& listePieces, int IndexMat,int IndexLos) {
     sf::Vector2f centre = calculerCentreLosange(losange);
-    // Modifier la position en fonction du type de pièce
+    // Positionnement de la pièce au centre du losange
     listePieces[selectedPieceIndex].getSprite().setPosition(
         centre.x - listePieces[selectedPieceIndex].getSprite().getGlobalBounds().width / 2.0f,
         centre.y - listePieces[selectedPieceIndex].getSprite().getGlobalBounds().height / 2.0f
@@ -365,20 +491,32 @@ void MakeBoard::PlacementPiece(int& selectedPieceIndex, const sf::ConvexShape& l
     listePieces[selectedPieceIndex].setTilePositions({IndexLos,IndexMat});
 }
 
-// Fonction pour replacer la pièce à sa position d'origine si coup invalide
+/**
+ * @brief Replace une pièce à sa position d'origine
+ * @param selectedPieceIndex Index de la pièce
+ * @param camp Camp de la pièce
+ * @param matriceIndex Index de la matrice
+ * @param pieces Liste des pièces
+ */
 void MakeBoard::ReplacementPiece(int& selectedPieceIndex, int camp, int matriceIndex, std::vector<PieceImage>& pieces) {
     std::vector<std::vector<sf::ConvexShape>> matrices = {getMatrice1(), getMatrice2(), getMatrice3(), getMatrice4(), getMatrice5(), getMatrice6()};
     int tileIndex = pieces[selectedPieceIndex].getTilePositions()[0];
     const sf::ConvexShape& losange = matrices[matriceIndex - 1][tileIndex];
     sf::Vector2f centre = calculerCentreLosange(losange);
 
+    // Repositionnement de la pièce à sa position d'origine
     pieces[selectedPieceIndex].getSprite().setPosition(
         centre.x - pieces[selectedPieceIndex].getSprite().getGlobalBounds().width / 2.0f,
         centre.y - pieces[selectedPieceIndex].getSprite().getGlobalBounds().height / 2.0f
     );
 }
 
-
+/**
+ * @brief Détermine la sous-matrice à partir des coordonnées
+ * @param x Coordonnée X
+ * @param y Coordonnée Y
+ * @return Index de la sous-matrice
+ */
 int MakeBoard::determineSubMatrix(int x, int y) {
     if (x < 4 && y < 4) return 1; // haut gauche
     if (x < 4 && y >= 4 && y < 8) return 2; // haut milieu
@@ -389,6 +527,13 @@ int MakeBoard::determineSubMatrix(int x, int y) {
     return 0;
 }
 
+/**
+ * @brief Convertit des coordonnées en index de losange
+ * @param x Coordonnée X
+ * @param y Coordonnée Y
+ * @param matrice Index de la matrice
+ * @return Index du losange
+ */
 int MakeBoard::coordonneEnIndexDeLosange(int x, int y, int matrice) {
     if (matrice == 1) {
         return 15 - (x + 4 * y); //bon
@@ -411,9 +556,16 @@ int MakeBoard::coordonneEnIndexDeLosange(int x, int y, int matrice) {
     return -1;
 }
 
+/**
+ * @brief Convertit un index en coordonnées de plateau
+ * @param index Index à convertir
+ * @param sousMatrice Sous-matrice
+ * @return Paire de coordonnées (x, y)
+ */
 std::pair<int, int> MakeBoard::indexEnCoordonneDePlateau(int index, int sousMatrice) {
     int x, y;
     
+    // Conversion selon la sous-matrice
     if(sousMatrice == 1) {
         y = 3 - (index / 4);  // division entière pour obtenir la ligne
         x = 3 - (index % 4);  // reste pour obtenir la colonne
@@ -442,9 +594,17 @@ std::pair<int, int> MakeBoard::indexEnCoordonneDePlateau(int index, int sousMatr
     return {x, y};
 }
 
-
-
+/**
+ * @brief Place une pièce pour l'IA
+ * @param listePieces Liste des pièces
+ * @param IndexMatStart Index de la matrice de départ
+ * @param IndexLosStart Index du losange de départ
+ * @param IndexMatEnd Index de la matrice d'arrivée
+ * @param IndexLosEnd Index du losange d'arrivée
+ * @param selectedPieceIndex Index de la pièce sélectionnée
+ */
 void MakeBoard::PlacementPieceAI(std::vector<PieceImage>& listePieces, int IndexMatStart,int IndexLosStart,int IndexMatEnd,int IndexLosEnd,int& selectedPieceIndex) {
+    // Recherche de la pièce à déplacer
     int aiPieceIndex = -1;
     for(int i = 0; i < listePieces.size(); i++) {
         if (listePieces[i].getTilePositions()[0] == IndexLosStart && listePieces[i].getTilePositions()[1] == IndexMatStart) {
@@ -453,8 +613,8 @@ void MakeBoard::PlacementPieceAI(std::vector<PieceImage>& listePieces, int Index
         }
     }
 
+    // Déplacement de la pièce
     sf::ConvexShape losange = getMatrice(IndexMatEnd)[IndexLosEnd];
-
     sf::Vector2f centre = calculerCentreLosange(losange);
 
     listePieces[aiPieceIndex].getSprite().setPosition(
@@ -462,9 +622,13 @@ void MakeBoard::PlacementPieceAI(std::vector<PieceImage>& listePieces, int Index
         centre.y - listePieces[aiPieceIndex].getSprite().getGlobalBounds().height / 2.0f
         );
     listePieces[aiPieceIndex].setTilePositions({IndexLosEnd,IndexMatEnd});
-    //selectedPieceIndex = aiPieceIndex;
 }
 
+/**
+ * @brief Vérifie si la souris est sur le bouton retour
+ * @param mousePos Position de la souris
+ * @return true si la souris est sur le bouton
+ */
 bool MakeBoard::isMouseOverBackButton(const sf::Vector2f& mousePos) const {
     return backButton.getGlobalBounds().contains(mousePos);
 }
