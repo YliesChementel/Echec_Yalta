@@ -50,15 +50,12 @@ make
 ```
 
 2. Dans le menu principal, vous pouvez :
-   - Choisir quels joueurs seront contrôlés par l'IA (Il est possible que l'IA prenne du temps pour jouer son coup.)
+   - Choisir quels joueurs seront contrôlés par l'IA. (Il est possible que l'IA prenne du temps pour jouer son coup en difficulté supérieure.)
    - Activer le mode debug (optionnel)
    - Lancer une nouvelle partie
    - Quitter le jeu
 
-## Contrôles
-
-- Clic gauche : Sélectionner/déplacer une pièce
-- Échap : Retour au menu principal
+![Accueil](MVC/resources/images/ReadMeImages/accueil.gif)
 
 ## Mode Debug
 
